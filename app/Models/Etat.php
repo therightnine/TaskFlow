@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Projet;
 
 class Etat extends Model
 {
@@ -11,8 +12,8 @@ class Etat extends Model
 
     protected $fillable = ['etat'];
 
-    public function projects()
+    public function projets()
     {
-        return $this->hasMany(Project::class,'id_etat');
+        return $this->hasMany(Projet::class, 'id_etat');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
+use App\Models\Projet;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -52,7 +52,7 @@ public function addSupervisor(Request $request, Project $project)
 
     $superviseurs = $project->other_superviseurs ?? [];
 
-    
+
     if (!in_array($user->id, $superviseurs) && $user->id != $project->id_user) {
         $superviseurs[] = $user->id;
     }

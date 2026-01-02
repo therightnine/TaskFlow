@@ -6,6 +6,7 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'TaskFlow')</title>
 
@@ -17,13 +18,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#238899'
-                    },
+                    colors: { primary: '#238899' },
                     fontFamily: {
                         vietnam: ['Be Vietnam Pro', 'sans-serif'],
                         inter: ['Inter', 'sans-serif'],
@@ -48,60 +49,43 @@
 
         {{-- Menu --}}
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
-            <li>
-                <a href="{{ route('dashboard.chef') }}" class="flex items-center gap-4 py-3 px-4 rounded bg-primary text-white">
-                    <img src="{{ asset('images/ic_dashboard.png') }}" class="w-6 h-6">
-                    Dashboard
-                </a>
-            </li>
+            @php
+                $menuItems = [
+                    ['route' => 'dashboard.chef', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
+                    ['route' => 'chef.projects', 'icon' => 'ic_projects.png', 'label' => 'Projects'],
+                    ['route' => 'chef.tasks', 'icon' => 'ic_teams.png', 'label' => 'Tasks'],
+                    ['route' => 'chef.team', 'icon' => 'ic_teams.png', 'label' => 'Teams'],
+                    ['route' => 'chef.reports', 'icon' => 'ic_reports.png', 'label' => 'Reports'],
+                    ['route' => 'chef.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
+                    ['route' => 'chef.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
+                ];
+            @endphp
 
-            <li>
-                <a href="{{ route('projects.index') }}" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_projects.png') }}" class="w-6 h-6">
-                    Projects
-                </a>
-            </li>
+            @foreach($menuItems as $item)
+                @php
+                    $active = $item['route'] === 'chef.settings'
+                        ? Route::is('chef.settings') || Route::is('chef.profile')
+                        : Route::is($item['route']);
+                @endphp
+                <li>
+                    <a href="{{ route($item['route']) }}"
+                       class="flex items-center gap-4 py-3 px-4 rounded transition
+                              {{ $active ? 'bg-primary text-white' : 'hover:text-primary' }}">
+                        <img src="{{ asset('images/' . $item['icon']) }}"
+                             class="w-6 h-6 transition-all"
+                             style="{{ $active ? 'filter: brightness(0) invert(1);' : '' }}">
+                        {{ $item['label'] }}
+                    </a>
+                </li>
+            @endforeach
 
-            <li>
-                <a href="" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_teams.png') }}" class="w-6 h-6">
-                    Tasks
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('chef.team') }}" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_teams.png') }}" class="w-6 h-6">
-                    Teams
-                </a>
-            </li>
-
-            <li>
-                <a href="" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_reports.png') }}" class="w-6 h-6">
-                    Reports
-                </a>
-            </li>
-
-            <li>
-                <a href="" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_messages.png') }}" class="w-6 h-6">
-                    Messages
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('chef.settings') }}" class="flex items-center gap-4 py-3 px-4 rounded hover:text-primary transition">
-                    <img src="{{ asset('images/ic_settings.png') }}" class="w-6 h-6">
-                    Settings
-                </a>
-            </li>
-
+            {{-- Sign Out --}}
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="flex items-center gap-4 py-3 px-4 w-full text-gray-600 hover:text-primary rounded transition">
-                        <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6">
+                    <button type="submit"
+                            class="flex items-center gap-4 py-3 px-4 w-full text-gray-600 hover:text-primary rounded transition">
+                        <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6 transition-all">
                         Sign Out
                     </button>
                 </form>
@@ -114,19 +98,18 @@
 
         {{-- TOP MENU --}}
         <header class="h-20 bg-white shadow-sm flex items-center px-8">
-
-            {{-- PAGE TITLE --}}
             <h1 class="text-xl font-semibold text-gray-800">
                 @yield('page-title', 'Projets')
             </h1>
 
-            {{-- SEARCH CENTER --}}
+            {{-- SEARCH --}}
             <div class="flex-1 flex justify-center">
                 <div class="relative w-[420px]">
                     <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
-                    <input type="text" placeholder="Search here..." class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <input type="text" placeholder="Search here..."
+                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
             </div>
 
@@ -134,32 +117,36 @@
             <div class="flex items-center gap-6">
                 <div class="relative">
                     <button id="userDropdownBtn" class="flex items-center gap-3 cursor-pointer focus:outline-none">
-                        <img src="{{ $user && $user->photo ? asset($user->photo) : asset('images/default-avatar.png') }}" class="w-10 h-10 rounded-full object-cover">
+                        <img src="{{ $user && $user->photo ? asset($user->photo) : asset('images/default-avatar.png') }}"
+                             class="w-10 h-10 rounded-full object-cover">
                         <div class="leading-tight">
                             <p class="text-sm font-semibold text-gray-800">
                                 {{ $user->prenom ?? '' }} {{ $user->nom ?? '' }}
                             </p>
-                            <p class="text-xs text-gray-400">Créateur de projet</p>
+                            <p class="text-xs text-gray-400">Chef de projet</p>
                         </div>
                         <span class="text-gray-400">▾</span>
                     </button>
 
-                    <div id="userDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
+                    <div id="userDropdownMenu"
+                         class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
                         <ul class="py-2">
                             <li>
-                                <a href="" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <a href="{{ route('chef.settings') }}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
                                     Manage Account
                                 </a>
                             </li>
                             <li>
-                                <a href="" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <a href="{{ route('chef.profile') }}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
                                     Show Profile
                                 </a>
                             </li>
                             <li>
-                                <a href="" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
                                     Activity Log
                                 </a>

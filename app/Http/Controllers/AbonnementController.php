@@ -68,8 +68,7 @@ public function update(Request $request, Abonnement $abonnement) {
                      ->with('status', 'Offre mise à jour avec succès.');
 }
 
-    public function destroy
-(Request $request, Abonnement $abonnement)
+    public function destroy (Request $request, Abonnement $abonnement)
 {
     $id = $abonnement->id;
     $abonnement->delete();

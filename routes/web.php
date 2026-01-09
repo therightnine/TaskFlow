@@ -7,6 +7,8 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AbonnementController;
+use App\Http\Controllers\RoleController;
+use App\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,11 +31,11 @@ Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
     ->name('abonnements.choose');
 
 // Gestion des abonnements (Admin)
-Route::get('/admin/abonnements', [AbonnementController::class, 'gest_abonnement'])
+Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
     ->name('admin.abonnements.gest_abonnements')
     ->middleware('auth');
 // Gestion des roles (Admin)
-Route::get('/admin/roles', [AbonnementController::class, 'gest_roles'])
+Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
     ->name('admin.roles.gest_roles')
     ->middleware('auth');
 // Gestion des utilisateurs (Admin)

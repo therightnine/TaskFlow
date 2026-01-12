@@ -6,9 +6,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
+<<<<<<< HEAD
 use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\RoleController;
 use App\Models\Role;
+=======
+>>>>>>> origin/main
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +95,12 @@ Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateu
 |--------------------------------------------------------------------------*/
 
 // Login routes
+
+/*
+|--------------------------------------------------------------------------
+| Authentification
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -109,6 +118,21 @@ Route::middleware(['auth'])->group(function() {
 Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->
 name('dashboard.supervisor');
 Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
+/*
+|--------------------------------------------------------------------------
+| Dashboards (selon rôle)
+|--------------------------------------------------------------------------
+*/
+Route::get('/dashboard/chef', [DashboardController::class, 'chef'])
+    ->name('dashboard.chef');
+
+/*
+|--------------------------------------------------------------------------
+| Projets (CRUD) → ProjetController
+|--------------------------------------------------------------------------
+*/
+Route::get('/projects', [ProjetController::class, 'index'])
+    ->name('projects.index');
 
 Route::get('/projects/create', [ProjetController::class, 'create'])
     ->name('projects.create');

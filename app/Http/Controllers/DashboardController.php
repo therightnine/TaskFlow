@@ -19,13 +19,7 @@ class DashboardController extends Controller
 {
     //
     
-    public function __construct()
-        {
-            // Protège toutes les actions par l'auth (session guard 'web')
-            $this->middleware('auth');
-        }
-
-   
+    
     
     // DashboardController.php
  

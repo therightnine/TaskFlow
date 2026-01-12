@@ -7,10 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-    use HasFactory;
+    
+    protected $role = 'roles'; // correspond à ta table existante
 
-    protected $table = 'roles';
-      public function users() {
-        return $this->hasMany(User::class, 'id_role');
-    }
+    // champs modifiables (si tu fais du CRUD)
+    protected $fillable = [
+        'role',   // nom du role (Admin, User…)
+        'description',  // texte libre
+    ];
+
+    
+// Désactive les colonnes created_at / updated_at
+    public $timestamps = false;
+
+    
 }

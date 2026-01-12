@@ -1,13 +1,13 @@
 @extends('layouts.admin_layout') 
 
-@section('title', 'Créer une offre d’abonnement')
+@section('title', 'Créer un nouveau rôle')
 
 @section('content')
   <div class="max-w-2xl mx-auto">
     {{-- Titre --}}
     <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900">Créer une offre d’abonnement</h1>
-      <p class="text-sm text-gray-500 mt-1">Renseigne les informations de l’offre puis enregistre.</p>
+      <h1 class="text-2xl font-semibold text-gray-900">Nouveau rôle</h1>
+      <p class="text-sm text-gray-500 mt-1">Renseigne les informations du rôle puis enregistre.</p>
     </div>
 
     {{-- Messages d'erreur globaux --}}
@@ -26,24 +26,24 @@
     @endif
 
     {{-- Formulaire de création --}}
-    <form method="POST" action="{{ route('admin.abonnements.store') }}">
+    <form method="POST" action="{{ route('admin.roles.store') }}">
       @csrf
 
-      {{-- Nom de l’abonnement --}}
+      {{-- Nom du rôle --}}
       <div>
-        <label for="abonnement" class="block text-sm font-medium text-gray-700">
-          Nom de l’abonnement <span class="text-red-500">*</span>
+        <label for="role" class="block text-sm font-medium text-gray-700">
+          Nom du rôle <span class="text-red-500">*</span>
         </label>
         <input
           type="text"
-          name="abonnement"
-          id="abonnement"
+          name="role"
+          id="role"
           maxlength="150"
-          value="{{ old('abonnement') }}"
+          value="{{ old('role') }}"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
-                 @error('abonnement') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
+                 @error('role') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
           placeholder="Ex : Standard, Premium, Entreprise" required>
-        @error('abonnement')
+        @error('role')
           <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
       </div>
@@ -60,32 +60,11 @@
           maxlength="500"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
                  @error('description') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-          placeholder="Décris brièvement l’offre (inclus, limites, conditions)…">{{ old('description') }}</textarea>
+          placeholder="Décris brièvement le rôle (inclus, limites, conditions)…">{{ old('description') }}</textarea>
         @error('description')
           <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
       </div>
-
-      {{-- Prix --}}
-      <div>
-        <label for="prix" class="block text-sm font-medium text-gray-700">
-          Prix (TND) <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          name="prix"
-          id="prix"
-          step="0.01"
-          min="0"
-          value="{{ old('prix') }}"
-          class="mt-1 block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
-                 @error('prix') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-          placeholder="0.00" required>
-        @error('prix')
-          <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-      </div>
-
       {{-- Actions --}}
       <div class="flex items-center gap-3 pt-2">
         <button type="submit"
@@ -93,9 +72,10 @@
           Enregistrer
         </button>
 
-        <a href="{{ route('admin.abonnements.gest_abonnements') }}" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+        <a href="{{ route('admin.roles.gest_roles') }}" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
           Annuler
         </a>
       </div>
     </form>
   </div>
+@endsection

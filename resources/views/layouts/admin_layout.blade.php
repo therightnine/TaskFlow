@@ -53,7 +53,7 @@
 $menuItems = [
     ['route' => 'dashboard.admin', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
     ['route' => 'admin.abonnements.gest_abonnements', 'icon' => 'ic_projects.png', 'label' => 'Gestion Abonnements'],
-    ['route' => 'admin.roles.gest_roles', 'icon' => 'ic_projects.png', 'label' => 'Gestion Rôles'],
+    ['route' => 'admin.roles.gest_roles', 'icon' => 'ic_teams.png', 'label' => 'Gestion Rôles'],
 ];
 @endphp
 
@@ -206,13 +206,11 @@ $menuItems = [
                     'Accept': 'application/json'
                 }
             });
-// 🔁 Rechargement si succès (OK, 204 ou redirection 302)
-if (res.ok || res.status === 204 || res.status === 302) {
-    location.reload();
-    return; // on stoppe la suite pour éviter l'animation inutile
-}
-
-
+            // 🔁 Rechargement si succès (OK, 204 ou redirection 302)
+            if (res.ok || res.status === 204 || res.status === 302) {
+                location.reload();
+                return; // on stoppe la suite pour éviter l'animation inutile
+            }
             if (!res.ok && res.status !== 204) {
                 let detail = '';
                 try { detail = await res.text(); } catch (e) {}
@@ -227,6 +225,47 @@ if (res.ok || res.status === 204 || res.status === 302) {
 
             // Toast simple (optionnel)
             console.log(`Offre "${name}" supprimée.`);
+
+        } catch (err) {
+            console.error(err);
+            alert(`Suppression impossible : ${err.message || 'erreur inconnue'}`);
+        } finally {
+            buttonEl.disabled = false;
+            buttonEl.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    async function deleteRole(url, id, name, buttonEl) {
+        const row = document.getElementById(`role-row-${id}`);
+        try {
+            buttonEl.disabled = true;
+            buttonEl.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json'
+                }
+            });
+            // 🔁 Rechargement si succès (OK, 204 ou redirection 302)
+            if (res.ok || res.status === 204 || res.status === 302) {
+                location.reload();
+                return; // on stoppe la suite pour éviter l'animation inutile
+            }
+            if (!res.ok && res.status !== 204) {
+                let detail = '';
+                try { detail = await res.text(); } catch (e) {}
+                throw new Error(detail || `Erreur HTTP ${res.status}`);
+            }
+
+            // Supprime la ligne (effet léger)
+            if (row) {
+                row.classList.add('transition', 'duration-200', 'opacity-0', 'scale-95');
+                setTimeout(() => row.remove(), 200);
+            }
+
+            // Toast simple (optionnel)
+            console.log(`Role "${name}" supprimée.`);
 
         } catch (err) {
             console.error(err);
@@ -255,6 +294,24 @@ if (res.ok || res.status === 204 || res.status === 302) {
         if (!ok) return;
 
         deleteAbonnement(url, id, name, btn);
+        
+    });
+    // Délégation d'événement : un seul listener pour tous les boutons .btn-delete-role
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-delete-role');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const url = btn.dataset.url;
+        const name = btn.dataset.name || 'ce rôle';
+
+        if (!url || !id) {
+            alert('Données manquantes pour la suppression.');
+            return;
+        }
+        const ok = confirm(`Voulez-vous vraiment supprimer le rôle "${name}" ?`);
+        if (!ok) return;
+
+        deleteRole(url, id, name, btn);
     });
 })();
 </script>

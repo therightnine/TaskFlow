@@ -1,15 +1,14 @@
 
 @extends('layouts.admin_layout') 
 
-@section('title', 'Modifier une offre d’abonnement')
-
+@section('title', 'Modifier un rôle')
 
 @section('content')
   <div class="max-w-2xl mx-auto">
     {{-- Titre --}}
     <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900">Modifier une offre d’abonnement</h1>
-      <p class="text-sm text-gray-500 mt-1">Mets à jour les informations de l’offre puis enregistre.</p>
+      <h1 class="text-2xl font-semibold text-gray-900">Modifier un rôle</h1>
+      <p class="text-sm text-gray-500 mt-1">Mettre à jour les informations du rôle puis enregistre.</p>
     </div>
 
     {{-- Messages d'erreur globaux --}}
@@ -33,26 +32,26 @@
     @endif
 
     {{-- Formulaire de modification --}}
-    <form method="POST" action="{{ route('admin.abonnements.update', $abonnement->id) }}" class="bg-white p-6 rounded-md shadow-md">
+    <form method="POST" action="{{ route('admin.roles.update', $role->id) }}" class="bg-white p-6 rounded-md shadow-md">
       @csrf
       @method('PUT')
 
-      {{-- Nom de l’abonnement --}}
+      {{-- Nom du rôle --}}
       <div class="mb-4">
-        <label for="abonnement" class="block text-sm font-medium text-gray-700">
-          Nom de l’abonnement <span class="text-red-500">*</span>
+        <label for="role" class="block text-sm font-medium text-gray-700">
+          Nom du rôle <span class="text-red-500">*</span>
         </label>
         <input
           type="text"
-          name="abonnement"
-          id="abonnement"
+          name="role"
+          id="role"
           maxlength="150"
-          value="{{ old('abonnement', $abonnement->abonnement) }}"
+          value="{{ old('role', $role->role) }}"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
-                 @error('abonnement') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
+                 @error('role') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
           placeholder="Ex : Standard, Premium, Entreprise"
           required>
-        @error('abonnement')
+        @error('role')
           <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
       </div>
@@ -69,29 +68,8 @@
           maxlength="500"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
                  @error('description') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-          placeholder="Décris brièvement l’offre (inclus, limites, conditions)…">{{ old('description', $abonnement->description) }}</textarea>
+          placeholder="Décris brièvement le rôle (inclus, limites, conditions)…">{{ old('description', $role->description) }}</textarea>
         @error('description')
-          <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-      </div>
-
-      {{-- Prix --}}
-      <div class="mb-6">
-        <label for="prix" class="block text-sm font-medium text-gray-700">
-          Prix (TND) <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          name="prix"
-          id="prix"
-          step="0.01"
-          min="0"
-          value="{{ old('prix', $abonnement->prix) }}"
-          class="mt-1 block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
-                 @error('prix') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-          placeholder="0.00"
-          required>
-        @error('prix')
           <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
       </div>
@@ -103,7 +81,7 @@
           Enregistrer
         </button>
 
-        <a href="{{ route('admin.abonnements.gest_abonnements') }}" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+        <a href="{{ route('admin.roles.gest_roles') }}" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
           Annuler
         </a>
       </div>

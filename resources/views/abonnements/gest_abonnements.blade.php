@@ -1,5 +1,5 @@
 {{-- resources/views/abonnements/gest_abonnements.blade.php --}}
-@extends('layouts.admin_layout') {{-- adapte si ton layout est différent --}}
+@extends('layouts.admin_layout')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -10,11 +10,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">
-                        Gestion des abonnements
+                        Liste des abonnements
                     </h2>
-                    
-                    <p class="mt-1 text-sm text-gray-500">Liste des offres disponibles.</p>
-                    
+                                        
                 </div>
                 
                 <div>

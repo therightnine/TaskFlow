@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Models\Abonnement;
-use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class AbonnementController extends Controller
@@ -22,12 +21,7 @@ class AbonnementController extends Controller
         $abonnements = Abonnement::all();
         return view('abonnements.gest_abonnements', compact('abonnements'));
     }
-    public function gest_roles()
-    {
-        $roles = Role::all();
-        return view('roles.gest_roles', compact('roles'));
-    }
-
+    
 
     public function create()
     {

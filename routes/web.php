@@ -20,8 +20,9 @@ Route::get('/', function () {
 })->name('home');
 /*
 |--------------------------------------------------------------------------
-| Dashboard Admin - Abonnements
+| Dashboard Admin 
 |--------------------------------------------------------------------------
+| Abonnements---------------------------------------
 */
 // GET /abonnements  →  AbonnementController@index_abonnement
 Route::get('/abonnements', [AbonnementController::class, 'index_abonnement'])
@@ -34,16 +35,8 @@ Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
 Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
     ->name('admin.abonnements.gest_abonnements')
     ->middleware('auth');
-// Gestion des roles (Admin)
-Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
-    ->name('admin.roles.gest_roles')
-    ->middleware('auth');
-// Gestion des utilisateurs (Admin)
-Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateurs'])
-    ->name('admin.utilisateurs.gest_utilisateurs')
-    ->middleware('auth');
 
- // Create
+    // Create
     Route::get('/admin/abonnements/create', [AbonnementController::class, 'create'])
         ->name('admin.abonnements.create');
 
@@ -63,6 +56,38 @@ Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateu
     Route::delete('/admin/abonnements/{abonnement}', [AbonnementController::class, 'destroy'])
         ->name('admin.abonnements.destroy');
 
+/*
+|Roles--------------------------------------------------------------------------*/
+// Gestion des roles (Admin)
+Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
+    ->name('admin.roles.gest_roles')
+    ->middleware('auth');
+
+    // Create
+    Route::get('/admin/roles/create', [RoleController::class, 'create'])
+        ->name('admin.roles.create');
+
+    // Store
+    Route::post('/admin/roles', [RoleController::class, 'store'])
+        ->name('admin.roles.store');
+
+    // Edit
+    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])
+        ->name('admin.roles.edit');
+    // Update
+    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])
+        ->name('admin.roles.update');
+
+    // Destroy
+    Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])
+        ->name('admin.roles.destroy');
+/*
+|Utilisateurs--------------------------------------------------------------------------*/
+
+// Gestion des utilisateurs (Admin)
+Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateurs'])
+    ->name('admin.utilisateurs.gest_utilisateurs')
+    ->middleware('auth');
 /*
 |--------------------------------------------------------------------------*/
 

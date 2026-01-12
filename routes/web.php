@@ -6,12 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
-<<<<<<< HEAD
 use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\RoleController;
 use App\Models\Role;
-=======
->>>>>>> origin/main
 
 /*
 |--------------------------------------------------------------------------

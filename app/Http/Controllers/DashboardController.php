@@ -12,13 +12,19 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\Controller;
 
-use DB; // Make sure to import
+//use DB; // Make sure to import
 
 
 class DashboardController extends Controller
 {
     //
     
+    public function __construct()
+        {
+            // Protège toutes les actions par l'auth (session guard 'web')
+            $this->middleware('auth');
+        }
+
    
     
     // DashboardController.php
@@ -89,18 +95,6 @@ class DashboardController extends Controller
             'newTasks',
             'overdueTasks'
         ));
-<<<<<<< HEAD
-
-=======
-
-    }
-
-
-
-    public function admin()
-    {
-        return view('dashboard.admin');
->>>>>>> origin/main
     }
 /*|--------------------------------------------------------------------------
 | Dashboard Admin - Abonnements

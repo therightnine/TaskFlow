@@ -8,6 +8,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AdminSettingsController;
 use App\Models\Role;
 
 /*
@@ -90,6 +91,15 @@ Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateu
     ->middleware('auth');
 /*
 |--------------------------------------------------------------------------*/
+//settings admin
+/*--------------------------------------------------------------------------*/
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/admin/settings', [AdminSettingsController::class, 'indexadmin'])
+        ->name('admin.settings.indexadmin');
+});
+
+/*-------------------------------------------------------------------------*/
 
 // Login routes
 

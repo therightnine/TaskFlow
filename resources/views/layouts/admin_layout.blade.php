@@ -50,12 +50,13 @@
         {{-- Menu --}}
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
            @php
-$menuItems = [
-    ['route' => 'dashboard.admin', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
-    ['route' => 'admin.abonnements.gest_abonnements', 'icon' => 'ic_projects.png', 'label' => 'Gestion Abonnements'],
-    ['route' => 'admin.roles.gest_roles', 'icon' => 'ic_teams.png', 'label' => 'Gestion Rôles'],
-];
-@endphp
+                $menuItems = [
+                    ['route' => 'dashboard.admin', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
+                    ['route' => 'admin.abonnements.gest_abonnements', 'icon' => 'ic_projects.png', 'label' => 'Gestion Abonnements'],
+                    ['route' => 'admin.roles.gest_roles', 'icon' => 'ic_teams.png', 'label' => 'Gestion Rôles'],
+                    ['route' => 'admin.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
+                ];
+            @endphp
 
 
             @foreach($menuItems as $item)

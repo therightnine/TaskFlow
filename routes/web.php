@@ -94,10 +94,8 @@ Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateu
 //settings admin
 /*--------------------------------------------------------------------------*/
 
-Route::middleware(['web', 'auth'])->group(function () {
-    Route::get('/admin/settings', [AdminSettingsController::class, 'indexadmin'])
-        ->name('admin.settings.indexadmin');
-});
+Route::get('/admin/settings', [AdminSettingsController::class, 'indexadmin'])
+->name('admin.settings');
 
 /*-------------------------------------------------------------------------*/
 

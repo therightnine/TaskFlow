@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Login - TaskFlow')
+@section('title', 'Connexion - TaskFlow')
 
 @section('content')
 
 <div class="w-full max-w-[1600px] mx-auto h-[800px] flex rounded-[60px] mt-[100px]">
 
-    <!-- LEFT: LOGIN FORM -->
+    <!-- GAUCHE : FORMULAIRE DE CONNEXION -->
     <div class="w-full flex justify-center items-center bg-white">
         <div class="w-[500px] p-12 bg-white rounded-[60px] shadow-2xl shadow-black/20">
 
             <h1 class="text-5xl font-bold text-zinc-900 mb-12 text-center font-vietnam">
-                Login
+                Connexion
             </h1>
 
             <form method="POST" action="{{ route('login') }}">
@@ -49,9 +49,9 @@
                     @enderror
                 </div>
 
-                <!-- PASSWORD -->
+                <!-- MOT DE PASSE -->
                 <label for="password" class="block text-2xl mb-3 text-zinc-900 font-vietnam">
-                    Password
+                    Mot de passe
                 </label>
                 <div class="w-full mb-6">
                     <div class="relative">
@@ -81,32 +81,32 @@
                     @enderror
                 </div>
 
-                <!-- FORGOT -->
+                <!-- MOT DE PASSE OUBLIÉ -->
                 <div class="text-right mb-6">
                     <a href="#" class="text-sky-900 text-lg font-medium hover:underline">
-                        Forgot Password?
+                        Mot de passe oublié ?
                     </a>
                 </div>
 
-                <!-- SUBMIT -->
+                <!-- BOUTON CONNEXION -->
                 <button type="submit"
                         class="w-full py-4 bg-cyan-500 text-white text-2xl font-bold
                                rounded-lg hover:bg-sky-700 transition">
-                    Login
+                    Connexion
                 </button>
             </form>
 
-            <!-- REGISTER -->
+            <!-- INSCRIPTION -->
             <div class="mt-6 text-center text-lg">
-                <span class="text-zinc-900">Don’t have an account? </span>
+                <span class="text-zinc-900">Vous n'avez pas de compte ? </span>
                 <a href="#" class="text-sky-900 font-bold hover:underline">
-                    Register
+                    Inscription
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT IMAGE -->
+    <!-- IMAGE DROITE -->
     <div class="w-full flex items-center justify-center -ml-20">
         <img src="{{ asset('images/login-right.png') }}" class="h-[520px] object-contain">
     </div>

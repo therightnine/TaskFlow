@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 */
 Route::get('/dashboard/chef', [DashboardController::class, 'chef'])
     ->name('dashboard.chef');
+Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])
+    ->name('dashboard.contributeur');
+Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
+    ->name('dashboard.superviseur');
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +70,14 @@ Route::post('/projects/{project}/favorite', [ProjetController::class, 'toggleFav
 
 Route::post('/projects/{project}/add-supervisor', [ProjetController::class, 'addSupervisor'])
     ->name('projects.updateSupervisor');
+
+Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
+    ->name('projects.addContributor');
+Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
+Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -98,3 +112,23 @@ Route::get('/settings/profile', [ProfileController::class, 'index'])
 
 Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])
     ->name('chef.updateBio');
+
+
+ /// Pages Taches
+
+Route::middleware('auth')->group(function () {
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{id}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{id}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::post('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
+    Route::post('/tasks/{task}/add-contributor', [TaskController::class, 'addContributor'])->name('tasks.addContributor');
+    Route::post('/tasks/{task}/remove-contributor', [TaskController::class, 'removeContributor'])->name('tasks.removeContributor');
+    Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])->name('tasks.toggleContributor');
+
+
+    Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask']) ->name('tasks.archive');
+
+});
+

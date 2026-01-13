@@ -5,7 +5,7 @@
 @section('content')
 
     <!-- Hero Section -->
-      <section class="relative h-[700px] pt-[180px] px-[120px]">
+    <section class="relative h-[700px] pt-[180px] px-[120px]">
 
         <h1 class="text-[56px] font-medium leading-[72px] text-black max-w-[720px]">
           Planifiez Mieux, <br> Avancez Plus Vite <br> Avec TaskFlow.
@@ -20,14 +20,14 @@
             <!-- Get Started Button -->
             <button class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px] 
                           hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500 transition">
-                Get Started
+                Commencer
             </button>
 
             <!-- Login Link as Button -->
             <a href="{{ route('login') }}" 
               class="border border-black px-10 py-4 rounded-xl text-[16px] inline-block text-center
                       hover:bg-cyan-500 hover:text-white transition">
-                Login
+                Connexion
             </a>
         </div>
 

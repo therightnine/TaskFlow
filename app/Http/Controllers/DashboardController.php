@@ -92,12 +92,12 @@ class DashboardController extends Controller
     {
         return view('dashboard.admin');
     }
-    public function supervieur()
+    public function superviseur()
     {
         return view('dashboard.superviseur');                
 
     }
-    public function contribiteur()
+    public function contributeur()
     {
         return view('dashboard.contributeur');                
     }

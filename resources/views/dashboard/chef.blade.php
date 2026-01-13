@@ -1,6 +1,8 @@
 @extends('layouts.chef_layout')
 
-@section('title', 'Chef De Projet | Dashboard Home')
+@section('title', 'Dashboard')
+@section('page-title', 'Dashboard')
+
 
 @section('content')
 

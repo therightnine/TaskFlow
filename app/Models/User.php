@@ -43,8 +43,43 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'id_role');
     }
 
-    public function projets()
+    // Projects I own
+    public function projetsOwned()
     {
         return $this->hasMany(Projet::class, 'id_user');
     }
+
+    // Projects I contribute to
+    public function projetsContributed()
+    {
+        return $this->belongsToMany(
+            Projet::class,
+            'projet_contributeur',
+            'user_id',
+            'projet_id'
+        );
+    }
+
+    // Projects I supervise
+    public function projetsSupervised()
+    {
+        return $this->belongsToMany(
+            Projet::class,
+            'projet_superviseur',
+            'user_id',
+            'projet_id'
+        );
+    }
+
+    public function contributedTasks()
+    {
+        return $this->belongsToMany(
+            Tache::class,
+            'tache_contributeur',
+            'user_id',
+            'tache_id'
+        );
+    }
+
+
 }

@@ -6,7 +6,7 @@
 
 @section('content')
 
-<span>Superviseur Dashboard</span>
+<span>Contributeur Dashboard</span>
 
 
 

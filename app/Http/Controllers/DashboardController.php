@@ -8,12 +8,18 @@ use App\Models\User;
 use App\Models\Projet;
 use App\Models\Tache;
 use Carbon\Carbon;
-use DB; // Make sure to import
+use Illuminate\Support\Facades\DB;
+
+use App\Http\Controllers\Controller;
+
+//use DB; // Make sure to import
 
 
 class DashboardController extends Controller
 {
     //
+    
+    
     
     // DashboardController.php
  
@@ -83,15 +89,55 @@ class DashboardController extends Controller
             'newTasks',
             'overdueTasks'
         ));
-
     }
+/*|--------------------------------------------------------------------------
+| Dashboard Admin - Abonnements
+|--------------------------------------------------------------------------*/
+public function admin()
+{
+    $user = auth()->user();
+    $abonnements = DB::table('abonnements')
+        ->orderBy('id', 'desc')
+        ->paginate(10);
 
+    // Date de référence (aujourd'hui)
+    $dateRef = now()->toDateString();
 
+    // Récupérer les abonnements actifs
+    $rows = DB::table('user_abonnement')
+        ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
+        ->whereDate('user_abonnement.date_debut', '<=', $dateRef)
+        ->where(function ($q) use ($dateRef) {
+            $q->whereNull('user_abonnement.date_fin')
+              ->orWhereDate('user_abonnement.date_fin', '>=', $dateRef);
+        })
+        ->select(
+            'abonnements.abonnement',
+            DB::raw('COUNT(user_abonnement.id_inscri) AS active_count')
+        )
+        ->groupBy('abonnements.abonnement')
+        ->orderBy('abonnements.abonnement')
+        ->get();
 
-    public function admin()
-    {
-        return view('dashboard.admin');
+    // Préparer les données pour le graphe
+    $labels = [];
+    $values = [];
+    foreach ($rows as $r) {
+        $labels[] = $r->abonnement ?? 'Inconnu';
+        $values[] = (int) $r->active_count;
     }
+    $total = array_sum($values);
+
+    return view('dashboard.admin', [
+        'user' => $user,
+        'subscriptionLabels' => $labels,
+        'subscriptionValues' => $values,
+        'subscriptionTotal'  => $total,
+        'abonnements'        => $abonnements,
+    ]);
+}
+/*--------------------------------------------------------------------------*/
+
     public function supervieur()
     {
         return view('dashboard.superviseur');                

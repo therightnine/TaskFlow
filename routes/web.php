@@ -6,6 +6,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AbonnementController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AdminSettingsController;
+use App\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +19,89 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return view('home');
 })->name('home');
+/*
+|--------------------------------------------------------------------------
+| Dashboard Admin 
+|--------------------------------------------------------------------------
+| Abonnements---------------------------------------
+*/
+// GET /abonnements  →  AbonnementController@index_abonnement
+Route::get('/abonnements', [AbonnementController::class, 'index_abonnement'])
+    ->name('abonnements.index');
+
+Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
+    ->name('abonnements.choose');
+
+// Gestion des abonnements (Admin)
+Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
+    ->name('admin.abonnements.gest_abonnements')
+    ->middleware('auth');
+
+    // Create
+    Route::get('/admin/abonnements/create', [AbonnementController::class, 'create'])
+        ->name('admin.abonnements.create');
+
+    // Store
+    Route::post('/admin/abonnements', [AbonnementController::class, 'store'])
+        ->name('admin.abonnements.store');
+
+    // Edit
+    Route::get('/admin/abonnements/{abonnement}/edit', [AbonnementController::class, 'edit'])
+        ->name('admin.abonnements.edit');
+
+    // Update
+    Route::put('/admin/abonnements/{abonnement}', [AbonnementController::class, 'update'])
+        ->name('admin.abonnements.update');
+
+    // Destroy
+    Route::delete('/admin/abonnements/{abonnement}', [AbonnementController::class, 'destroy'])
+        ->name('admin.abonnements.destroy');
+
+/*
+|Roles--------------------------------------------------------------------------*/
+// Gestion des roles (Admin)
+Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
+    ->name('admin.roles.gest_roles')
+    ->middleware('auth');
+
+    // Create
+    Route::get('/admin/roles/create', [RoleController::class, 'create'])
+        ->name('admin.roles.create');
+
+    // Store
+    Route::post('/admin/roles', [RoleController::class, 'store'])
+        ->name('admin.roles.store');
+
+    // Edit
+    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])
+        ->name('admin.roles.edit');
+    // Update
+    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])
+        ->name('admin.roles.update');
+
+    // Destroy
+    Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])
+        ->name('admin.roles.destroy');
+/*
+|Utilisateurs--------------------------------------------------------------------------*/
+
+// Gestion des utilisateurs (Admin)
+Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateurs'])
+    ->name('admin.utilisateurs.gest_utilisateurs')
+    ->middleware('auth');
+/*
+|--------------------------------------------------------------------------*/
+//settings admin
+/*--------------------------------------------------------------------------*/
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/admin/settings', [AdminSettingsController::class, 'indexadmin'])
+        ->name('admin.settings.indexadmin');
+});
+
+/*-------------------------------------------------------------------------*/
+
+// Login routes
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +112,19 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+//Dashboard routes
+Route::middleware(['auth'])->group(function() {
+    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->
+    name('dashboard.chef');
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->
+    name('dashboard.admin');
+    
+});
+
+
+Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->
+name('dashboard.supervisor');
+Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
 /*
 |--------------------------------------------------------------------------
 | Dashboards (selon rôle)

@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\AdminUsersController;
 use App\Models\Role;
 
 /*
@@ -86,9 +87,23 @@ Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
 |Utilisateurs--------------------------------------------------------------------------*/
 
 // Gestion des utilisateurs (Admin)
-Route::get('/admin/utilisateurs', [AbonnementController::class, 'gest_utilisateurs'])
-    ->name('admin.utilisateurs.gest_utilisateurs')
-    ->middleware('auth');
+
+// Routes admin pour la gestion des utilisateurs
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Liste des utilisateurs
+    Route::get('/utilisateurs', [AdminUsersController::class, 'index'])
+        ->name('utilisateurs.index');
+    
+    // Mise à jour d'un utilisateur
+    Route::put('/users/{user}', [AdminUsersController::class, 'update'])
+        ->name('users.update');
+    
+    // Suppression d'un utilisateur
+    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])
+        ->name('users.destroy');
+});
+
 /*
 |--------------------------------------------------------------------------*/
 //settings admin

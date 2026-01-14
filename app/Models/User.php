@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
 use App\Models\Projet; 
+use App\Models\UserAbonnement;
 class User extends Authenticatable
 {
     use Notifiable;
@@ -46,5 +47,20 @@ class User extends Authenticatable
     public function projets()
     {
         return $this->hasMany(Projet::class, 'id_user');
+    }
+    
+    public function abonnements()
+    {
+        return $this->hasMany(UserAbonnement::class, 'id_inscri');
+    }
+
+      public function currentAbonnement()
+    {
+    return $this->hasOne(UserAbonnement::class, 'id_inscri')
+        ->where(function($query) {
+            $query->where('date_fin', '>=', now())
+                  ->orWhereNull('date_fin');
+        })
+        ->latest('date_debut');
     }
 }

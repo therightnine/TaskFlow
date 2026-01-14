@@ -1,84 +1,90 @@
-{{-- resources/views/abonnements/gest_abonnements.blade.php --}}
-@extends('layouts.admin_layout') {{-- adapte si ton layout est différent --}}
+{{-- resources/views/utilisateurs/gest_utilisateurs.blade.php --}}
+@extends('layouts.admin_layout')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-6">Gestion des abonnements</h1>
+    <h2 class="text-xl font-semibold mb-4">Gestion des utilisateurs</h2>
 
-</div>
-<div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-800">
-                        Gestion des utilisateurss
-                    </h2>
-                    
-                    <p class="mt-1 text-sm text-gray-500">Liste des utilisateurs.</p>
-                    
-                </div>
-                
-                <div>
-                    
-            <!-- Bouton ajout -->
-            <a href="{{ route('admin.abonnements.create') }}" 
-           class="text-lg inline-flex items-center rounded-lg bg-indigo-600 p-2 text-white hover:bg-indigo-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16M20 12H4"/>
-            </svg>
-            </a>
-                </div>
-            </div>
+    {{-- Messages de statut / erreurs --}}
+    @if(session('status'))
+        <div class="bg-green-100 text-green-800 px-3 py-2 rounded mb-3">
+            {{ session('status') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-800 px-3 py-2 rounded mb-3">
+            <ul class="list-disc ml-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                 <!-- Tableau simple -->
-            <div class="mt-4 overflow-x-auto">
-             <table class="min-w-full border-collapse">
-                <thead>
-                    <tr class="text-left text-sm text-gray-600">
-                    <th class="border-b px-3 py-2">Abonnement</th>
-                    <th class="border-b px-3 py-2 whitespace-normal w-40">Description</th>
-                    <th class="border-b px-3 py-2">Prix</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm text-gray-800">
-                    @forelse($abonnements as $ab)
-                    <tr class="hover:bg-gray-50">
-                    <td class="border-b px-3 py-2 font-semibold">{{ $ab->abonnement }}</td>
-                    <td class="border-b px-3 py-2">{{ $ab->description }}</td>
-                    <td class="border-b px-3 py-2">{{ number_format($ab->prix, 2, ',', ' ') }} TND</td>
-                    <td class="border-b px-3 py-2">
-                <!-- Action buttons -->
-                <a href="{{ route('admin.abonnements.edit', $ab->id) }}" 
-                    class="text-lg inline-flex items-center rounded-lg bg-green-600 p-2 text-white hover:bg-green-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15.232 5.232a2.5 2.5 0 113.536 3.536L7.5 20.036H4v-3.5L15.232 5.232z"/>
-                    </svg>
-                </a>
+    <table class="min-w-full border-collapse">
+        <thead>
+            <tr class="border-b">
+                <th class="text-left p-2">Nom</th>
+                <th class="text-left p-2">Prénom</th>
+                <th class="text-left p-2">E‑mail</th>
+                <!--<th class="text-left p-2">Rôle</th>
+                <th class="text-left p-2">Abonnement</th>-->
+                <th class="text-left p-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @forelse($users as $user)
+            <tr class="border-b align-top">
+                {{-- Formulaire de mise à jour par ligne --}}
+                <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
 
-                    <button type="button"
-                        class="btn-delete-ab text-lg inline-flex items-center rounded-lg bg-red-600 p-2 text-white hover:bg-red-700"
-                        data-id="{{ $ab->id }}"
-                        data-url="{{ route('admin.abonnements.destroy', $ab->id) }}"
-                        data-name="{{ $ab->abonnement }}">
-                        <!-- icône trash -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <td class="p-2">
+                        <input type="text" name="nom" class="w-full border rounded px-2 py-1"
+                               value="{{ old('nom', $user->nom) }}" required>
+                    </td>
+
+                    <td class="p-2">
+                        <input type="text" name="prenom" class="w-full border rounded px-2 py-1"
+                               value="{{ old('prenom', $user->prenom) }}" required>
+                    </td>
+
+                    <td class="p-2">
+                        <input type="email" name="email" class="w-full border rounded px-2 py-1"
+                               value="{{ old('email', $user->email) }}" required>
+                    </td>
+             
+                    <td class="p-2 space-x-2">
+                        <button type="submit"
+                                class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                            </svg>
+                        </button>
+                </form>
+
+                        {{-- Formulaire de suppression --}}
+                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                              class="inline-block"
+                              onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="inline-block bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-4 0h14"/>
                         </svg>
-                    </button>
-                </td>
-                </tr>
-                    @empty
-                    <tr>
-                    <td colspan="4" class="px-3 py-4 text-center text-sm text-gray-500">
-                        Aucune offre disponible.
+                            </button>
+                        </form>
                     </td>
-                    </tr>
-                     @endforelse
-                </tbody>
-             </table>
-            </div>
-
-            
-        </div>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6" class="p-3 text-center text-gray-500">Aucun utilisateur.</td>
+            </tr>
+        @endforelse
+        </tbody>
+    </table>
 @endsection

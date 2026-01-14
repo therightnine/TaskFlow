@@ -14,7 +14,8 @@ class AbonnementController extends Controller
     
     public function index_abonnement()
     {
-        return view('abonnements.abonnement');
+        $abonnements = Abonnement::orderBy('id', 'asc')->take(3)->get();
+        return view('abonnements.abonnement', compact('abonnements'));
     }
      public function gest_abonnement()
     {

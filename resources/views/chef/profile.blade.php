@@ -1,4 +1,8 @@
-@extends('layouts.chef_layout')
+@php 
+        $layout = auth()->user()->id_role === 3
+        ? 'layouts.chef_layout'
+        : 'layouts.superviseur_layout';
+@endphp
 
 @section('title', 'Profil')
 

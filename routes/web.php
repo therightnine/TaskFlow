@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\EquipeController;
 
 
 /*
@@ -81,11 +82,9 @@ Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, '
 
 /*
 |--------------------------------------------------------------------------
-| Pages Chef (DashboardController)
+| Pages Createur (DashboardController)
 |--------------------------------------------------------------------------
 */
-Route::get('/team', [DashboardController::class, 'team'])
-    ->name('chef.team');
 
 Route::get('/tasks', [DashboardController::class, 'tasks'])
     ->name('chef.tasks');
@@ -97,8 +96,41 @@ Route::get('/messages', [DashboardController::class, 'messages'])
     ->name('chef.messages');
 
 /*
+
+
+
+/*
 |--------------------------------------------------------------------------
-| Paramètres & Profil
+| Pages Superviseur (DashboardController)
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
+    ->name('superviseur.tasks');
+
+Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
+    ->name('superviseur.reports');
+
+Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
+    ->name('superviseur.messages');
+/*
+
+/*
+|--------------------------------------------------------------------------
+| Pages Equipe  (EquipeController)
+|--------------------------------------------------------------------------
+*/
+Route::get('/equipe', [EquipeController::class, 'index'])
+    ->name('equipe');
+
+Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
+    ->name('equipe.partials.profile');
+/*
+
+
+|--------------------------------------------------------------------------
+| Paramètres & Profil Createur (SettingsController & ProfileController)
 |--------------------------------------------------------------------------
 */
 Route::get('/settings', [SettingsController::class, 'index'])
@@ -112,6 +144,23 @@ Route::get('/settings/profile', [ProfileController::class, 'index'])
 
 Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])
     ->name('chef.updateBio');
+
+/*
+|--------------------------------------------------------------------------
+| Paramètres & Profil Superviseur (SettingsController & ProfileController)
+|--------------------------------------------------------------------------
+*/
+Route::get('/superviseur/settings', [SettingsController::class, 'index'])
+    ->name('superviseur.settings');
+
+Route::post('/superviseur/settings', [SettingsController::class, 'update'])
+    ->name('superviseur.settings.update');
+
+Route::get('/superviseur/settings/profile', [ProfileController::class, 'index'])
+    ->name('superviseur.profile');
+
+Route::post('/superviseur/settings/update-bio', [ProfileController::class, 'updateBio'])
+    ->name('superviseur.updateBio');
 
 
  /// Pages Taches
@@ -131,4 +180,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask']) ->name('tasks.archive');
 
 });
+
+
+
+
+
+
 

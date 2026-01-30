@@ -43,8 +43,15 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'id_role');
     }
 
+    
+
     // Projects I own
     public function projetsOwned()
+    {
+        return $this->hasMany(Projet::class, 'id_user');
+    }
+
+    public function ownedProjects()
     {
         return $this->hasMany(Projet::class, 'id_user');
     }
@@ -57,7 +64,7 @@ class User extends Authenticatable
             'projet_contributeur',
             'user_id',
             'projet_id'
-        );
+        )->withTimestamps();
     }
 
     // Projects I supervise
@@ -68,8 +75,19 @@ class User extends Authenticatable
             'projet_superviseur',
             'user_id',
             'projet_id'
-        );
+        )->withTimestamps();
     }
+
+    public function allProjects()
+    {
+        $owned = Projet::where('id_user', $this->id)->get();
+        $contrib = $this->projetsContributed; // eager loaded or relationship
+        $superv = $this->projetsSupervised;  // eager loaded or relationship
+
+        return $owned->merge($contrib)->merge($superv)->unique('id')->values();
+    }
+
+
 
     public function contributedTasks()
     {
@@ -80,6 +98,23 @@ class User extends Authenticatable
             'tache_id'
         );
     }
+
+    public function isSuperviseur()
+    {
+        return $this->role->name === 'superviseur';
+    }
+
+    public function isChef()
+    {
+        return $this->role->name === 'chef de projet';
+    }
+
+    public function isContributeur()
+    {
+        return $this->role->name === 'contributeur';
+    }
+
+
 
 
 }

@@ -110,5 +110,16 @@ class Projet extends Model
         ];
     }
 
+
+
+// Convenience to get all team members
+public function teamMembers() {
+    return $this->owner
+        ? collect([$this->owner])
+            ->merge($this->superviseurs)
+            ->merge($this->contributors)
+        : $this->superviseurs->merge($this->contributors);
+}
+
 }
 

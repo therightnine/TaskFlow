@@ -56,8 +56,6 @@
                 ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
                 ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tâches'],
                 ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Équipes'],
-                ['route' => 'chef.reports', 'icon' => 'ic_reports.png', 'label' => 'Rapports'],
-                ['route' => 'chef.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
                 ['route' => 'chef.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
             ];
             @endphp

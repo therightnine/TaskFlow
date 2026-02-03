@@ -1,6 +1,6 @@
 @extends('layouts.admin_layout')
 
-@section('title', 'Edit Profile')
+@section('title', 'Modifier le profil')
 
 @section('content')
 @php

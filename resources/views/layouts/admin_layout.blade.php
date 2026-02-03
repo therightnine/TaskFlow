@@ -55,7 +55,7 @@
                     ['route' => 'admin.abonnements.gest_abonnements', 'icon' => 'ic_projects.png', 'label' => 'Abonnements'],
                     ['route' => 'admin.roles.gest_roles', 'icon' => 'ic_teams.png', 'label' => 'Rôles'],
                     ['route' => 'admin.utilisateurs.index', 'icon' => 'ic_teams.png', 'label' => 'Utilisateurs'],
-                    ['route' => 'admin.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
+                    ['route' => 'admin.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
                 ];
             @endphp
 
@@ -86,7 +86,7 @@
                     <button type="submit"
                             class="flex items-center gap-4 py-3 px-4 w-full text-gray-600 hover:text-primary rounded transition">
                         <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6 transition-all">
-                        Sign Out
+                        Se déconnecter
                     </button>
                 </form>
             </li>

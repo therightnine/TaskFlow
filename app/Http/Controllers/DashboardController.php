@@ -8,56 +8,40 @@ use App\Models\User;
 use App\Models\Projet;
 use App\Models\Tache;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-
-use App\Http\Controllers\Controller;
-
-//use DB; // Make sure to import
-
+use DB;
 
 class DashboardController extends Controller
 {
-    //
-    
-    
-    
-    // DashboardController.php
- 
-
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD CHEF
+    |--------------------------------------------------------------------------
+    */
     public function chef()
     {
         $user = auth()->user();
-
         $today = Carbon::today();
 
-        // 1️⃣ Active Projects
         $activeProjects = Projet::whereHas('etat', fn($q) =>
             $q->where('etat', '!=', 'completed')
         )->count();
 
-        // 2️⃣ Tasks Due Today
         $tasksDueToday = Tache::whereDate('deadline', $today)->count();
 
-        // 3️⃣ Pending Approvals
         $pendingApprovals = Projet::whereHas('etat', fn($q) =>
             $q->where('etat', 'pending')
         )->count();
 
-        // 4️⃣ New Issues Raised (today)
         $newIssues = Tache::whereDate('created_at', $today)->count();
 
-        // 📊 Tasks status (Pie chart)
         $tasksByStatus = Tache::selectRaw('etat.etat, COUNT(*) as total')
             ->join('etat', 'etat.id', '=', 'taches.id_etat')
             ->groupBy('etat.etat')
             ->pluck('total', 'etat.etat');
 
-       
-
-        // Get monthly tasks data
         $tasksPerMonth = Tache::select(
                 DB::raw('MONTH(created_at) as month'),
-                DB::raw('SUM(CASE WHEN id_etat = 3 THEN 1 ELSE 0 END) as completed'), // id_etat = 3 -> Terminé
+                DB::raw('SUM(CASE WHEN id_etat = 3 THEN 1 ELSE 0 END) as completed'),
                 DB::raw('COUNT(*) as total'),
                 DB::raw('SUM(CASE WHEN deadline < NOW() AND id_etat != 3 THEN 1 ELSE 0 END) as overdue')
             )
@@ -65,18 +49,16 @@ class DashboardController extends Controller
             ->orderBy(DB::raw('MONTH(created_at)'))
             ->get();
 
-        // Prepare arrays for Chart.js
         $completedTasks = array_fill(0, 12, 0);
         $newTasks = array_fill(0, 12, 0);
         $overdueTasks = array_fill(0, 12, 0);
 
         foreach ($tasksPerMonth as $task) {
-            $monthIndex = $task->month - 1; // January = 0
-            $completedTasks[$monthIndex] = $task->completed;
-            $newTasks[$monthIndex] = $task->total;
-            $overdueTasks[$monthIndex] = $task->overdue;
+            $index = $task->month - 1;
+            $completedTasks[$index] = $task->completed;
+            $newTasks[$index] = $task->total;
+            $overdueTasks[$index] = $task->overdue;
         }
-
 
         return view('dashboard.chef', compact(
             'user',
@@ -103,7 +85,7 @@ public function admin()
     // Date de référence (aujourd'hui)
     $dateRef = now()->toDateString();
 
-    // Récupérer les abonnements actifs
+// Récupérer les abonnements actifs
     $rows = DB::table('user_abonnement')
         ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
         ->whereDate('user_abonnement.date_debut', '<=', $dateRef)
@@ -136,15 +118,142 @@ public function admin()
         'abonnements'        => $abonnements,
     ]);
 }
+
+
+
+
+
+
+    
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD SUPERVISEUR
+    |--------------------------------------------------------------------------
+    */
+    public function superviseur()
+{
+    $user = auth()->user();
+
+    // Projects assigned to this supervisor
+    $projects = $user->projetsSupervised()
+        ->with('taches', 'contributors')
+        ->get();
+
+    /*
+    |--------------------------------------------------------------------------
+    | TASK PROGRESS BY MONTH (used for stats)
+    |--------------------------------------------------------------------------
+    */
+    $taskProgressByMonth = [];
+
+    for ($month = 1; $month <= 12; $month++) {
+        $monthData = [];
+
+        foreach ($projects as $project) {
+            $tasksInMonth = $project->taches->filter(fn ($tache) =>
+                \Carbon\Carbon::parse($tache->created_at)->month === $month
+            );
+
+            $totalTasks = $tasksInMonth->count();
+            $completedTasks = $tasksInMonth->where('id_etat', 3)->count();
+
+            $monthData[] = [
+                'project_name'     => $project->nom_projet,
+                'total_tasks'      => $totalTasks,
+                'completed_tasks'  => $completedTasks,
+                'progress'         => $totalTasks > 0
+                    ? round(($completedTasks / $totalTasks) * 100)
+                    : 0,
+            ];
+        }
+
+        $taskProgressByMonth[$month] = $monthData;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BAR CHART DATA (COMPLETED / IN PROGRESS / PENDING)
+    |--------------------------------------------------------------------------
+    */
+    $tasksCompletedByMonth  = array_fill(0, 12, 0);
+    $tasksInProgressByMonth = array_fill(0, 12, 0);
+    $tasksPendingByMonth    = array_fill(0, 12, 0);
+
+    for ($month = 1; $month <= 12; $month++) {
+        $index = $month - 1;
+
+        $tasksCompletedByMonth[$index] = Tache::whereIn('id_projet', $projects->pluck('id'))
+            ->where('id_etat', 3) // completed
+            ->whereMonth('created_at', $month)
+            ->count();
+
+        $tasksInProgressByMonth[$index] = Tache::whereIn('id_projet', $projects->pluck('id'))
+            ->where('id_etat', 2) // in progress
+            ->whereMonth('created_at', $month)
+            ->count();
+
+        $tasksPendingByMonth[$index] = Tache::whereIn('id_projet', $projects->pluck('id'))
+            ->where('id_etat', 1) // pending
+            ->whereMonth('created_at', $month)
+            ->count();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | LINE CHART – PROJECT PROGRESS
+    |--------------------------------------------------------------------------
+    */
+    $monthlyProjectProgress = [];
+
+    foreach ($projects as $project) {
+        $monthlyData = Tache::select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as completed')
+            )
+            ->where('id_projet', $project->id)
+            ->where('id_etat', 3)
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->pluck('completed', 'month')
+            ->toArray();
+
+        $monthlyArray = array_fill(0, 12, 0);
+
+        foreach ($monthlyData as $m => $count) {
+            $monthlyArray[$m - 1] = $count;
+        }
+
+        $monthlyProjectProgress[] = [
+            'project_name'      => $project->nom_projet,
+            'monthly_completed' => $monthlyArray,
+        ];
+    }
+
+    return view('dashboard.superviseur', compact(
+        'user',
+        'taskProgressByMonth',
+        'monthlyProjectProgress',
+        'tasksCompletedByMonth',
+        'tasksInProgressByMonth',
+        'tasksPendingByMonth'
+    ));
+}
+
+    
 /*--------------------------------------------------------------------------*/
 
     public function supervieur()
     {
-        return view('dashboard.superviseur');                
+        return view('dashboard.superviseur');    
+    }            
+    /*
+    |--------------------------------------------------------------------------
+    | AUTRES DASHBOARDS
+    |--------------------------------------------------------------------------
+    */
+    
 
-    }
-    public function contribiteur()
+    public function contributeur()
     {
-        return view('dashboard.contributeur');                
+        return view('dashboard.contributeur');
     }
 }

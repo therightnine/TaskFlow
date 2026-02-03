@@ -52,20 +52,20 @@
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
            @php
             $menuItems = [
-                ['route' => 'dashboard.chef', 'icon' => 'ic_dashboard.png', 'label' => 'Tableau de bord'],
+                ['route' => 'dashboard.superviseur', 'icon' => 'ic_dashboard.png', 'label' => 'Tableau de bord'],
                 ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
                 ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tâches'],
                 ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Équipes'],
-                ['route' => 'chef.reports', 'icon' => 'ic_reports.png', 'label' => 'Rapports'],
-                ['route' => 'chef.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
-                ['route' => 'chef.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
+                ['route' => 'superviseur.reports', 'icon' => 'ic_reports.png', 'label' => 'Rapports'],
+                ['route' => 'superviseur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
+                ['route' => 'superviseur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
             ];
             @endphp
 
             @foreach($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'chef.settings'
-                        ? Route::is('chef.settings') || Route::is('chef.profile')
+                    $active = $item['route'] === 'superviseur.settings'
+                        ? Route::is('superviseur.settings') || Route::is('superviseur.profile')
                         : Route::is($item['route']);
                 @endphp
                 <li>
@@ -100,7 +100,7 @@
         {{-- MENU HAUT --}}
         <header class="h-20 bg-white shadow-sm flex items-center px-8">
             <h1 class="text-xl font-semibold text-gray-800">
-                @yield('page-title', 'Dashboard')
+                @yield( 'page-title', 'Dashboard')
             </h1>
 
             {{-- RECHERCHE --}}
@@ -124,7 +124,7 @@
                             <p class="text-sm font-semibold text-gray-800">
                                 {{ $user->prenom ?? '' }} {{ $user->nom ?? '' }}
                             </p>
-                            <p class="text-xs text-gray-400">Chef de projet</p>
+                            <p class="text-xs text-gray-400">Superviseur</p>
                         </div>
                         <span class="text-gray-400">▾</span>
                     </button>
@@ -133,14 +133,14 @@
                          class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
                         <ul class="py-2">
                             <li>
-                                <a href="{{ route('chef.settings') }}"
+                                <a href="{{ route('superviseur.settings') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
                                     Gérer le compte
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('chef.profile') }}"
+                                <a href="{{ route('superviseur.profile') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
                                     Voir le profil
@@ -155,7 +155,8 @@
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="flex items-center gap-3 px-4 py-2 w-full text-gray-700 hover:bg-gray-100">
+                                    <button type="submit"
+                                            class="flex items-center gap-3 px-4 py-2 w-full text-gray-700 hover:bg-gray-100">
                                         <img src="{{ asset('images/ic_logout.png') }}" class="w-5 h-5">
                                         Se déconnecter
                                     </button>

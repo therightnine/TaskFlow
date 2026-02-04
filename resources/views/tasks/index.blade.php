@@ -1,6 +1,6 @@
 @php
-    $layout = auth()->user()->id_role === 3
-        ? 'layouts.chef_layout'
+    $layout = auth()->user()->id_role === 4
+        ? 'layouts.contributeur_layout'
         : 'layouts.superviseur_layout';
 @endphp
 
@@ -263,7 +263,7 @@ function openContributorModal(taskId) {
     modal.classList.remove('hidden');
     if(!contributorState[taskId]){
         contributorState[taskId] = {original: new Set(), pending: new Set()};
-        modal.querySelectorAll('.contributor-item.bg-cyan-100').forEach(el => {
+        modal.querySelectorAll('.contributeur-item.bg-cyan-100').forEach(el => {
             const userId = el.id.split('-').pop();
             contributorState[taskId].original.add(userId);
             contributorState[taskId].pending.add(userId);

@@ -16,16 +16,19 @@
     <!-- Buttons -->
     <div class="flex gap-4">
         <!-- Login as link -->
-        <a href="{{ route('login') }}" 
+        <a href="{{ route('login') }}"
            class="bg-cyan-500 text-white px-6 py-2 rounded-xl text-[16px] inline-block text-center
                   hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500 transition">
             Login
         </a>
 
         <!-- Sign Up -->
-        <button class="border border-cyan-500 text-cyan-500 bg-white px-6 py-2 rounded-xl text-[16px]
-                       hover:bg-cyan-500 hover:text-white transition">
+                <!-- Sign Up -->
+        <a href="{{ route('register') }}"
+           class="border border-cyan-500 text-cyan-500 bg-white px-6 py-2 rounded-xl text-[16px]
+                  hover:bg-cyan-500 hover:text-white transition">
             Sign Up
-        </button>
+        </a>
+
     </div>
 </header>

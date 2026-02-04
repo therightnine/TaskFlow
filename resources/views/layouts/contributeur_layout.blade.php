@@ -52,20 +52,20 @@
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
             @php
                 $menuItems = [
-                    ['route' => 'dashboard.superviseur', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
+                    ['route' => 'dashboard.contributeur', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
                     ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projects'],
                     ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tasks'],
                     ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Team'],
-                    ['route' => 'superviseur.reports', 'icon' => 'ic_reports.png', 'label' => 'Reports'],
-                    ['route' => 'superviseur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
-                    ['route' => 'superviseur.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
+                    ['route' => 'contributeur.reports', 'icon' => 'ic_reports.png', 'label' => 'Reports'],
+                    ['route' => 'contributeur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
+                    ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
                 ];
             @endphp
 
             @foreach ($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'superviseur.settings'
-                        ? Route::is('superviseur.settings') || Route::is('superviseur.profile')
+                    $active = $item['route'] === 'contributeur.settings'
+                        ? Route::is('contributeur.settings') || Route::is('contributeur.profile')
                         : Route::is($item['route']);
                 @endphp
 

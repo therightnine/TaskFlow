@@ -3,55 +3,50 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Etat;
-use App\Models\Tache;
-use App\Models\User;
 
 class Projet extends Model
 {
     protected $table = 'projets';
 
-    // Champs autorisés à remplir
-    protected $fillable = [
-        'nom_projet',
-        'description',
-        'date_debut',
-        'deadline',
-        'id_user',
-        'is_favorite',
-        'id_etat',
-        'other_superviseurs',
-    ];
-
-    // Pour stocker les autres superviseurs en array
-    protected $casts = [
-        'other_superviseurs' => 'array',
-    ];
-
-    // Relations
-    public function superviseur()
+    /* =========================
+       Propriétaire (Chef)
+       ========================= */
+    public function owner()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    public function otherSuperviseurs()
+    /* =========================
+       Superviseurs (many-to-many)
+       ========================= */
+    public function superviseurs()
     {
-        return User::whereIn('id', $this->other_superviseurs ?? [])->get();
+        return $this->belongsToMany(
+            User::class,
+            'projet_superviseur', // 🔴 table pivot
+            'projet_id',           // FK projet
+            'user_id'              // FK user
+        );
     }
 
-    public function etat()
+    /* =========================
+       Contributeurs (many-to-many)
+       ========================= */
+    public function contributeurs()
     {
-        return $this->belongsTo(Etat::class, 'id_etat');
+        return $this->belongsToMany(
+            User::class,
+            'projet_contributeur', // 🔴 table pivot
+            'projet_id',           // FK projet
+            'user_id'
+        );
     }
 
+    /* =========================
+       Tâches
+       ========================= */
     public function taches()
     {
         return $this->hasMany(Tache::class, 'id_projet');
     }
-
-    public function contributeurs()
-{
-    return $this->belongsToMany(User::class, 'projet_contributeur', 'projet_id', 'user_id');
-}
-
 }

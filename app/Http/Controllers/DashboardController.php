@@ -72,6 +72,15 @@ class DashboardController extends Controller
             'overdueTasks'
         ));
     }
+public function messages()
+{
+    // Ici tu peux récupérer des messages depuis ta DB si tu en as
+    // Exemple minimal :
+    $messages = []; // Remplace par ta requête réelle si nécessaire
+
+    return view('contributeur.message', compact('messages'));
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +93,7 @@ class DashboardController extends Controller
 
     // Projects assigned to this supervisor
     $projects = $user->projetsSupervised()
-        ->with('taches', 'contributors')
+        ->with('taches', 'contributeurs')
         ->get();
 
     /*
@@ -234,7 +243,14 @@ class DashboardController extends Controller
             'abonnements'        => $abonnements,
         ]);
     }
-
+public function reports()
+{
+    return view('contributeur.reports');
+}
+public function settings()
+{
+    return view('contributeur.settings');
+}
 
         /**
      * Dashboard Contributeur

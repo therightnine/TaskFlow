@@ -17,9 +17,9 @@ class EquipeController extends Controller
         $userId = Auth::id();
 
         // Fetch all projects related to the user
-        $projets = Projet::with(['owner', 'superviseurs', 'contributors'])
+        $projets = Projet::with(['owner', 'superviseurs', 'contributeurs'])
             ->where('id_user', $userId)
-            ->orWhereHas('contributors', fn($q) => $q->where('user_id', $userId))
+            ->orWhereHas('contributeurs', fn($q) => $q->where('user_id', $userId))
             ->orWhereHas('superviseurs', fn($q) => $q->where('user_id', $userId))
             ->get();
 
@@ -31,8 +31,8 @@ class EquipeController extends Controller
                 $members->push($projet->owner);
             }
 
-            if ($projet->contributors) {
-                $members = $members->merge($projet->contributors);
+            if ($projet->contributeurs) {
+                $members = $members->merge($projet->contributeurs);
             }
 
             if ($projet->superviseurs) {

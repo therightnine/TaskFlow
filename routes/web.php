@@ -8,7 +8,10 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EquipeController;
-
+use App\Http\Controllers\OptionalController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\MessagesController;
 /*
 |--------------------------------------------------------------------------
 | Page d'accueil
@@ -148,6 +151,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings', [SettingsController::class, 'update'])->name('chef.settings.update');
     Route::get('/settings/profile', [ProfileController::class, 'index'])->name('chef.profile');
     Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])->name('chef.updateBio');
+    Route::get('settings/tasks', [TaskController::class, 'index'])->name('chef.tasks');
+    Route::get('settings/team', [EquipeController::class, 'index'])->name('chef.team');
+    Route::get('/settings/reports', [ReportsController::class, 'index'])->name('chef.reports');
+    Route::get('/settings/messages', [MessagesController::class, 'index'])->name('chef.messages');
 
     /*
     |--------------------------------------------------------------------------
@@ -182,4 +189,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/contributeur/settings/update-bio', [ProfileController::class, 'updateBio'])
         ->name('contributeur.updateBio');
+        /*
+|--------------------------------------------------------------------------
+| Registration (First page + Optional page)
+|--------------------------------------------------------------------------
+*/
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/register/optional/{user_id}', [OptionalController::class, 'show'])->name('register.optional');
+Route::post('/register/optional/{user_id}', [OptionalController::class, 'store'])->name('register.optional.store');
+
+
 });

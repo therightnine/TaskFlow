@@ -10,7 +10,7 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return view('chef.settings', [
+        return view('contributeur.settings', [
             'user' => Auth::user(),
         ]);
     }

@@ -53,7 +53,7 @@ class User extends Authenticatable
         Projet::class,          // Le modèle cible
         'projet_contributeurs', // Nom de la table pivot
         'user_id',              // Clé étrangère du user dans la table pivot
-        'id_projet'             // Clé étrangère du projet dans la table pivot
+        'projet_id'             // Clé étrangère du projet dans la table pivot
     );
 }
 }

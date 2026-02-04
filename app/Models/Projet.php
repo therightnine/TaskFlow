@@ -48,4 +48,10 @@ class Projet extends Model
     {
         return $this->hasMany(Tache::class, 'id_projet');
     }
+
+    public function contributeurs()
+{
+    return $this->belongsToMany(User::class, 'projet_contributeur', 'projet_id', 'user_id');
+}
+
 }

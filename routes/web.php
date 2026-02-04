@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\EquipeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,74 +29,157 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| Dashboards (selon rôle)
+| Routes protégées (AUTH)
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard/chef', [DashboardController::class, 'chef'])
-    ->name('dashboard.chef');
+Route::middleware(['auth'])->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| Projets (CRUD) → ProjetController
-|--------------------------------------------------------------------------
-*/
-Route::get('/projects', [ProjetController::class, 'index'])
-    ->name('projects.index');
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboards par rôle
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->name('dashboard.chef');
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->name('dashboard.supervisor');
+    Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
 
-Route::get('/projects/create', [ProjetController::class, 'create'])
-    ->name('projects.create');
+    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])
+        ->name('dashboard.contributeur');
 
-Route::post('/projects', [ProjetController::class, 'store'])
-    ->name('projects.store');
+    Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
+        ->name('dashboard.superviseur');
 
-Route::get('/projects/{project}/edit', [ProjetController::class, 'edit'])
-    ->name('projects.edit');
+    /*
+    |--------------------------------------------------------------------------
+    | Projets (CRUD)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/projects', [ProjetController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [ProjetController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjetController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}/edit', [ProjetController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [ProjetController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjetController::class, 'destroy'])->name('projects.destroy');
 
-Route::put('/projects/{project}', [ProjetController::class, 'update'])
-    ->name('projects.update');
+    Route::post('/projects/{project}/archive', [ProjetController::class, 'archive'])->name('projects.archive');
+    Route::post('/projects/{project}/favorite', [ProjetController::class, 'toggleFavorite'])->name('projects.favorite');
 
-Route::delete('/projects/{project}', [ProjetController::class, 'destroy'])
-    ->name('projects.destroy');
+    Route::post('/projects/{project}/add-supervisor', [ProjetController::class, 'addSupervisor'])
+        ->name('projects.updateSupervisor');
 
-Route::post('/projects/{project}/archive', [ProjetController::class, 'archive'])
-    ->name('projects.archive');
+    Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
+        ->name('projects.addContributor');
 
-Route::post('/projects/{project}/favorite', [ProjetController::class, 'toggleFavorite'])
-    ->name('projects.favorite');
+    Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
+    Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
 
-Route::post('/projects/{project}/add-supervisor', [ProjetController::class, 'addSupervisor'])
-    ->name('projects.updateSupervisor');
+    /*
+    |--------------------------------------------------------------------------
+    | Tâches
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-/*
-|--------------------------------------------------------------------------
-| Pages Chef (DashboardController)
-|--------------------------------------------------------------------------
-*/
-Route::get('/team', [DashboardController::class, 'team'])
-    ->name('chef.team');
+    Route::post('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
+        ->name('tasks.updateStatus');
 
-Route::get('/tasks', [DashboardController::class, 'tasks'])
-    ->name('chef.tasks');
+    Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])
+        ->name('tasks.toggleContributor');
 
-Route::get('/reports', [DashboardController::class, 'reports'])
-    ->name('chef.reports');
+    Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask'])
+        ->name('tasks.archive');
 
-Route::get('/messages', [DashboardController::class, 'messages'])
-    ->name('chef.messages');
+    Route::post('/tasks/{task}/comment', [TaskController::class, 'addComment'])
+        ->name('tasks.comment.add');
 
-/*
-|--------------------------------------------------------------------------
-| Paramètres & Profil
-|--------------------------------------------------------------------------
-*/
-Route::get('/settings', [SettingsController::class, 'index'])
-    ->name('chef.settings');
+    Route::delete('/comments/{commentaire}', [TaskController::class, 'deleteComment'])
+        ->name('comments.destroy');
 
-Route::post('/settings', [SettingsController::class, 'update'])
-    ->name('chef.settings.update');
+    Route::put('/comments/{commentaire}', [TaskController::class, 'updateComment'])
+        ->name('comments.update');
 
-Route::get('/settings/profile', [ProfileController::class, 'index'])
-    ->name('chef.profile');
+    /*
+    |--------------------------------------------------------------------------
+    | Pages Superviseur
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
+        ->name('superviseur.tasks');
 
-Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])
-    ->name('chef.updateBio');
+    Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
+        ->name('superviseur.reports');
+
+    Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
+        ->name('superviseur.messages');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pages Contributeur (ALIASES – même pages)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/contributeur/tasks', [TaskController::class, 'index'])
+        ->name('contributeur.tasks');
+
+    Route::get('/contributeur/reports', [DashboardController::class, 'reports'])
+        ->name('contributeur.reports');
+
+    Route::get('/contributeur/messages', [DashboardController::class, 'messages'])
+        ->name('contributeur.messages');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Équipe
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/equipe', [EquipeController::class, 'index'])->name('equipe');
+    Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
+        ->name('equipe.partials.profile');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paramètres – Chef
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/settings', [SettingsController::class, 'index'])->name('chef.settings');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('chef.settings.update');
+    Route::get('/settings/profile', [ProfileController::class, 'index'])->name('chef.profile');
+    Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])->name('chef.updateBio');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paramètres – Superviseur
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/superviseur/settings', [SettingsController::class, 'index'])
+        ->name('superviseur.settings');
+
+    Route::post('/superviseur/settings', [SettingsController::class, 'update'])
+        ->name('superviseur.settings.update');
+
+    Route::get('/superviseur/settings/profile', [ProfileController::class, 'index'])
+        ->name('superviseur.profile');
+
+    Route::post('/superviseur/settings/update-bio', [ProfileController::class, 'updateBio'])
+        ->name('superviseur.updateBio');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paramètres – Contributeur
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/contributeur/settings', [SettingsController::class, 'index'])
+        ->name('contributeur.settings');
+
+    Route::post('/contributeur/settings', [SettingsController::class, 'update'])
+        ->name('contributeur.settings.update');
+
+    Route::get('/contributeur/settings/profile', [ProfileController::class, 'index'])
+        ->name('contributeur.profile');
+
+    Route::post('/contributeur/settings/update-bio', [ProfileController::class, 'updateBio'])
+        ->name('contributeur.updateBio');
+});

@@ -19,4 +19,5 @@ class Tache extends Model
     {
         return $this->belongsTo(Projet::class, 'id_projet');
     }
+    
 }

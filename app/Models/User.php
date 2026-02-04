@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
-use App\Models\Projet; 
+use App\Models\Projet;
 class User extends Authenticatable
 {
     use Notifiable;
@@ -47,4 +47,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Projet::class, 'id_user');
     }
+    public function projetsContributed()
+{
+    return $this->belongsToMany(
+        Projet::class,          // Le modèle cible
+        'projet_contributeurs', // Nom de la table pivot
+        'user_id',              // Clé étrangère du user dans la table pivot
+        'id_projet'             // Clé étrangère du projet dans la table pivot
+    );
+}
 }

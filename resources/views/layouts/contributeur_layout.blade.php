@@ -53,12 +53,12 @@
             @php
                 $menuItems = [
                     ['route' => 'dashboard.contributeur', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
-                    ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projects'],
-                    ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tasks'],
-                    ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Team'],
-                    ['route' => 'contributeur.reports', 'icon' => 'ic_reports.png', 'label' => 'Reports'],
+                    ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
+                    ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Taches'],
+                    ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Groupes'],
+                    ['route' => 'contributeur.reports', 'icon' => 'ic_reports.png', 'label' => 'Raports'],
                     ['route' => 'contributeur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
-                    ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
+                    ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramétres'],
                 ];
             @endphp
 

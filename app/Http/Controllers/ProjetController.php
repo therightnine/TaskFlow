@@ -17,7 +17,7 @@ class ProjetController extends Controller
         $user = auth()->user();
         $role = $user->id_role;
 
-        $query = Projet::with(['etat', 'superviseurs', 'contributors', 'taches']);
+        $query = Projet::with(['etat', 'superviseurs', 'contributeurs', 'taches']);
 
         if ($role == 3) {
             // Owner / chef de projet
@@ -27,7 +27,7 @@ class ProjetController extends Controller
             $query->whereHas('superviseurs', fn($q) => $q->where('users.id', $user->id));
         } elseif ($role == 4) {
             // Contributor: projects they contribute to
-            $query->whereHas('contributors', fn($q) => $q->where('users.id', $user->id));
+            $query->whereHas('contributeurs', fn($q) => $q->where('users.id', $user->id));
         } else {
             abort(403);
         }

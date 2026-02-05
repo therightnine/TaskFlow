@@ -25,7 +25,8 @@ class User extends Authenticatable
         'password',
         'date_naissance',
         'profession',
-        'photo'
+        'photo',
+        'id_role'
     ];
 
     public function getAuthPassword()

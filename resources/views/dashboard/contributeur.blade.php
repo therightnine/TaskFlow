@@ -93,7 +93,10 @@
                 @forelse ($recentTasks as $task)
                     <li class="flex justify-between">
                         <span>{{ $task->nom_tache }}</span>
-                        <span class="text-slate-400">{{ $task->updated_at ? $task->updated_at->diffForHumans() : '—' }}</span>
+                        <span class="text-slate-400">
+    {{ $task->updated_at ? \Carbon\Carbon::parse($task->updated_at)->diffForHumans() : '—' }}
+</span>
+
                     </li>
                 @empty
                     <li class="text-slate-400">Aucune activité récente</li>

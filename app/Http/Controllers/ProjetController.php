@@ -10,6 +10,8 @@ class ProjetController extends Controller
 {
 
 
+
+
     // Liste des projets
     public function index(Request $request)
     {
@@ -44,7 +46,7 @@ class ProjetController extends Controller
 
         $users = User::all();
 
-        $contributors = User::whereHas('role', fn ($q) =>
+        $contributeurs = User::whereHas('role', fn ($q) =>
             $q->where('role', 'Contributeur')
         )->get();
 
@@ -59,7 +61,9 @@ class ProjetController extends Controller
         }
 
         return view('projects.index', compact('projects', 'filter', 'users', 'assignables', 'userRole'));
+{
 
+    }
     }
 
 
@@ -118,7 +122,7 @@ class ProjetController extends Controller
 
 
 
-    public function addContributor(Request $request, Projet $project)
+    public function addContributeur(Request $request, Projet $project)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -131,7 +135,7 @@ class ProjetController extends Controller
             return back()->withErrors('Cet utilisateur n’est pas un contributeur.');
         }
 
-        $project->contributors()->syncWithoutDetaching([$user->id]);
+        $project->contributeurs()->syncWithoutDetaching([$user->id]);
 
         return back()->with('success', 'Contributeur ajouté.');
     }
@@ -278,7 +282,7 @@ class ProjetController extends Controller
         if (
             ($user->id_role == 3 && $project->id_user != $user->id) ||
             ($user->id_role == 2 && !$project->superviseurs->contains($user->id)) ||
-            ($user->id_role == 4 && !$project->contributors->contains($user->id))
+            ($user->id_role == 4 && !$project->contributeurs->contains($user->id))
         ) {
             abort(403);
         }

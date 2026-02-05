@@ -69,16 +69,18 @@
                         : Route::is($item['route']);
                 @endphp
 
-                <li>
+                                <li>
                     <a href="{{ route($item['route']) }}"
                        class="flex items-center gap-4 py-3 px-4 rounded transition
                               {{ $active ? 'bg-primary text-white' : 'hover:text-primary' }}">
-                        <img src="{{ asset('images/' . $item['icon']) }}"
-                             class="w-6 h-6"
-                             style="{{ $active ? 'filter: brightness(0) invert(1)' : '' }}">
+
+                            <img src="{{ asset('images/' . $item['icon']) }}"
+                            class="w-6 h-6 transition-all {{ $active ? 'brightness-0 invert' : '' }}">
+
                         {{ $item['label'] }}
                     </a>
                 </li>
+
             @endforeach
 
             {{-- LOGOUT --}}

@@ -1,7 +1,7 @@
 @php
     $layout = auth()->user()->id_role === 4
-        ? 'layouts.contributeur_layout'
-        : 'layouts.superviseur_layout';
+        ? 'layouts.superviseur_layout'
+        : 'layouts.contributeur_layout';
 @endphp
 
 @extends($layout)

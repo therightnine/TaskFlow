@@ -9,8 +9,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EquipeController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\Auth\OptionalController;
+
 /*
 |--------------------------------------------------------------------------
 | Page d'accueil
@@ -46,8 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->name('dashboard.supervisor');
     Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
 
-    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])
-        ->name('dashboard.contributeur');
+    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])->name('dashboard.contributeur');
 
     Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
         ->name('dashboard.superviseur');
@@ -120,7 +119,7 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Pages Contributeur (ALIASES – même pages)
+    | Pages Contributeur
     |--------------------------------------------------------------------------
     */
     Route::get('/contributeur/tasks', [TaskController::class, 'index'])
@@ -152,8 +151,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])->name('chef.updateBio');
     Route::get('settings/tasks', [TaskController::class, 'index'])->name('chef.tasks');
     Route::get('settings/team', [EquipeController::class, 'index'])->name('chef.team');
-    Route::get('/settings/reports', [ReportsController::class, 'index'])->name('chef.reports');
-    Route::get('/settings/messages', [MessagesController::class, 'index'])->name('chef.messages');
 
     /*
     |--------------------------------------------------------------------------

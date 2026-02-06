@@ -11,7 +11,7 @@
         <div class="w-[500px] p-12 bg-white rounded-[60px] shadow-2xl shadow-black/20">
 
             <h1 class="text-5xl font-bold text-zinc-900 mb-12 text-center font-vietnam">
-                Login
+                Connexion
             </h1>
 
             <form method="POST" action="{{ route('login') }}">
@@ -51,7 +51,7 @@
 
                 <!-- PASSWORD -->
                 <label for="password" class="block text-2xl mb-3 text-zinc-900 font-vietnam">
-                    Password
+                    Mot de passe
                 </label>
                 <div class="w-full mb-6">
                     <div class="relative">
@@ -84,7 +84,7 @@
                 <!-- FORGOT -->
                 <div class="text-right mb-6">
                     <a href="#" class="text-sky-900 text-lg font-medium hover:underline">
-                        Forgot Password?
+                        Mot de passe oublié ?
                     </a>
                 </div>
 
@@ -92,13 +92,13 @@
                 <button type="submit"
                         class="w-full py-4 bg-cyan-500 text-white text-2xl font-bold
                                rounded-lg hover:bg-sky-700 transition">
-                    Login
+                    Connexion
                 </button>
             </form>
 
             <!-- REGISTER -->
             <div class="mt-6 text-center text-lg">
-                <span class="text-zinc-900">Don’t have an account? </span>
+                <span class="text-zinc-900">Vous n'avez pas de compte ? </span>
                 <a href="{{ route('register') }}"
  class="text-sky-900 font-bold hover:underline">
     S'inscrire

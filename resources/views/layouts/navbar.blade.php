@@ -7,9 +7,9 @@
 
     <!-- Navigation -->
     <nav class="flex-1 flex justify-center gap-10 text-[16px]">
-        <a href="{{ route('home') }}" class="text-black hover:text-cyan-500 transition">Home</a>
-        <a href="#" class="text-black hover:text-cyan-500 transition">Features</a>
-        <a href="#" class="text-black hover:text-cyan-500 transition">Pricing</a>
+        <a href="{{ route('home') }}" class="text-black hover:text-cyan-500 transition">Acceuil</a>
+        <a href="#" class="text-black hover:text-cyan-500 transition">Fonctionnalités</a>
+        <a href="#" class="text-black hover:text-cyan-500 transition">Tarifs</a>
         <a href="#" class="text-black hover:text-cyan-500 transition">Contact</a>
     </nav>
 

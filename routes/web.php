@@ -112,7 +112,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 //settings admin
 /*--------------------------------------------------------------------------*/
 
-Route::get('/admin/settings', [AdminSettingsController::class, 'indexadmin'])
+Route::get('/admin/settings', [SettingsController::class, 'index'])
 ->name('admin.settings');
 
 /*-------------------------------------------------------------------------*/

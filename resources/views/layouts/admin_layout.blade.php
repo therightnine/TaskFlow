@@ -135,20 +135,20 @@
                                 <a href="{{ route('chef.settings') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
-                                    Manage Account
+                                    Gérer le compte
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('chef.profile') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
-                                    Show Profile
+                                    Voir le profil
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
-                                    Activity Log
+                                    Historique des activités
                                 </a>
                             </li>
                             <li>
@@ -156,7 +156,7 @@
                                     @csrf
                                     <button type="submit" class="flex items-center gap-3 px-4 py-2 w-full text-gray-700 hover:bg-gray-100">
                                         <img src="{{ asset('images/ic_logout.png') }}" class="w-5 h-5">
-                                        Log Out
+                                        Se déconnecter
                                     </button>
                                 </form>
                             </li>

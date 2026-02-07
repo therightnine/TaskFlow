@@ -1,8 +1,29 @@
-@php 
-        $layout = auth()->user()->id_role === 3
-        ? 'layouts.chef_layout'
-        : 'layouts.superviseur_layout';
+@php
+    $roleId = auth()->user()->id_role;
+
+    switch ($roleId) {
+        case 1: // Admin
+            $layout = 'layouts.admin_layout';
+            break;
+
+        case 3: // Chef de projet
+            $layout = 'layouts.chef_layout';
+            break;
+
+        case 2: // Superviseur
+            $layout = 'layouts.superviseur_layout';
+            break;
+
+        case 4: // Contributeur
+            $layout = 'layouts.contributeur_layout';
+            break;
+
+        default:
+            $layout = 'layouts.app'; // fallback safety
+    }
 @endphp
+
+@extends($layout)
 
 @section('title', 'Modifier le profil')
 @section('page-title', 'Paramètres')

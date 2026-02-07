@@ -140,7 +140,7 @@ Route::middleware(['auth'])->group(function () {
     | Pages Contributeur
     |--------------------------------------------------------------------------
     */
-    Route::get('/contributeur/tasks', [TaskController::class, 'index'])
+    Route::get('/contributeur/tasks', [TaskController::class, 'tasks'])
         ->name('contributeur.tasks');
 
     Route::get('/contributeur/reports', [DashboardController::class, 'reports'])
@@ -148,6 +148,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/contributeur/messages', [DashboardController::class, 'messages'])
         ->name('contributeur.messages');
+
+
 
     /*
     |--------------------------------------------------------------------------

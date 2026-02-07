@@ -3,48 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Tache;
 
 class Projet extends Model
 {
     protected $table = 'projets';
 
-    /* =========================
-       Propriétaire (Chef)
-       ========================= */
-    public function owner()
+    // Chef de projet
+    public function chef()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    /* =========================
-       Superviseurs (many-to-many)
-       ========================= */
-    public function superviseurs()
-    {
-        return $this->belongsToMany(
-            User::class,
-            'projet_superviseur', // 🔴 table pivot
-            'projet_id',           // FK projet
-            'user_id'              // FK user
-        );
-    }
-
-    /* =========================
-       Contributeurs (many-to-many)
-       ========================= */
+    // ✅ Contributeurs (TABLE QUE TU AS DONNÉE)
     public function contributeurs()
     {
         return $this->belongsToMany(
             User::class,
-            'projet_contributeur', // 🔴 table pivot
-            'projet_id',           // FK projet
+            'projet_contributeur',
+            'projet_id',
             'user_id'
-        );
+        )->withTimestamps();
     }
 
-    /* =========================
-       Tâches
-       ========================= */
+    // Superviseurs
+    public function superviseurs()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'projet_superviseur',
+            'projet_id',
+            'user_id'
+        )->withTimestamps();
+    }
+
+    // Tâches
     public function taches()
     {
         return $this->hasMany(Tache::class, 'id_projet');

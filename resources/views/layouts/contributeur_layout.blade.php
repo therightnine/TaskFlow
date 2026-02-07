@@ -59,6 +59,7 @@
                     ['route' => 'contributeur.reports', 'icon' => 'ic_reports.png', 'label' => 'Raports'],
                     ['route' => 'contributeur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
                     ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramétres'],
+                    
                 ];
             @endphp
 

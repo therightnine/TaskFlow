@@ -100,16 +100,15 @@ class User extends Authenticatable
     }
 
 
-    public function contributedTasks()
-    {
-        return $this->belongsToMany(
-            Tache::class,
-            'tache_contributeur',
-            'user_id',
-            'tache_id',
-            'role_id'
-        );
-    }
+    public function projetsContributes()
+{
+    return $this->belongsToMany(
+        Projet::class,
+        'projet_contributeur',
+        'user_id',
+        'projet_id'
+    )->withTimestamps();
+}
 
     public function isSuperviseur()
     {

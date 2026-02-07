@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Etat;
+use App\Models\Projet;
+use App\Models\User;
 
 class Tache extends Model
 {
     protected $table = 'taches';
-    public $timestamps = false;
 
     protected $fillable = [
         'nom_tache',
@@ -17,12 +19,6 @@ class Tache extends Model
         'id_projet',
         'id_etat',
     ];
-    protected $dates = [
-    'created_at',
-    'updated_at',
-    'deadline', // si tu veux utiliser Carbon pour deadline
-];
-
 
     public function projet()
     {
@@ -33,13 +29,14 @@ class Tache extends Model
     {
         return $this->belongsTo(Etat::class, 'id_etat');
     }
-
-
-      public function commentaires()
+     public function commentaires()
     {
-        return $this->hasMany(Commentaire::class, 'id_tache')->orderBy('created_at', 'desc');
+        return $this->hasMany(Commentaire::class, 'id_tache');
     }
 
+    /**
+     * Contributeurs de la tâche
+     */
     public function contributeurs()
     {
         return $this->belongsToMany(
@@ -50,15 +47,10 @@ class Tache extends Model
         );
     }
 
-    public function superviseurs()
+    public function isOverdue()
     {
-        return $this->belongsToMany(
-            User::class,
-            'tache_superviseur',
-            'id_tache',
-            'id_user'
-        );
+        return $this->deadline < now()
+            && $this->etat
+            && $this->etat->etat !== 'terminé';
     }
-
-    }
-
+}

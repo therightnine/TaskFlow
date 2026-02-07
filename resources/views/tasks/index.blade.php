@@ -189,9 +189,10 @@
                         @if($tasksForStatus->isEmpty())
                             <p class="text-gray-400 text-sm">Aucune tâche dans ce statut</p>
                         @else
-                            @foreach($tasksForStatus as $task)
-                                @include('tasks.partials.task-card', ['task' => $task, 'role' => $role, 'etats' => $etats])
-                            @endforeach
+                           @foreach($tasksForStatus as $task)
+    @include('tasks.partials.task_card', ['task' => $task, 'role' => $role, 'etats' => $etats])
+@endforeach
+
                         @endif
 
                     </div>
@@ -256,40 +257,40 @@ function openTaskModal(id) { document.getElementById('task-modal-' + id)?.classL
 function closeTaskModal(id) { document.getElementById('task-modal-' + id)?.classList.add('hidden'); }
 
 // Contributor modal
-const contributorState = {};
-function openContributorModal(taskId) {
+const contributeurState = {};
+function openContributeurModal(taskId) {
     const modal = document.getElementById('modal-' + taskId);
     if(!modal) return;
     modal.classList.remove('hidden');
-    if(!contributorState[taskId]){
-        contributorState[taskId] = {original: new Set(), pending: new Set()};
+    if(!contributeurState[taskId]){
+        contributeurState[taskId] = {original: new Set(), pending: new Set()};
         modal.querySelectorAll('.contributeur-item.bg-cyan-100').forEach(el => {
             const userId = el.id.split('-').pop();
-            contributorState[taskId].original.add(userId);
-            contributorState[taskId].pending.add(userId);
+            contributeurState[taskId].original.add(userId);
+            contributeurState[taskId].pending.add(userId);
         });
     }
 }
-function closeContributorModal(taskId){ document.getElementById('modal-' + taskId)?.classList.add('hidden'); }
-function toggleContributor(taskId, userId){
+function closeContributeurModal(taskId){ document.getElementById('modal-' + taskId)?.classList.add('hidden'); }
+function toggleContributeur(taskId, userId){
     const el = document.getElementById(`task-${taskId}-user-${userId}`);
-    const state = contributorState[taskId];
+    const state = contributeurState[taskId];
     if(state.pending.has(String(userId))){
         state.pending.delete(String(userId));
         el.classList.remove('bg-cyan-100','border-cyan-500'); el.classList.add('border-gray-200');
     } else { state.pending.add(String(userId)); el.classList.add('bg-cyan-100','border-cyan-500'); }
 }
 function saveContributors(taskId){
-    const state = contributorState[taskId];
+    const state = contributeurState[taskId];
     const toAdd = [...state.pending].filter(id => !state.original.has(id));
     const toRemove = [...state.original].filter(id => !state.pending.has(id));
     const requests = [];
-    toAdd.forEach(userId => { requests.push(fetch(`/tasks/${taskId}/contributor-toggle`,{
+    toAdd.forEach(userId => { requests.push(fetch(`/tasks/${taskId}/contributeur-toggle`,{
         method:'POST',
         headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
         body: JSON.stringify({user_id:userId, assign:true})
     })); });
-    toRemove.forEach(userId => { requests.push(fetch(`/tasks/${taskId}/contributor-toggle`,{
+    toRemove.forEach(userId => { requests.push(fetch(`/tasks/${taskId}/contributeur-toggle`,{
         method:'POST',
         headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
         body: JSON.stringify({user_id:userId, assign:false})
@@ -297,7 +298,7 @@ function saveContributors(taskId){
     Promise.all(requests).then(()=>{ location.reload(); });
 }
 function changePage(taskId, page){
-    document.querySelectorAll(`#modal-${taskId} .contributor-item`).forEach(el=>el.classList.add('hidden'));
+    document.querySelectorAll(`#modal-${taskId} .contributeur-item`).forEach(el=>el.classList.add('hidden'));
     document.querySelectorAll(`#modal-${taskId} .page-${page}`).forEach(el=>el.classList.remove('hidden'));
 }
 </script>

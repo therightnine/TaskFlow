@@ -320,12 +320,11 @@ use App\Http\Controllers\EquipeController;
     */
     Route::get('/contributeur/tasks', [TaskController::class, 'tasks'])
         ->name('contributeur.tasks');
+    
+    Route::get('/contributeur/projects', [ProjetController::class, 'index'])
+        ->name('contributeur.projects');
 
-    Route::get('/contributeur/reports', [DashboardController::class, 'reports'])
-        ->name('contributeur.reports');
-
-    Route::get('/contributeur/messages', [DashboardController::class, 'messages'])
-        ->name('contributeur.messages');
+   
 
 
 
@@ -347,7 +346,7 @@ use App\Http\Controllers\EquipeController;
     Route::post('/settings', [SettingsController::class, 'update'])->name('chef.settings.update');
     Route::get('/settings/profile', [ProfileController::class, 'index'])->name('chef.profile');
     Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])->name('chef.updateBio');
-    Route::get('settings/tasks', [TaskController::class, 'index'])->name('chef.tasks');
+    Route::get('settings/tasks', action: [TaskController::class, 'index'])->name('chef.tasks');
     Route::get('settings/team', [EquipeController::class, 'index'])->name('chef.team');
 
     /*

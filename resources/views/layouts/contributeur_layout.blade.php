@@ -10,15 +10,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'TaskFlow')</title>
 
-    {{-- Tailwind --}}
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    {{-- Google Fonts --}}
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
-    {{-- Chart --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -45,122 +44,137 @@
 
         {{-- Logo --}}
         <div class="mb-12 flex justify-center">
-            <img src="{{ asset('images/Logo.png') }}" class="w-40">
+            <img src="{{ asset('images/Logo.png') }}" alt="Logo" class="w-40 h-auto object-contain">
         </div>
 
-        {{-- MENU --}}
+        {{-- Menu --}}
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
-            @php
+           @php
                 $menuItems = [
-                    ['route' => 'dashboard.contributeur', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
-                    ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
-                    ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Taches'],
-                    ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Groupes'],
-                    ['route' => 'contributeur.reports', 'icon' => 'ic_reports.png', 'label' => 'Raports'],
-                    ['route' => 'contributeur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
+                    ['route' => 'dashboard.contributeur', 'icon' => 'ic_dashboard.png', 'label' => 'Tableau de bord'],
+                    ['route' => 'contributeur.projects', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
+                    ['route' => 'contributeur.tasks', 'icon' => 'ic_tasks.png', 'label' => 'Taches'],
+                    ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Equipes'],
                     ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramétres'],
-                    
                 ];
             @endphp
 
-            @foreach ($menuItems as $item)
+
+            @foreach($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'contributeur.settings'
-                        ? Route::is('contributeur.settings') || Route::is('contributeur.profile')
+                    $active = $item['route'] === 'chef.settings'
+                        ? Route::is('chef.settings') || Route::is('chef.profile')
                         : Route::is($item['route']);
                 @endphp
-
-                                <li>
+                <li>
                     <a href="{{ route($item['route']) }}"
                        class="flex items-center gap-4 py-3 px-4 rounded transition
                               {{ $active ? 'bg-primary text-white' : 'hover:text-primary' }}">
-
-                            <img src="{{ asset('images/' . $item['icon']) }}"
-                            class="w-6 h-6 transition-all {{ $active ? 'brightness-0 invert' : '' }}">
-
+                        <img src="{{ asset('images/' . $item['icon']) }}"
+                             class="w-6 h-6 transition-all"
+                             style="{{ $active ? 'filter: brightness(0) invert(1);' : '' }}">
                         {{ $item['label'] }}
                     </a>
                 </li>
-
             @endforeach
 
-            {{-- LOGOUT --}}
+            {{-- Sign Out --}}
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"
-                            class="flex items-center gap-4 py-3 px-4 w-full hover:text-primary">
-                        <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6">
-                        Se déconnecter
+                            class="flex items-center gap-4 py-3 px-4 w-full text-gray-600 hover:text-primary rounded transition">
+                        <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6 transition-all">
+                        Déconnexion
                     </button>
                 </form>
             </li>
         </ul>
     </aside>
 
-    {{-- MAIN --}}
+    {{-- MAIN AREA --}}
     <div class="flex-1 flex flex-col">
 
-        {{-- TOP BAR --}}
+        {{-- TOP MENU --}}
         <header class="h-20 bg-white shadow-sm flex items-center px-8">
             <h1 class="text-xl font-semibold text-gray-800">
-                @yield('page-title', 'Dashboard')
+                @yield('page-title', 'Projets')
             </h1>
 
             {{-- SEARCH --}}
             <div class="flex-1 flex justify-center">
                 <div class="relative w-[420px]">
-                    <span class="absolute inset-y-0 left-4 flex items-center">
+                    <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
-                    <input type="text" placeholder="Search..."
-                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 focus:ring-2 focus:ring-primary">
+                    <input type="text" placeholder="Search here..."
+                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
             </div>
 
-            {{-- USER --}}
-            <div class="relative">
-                <button id="userDropdownBtn" class="flex items-center gap-3">
-                    <img src="{{ $user && $user->photo ? asset($user->photo) : asset('images/default-avatar.png') }}"
-                         class="w-10 h-10 rounded-full">
-                    <div>
-                        <p class="text-sm font-semibold">{{ $user->prenom }} {{ $user->nom }}</p>
-                        <p class="text-xs text-gray-400">Contributeur</p>
-                    </div>
-                    <span>▾</span>
-                </button>
+            {{-- USER INFO --}}
+            <div class="flex items-center gap-6">
+                <div class="relative">
+                    <button id="userDropdownBtn" class="flex items-center gap-3 cursor-pointer focus:outline-none">
+                        <img src="{{ $user && $user->photo ? asset($user->photo) : asset('images/default-avatar.png') }}"
+                             class="w-10 h-10 rounded-full object-cover">
+                        <div class="leading-tight">
+                            <p class="text-sm font-semibold text-gray-800">
+                                {{ $user->prenom ?? '' }} {{ $user->nom ?? '' }}
+                            </p>
+                            <p class="text-xs text-gray-400">Contributeur</p>
+                        </div>
+                        <span class="text-gray-400">▾</span>
+                    </button>
 
-                <div id="userDropdownMenu"
-                     class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg hidden">
-                    <ul class="py-2">
-                        <li>
-                            <a href="{{ route('superviseur.settings') }}"
-                               class="block px-4 py-2 hover:bg-gray-100">
-                                Account settings
-                            </a>
-                        </li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                    Logout
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
+                    <div id="userDropdownMenu"
+                         class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
+                        <ul class="py-2">
+                            <li>
+                                <a href="{{ route('chef.settings') }}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
+                                    Gérer Compte
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('chef.profile') }}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
+                                    Voir Profil
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
+                                    Journal D'activité
+                                </a>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-3 px-4 py-2 w-full text-gray-700 hover:bg-gray-100">
+                                        <img src="{{ asset('images/ic_logout.png') }}" class="w-5 h-5">
+                                        Déconnexion
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </header>
 
-        {{-- DROPDOWN SCRIPT --}}
+        {{-- Dropdown JS --}}
         <script>
-            const btn = document.getElementById('userDropdownBtn');
-            const menu = document.getElementById('userDropdownMenu');
-            btn.addEventListener('click', e => {
-                e.stopPropagation();
-                menu.classList.toggle('hidden');
+            const dropdownBtn = document.getElementById('userDropdownBtn');
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+            dropdownBtn.addEventListener('click', () => dropdownMenu.classList.toggle('hidden'));
+            document.addEventListener('click', e => {
+                if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.add('hidden');
+                }
             });
-            document.addEventListener('click', () => menu.classList.add('hidden'));
         </script>
 
         {{-- CONTENT --}}

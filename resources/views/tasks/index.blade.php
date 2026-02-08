@@ -29,6 +29,16 @@
 @section('page-title', 'Tâches')
 
 @section('content')
+<head>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
+</head>
+
+
 
 @php
     $role = auth()->user()->id_role;
@@ -161,7 +171,7 @@
                                 <textarea name="description" rows="3"
                                     class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200"></textarea>
                             </div>
-                                                    <!-- Priority -->
+                            <!-- Priority -->
                             <div>
                                 <label class="text-sm font-medium">Priorité</label>
                                     <select name="priorite" required
@@ -212,7 +222,7 @@
 
         <!-- TASKS LIST -->
         @if($selectedProject && $tasks->isNotEmpty()) 
-            <div class="flex gap-6 overflow-x-auto pb-4 z-0">
+            <div class="flex gap-6 overflow-x-auto overflow-y-visible pb-4 relative ">
 
                 @php
                     $statuses = [
@@ -249,8 +259,7 @@
                     <div
                         class="
                             bg-gray-50 rounded-2xl p-4 shadow
-                            {{ $taskFilter === 'all' ? 'flex-shrink-0 w-80' : 'flex-1' }}
-                        "
+                            {{ $taskFilter === 'all' ? 'flex-shrink-0 w-80' : 'flex-1' }}"
                         data-etat-id="{{ $etats->firstWhere('etat', $statusName)->id }}"
                         ondragover="allowDrop(event)"
                         ondrop="dropOnColumn(event)"
@@ -274,80 +283,102 @@
                         @else
                             @foreach($tasksForStatus as $task)
                                 {{--TASK CARD CODE  --}}
-                                <div class="relative bg-white rounded-xl p-4 mb-4 shadow flex flex-col justify-between hover:shadow-xl hover:scale-[1.02] transition-transform duration-200 cursor-pointer z-0"
+                                <div class="relative bg-white rounded-xl p-4 mb-4 shadow flex flex-col justify-between hover:shadow-xl  cursor-pointer"
                                         draggable="{{ $role == 4 && $task->projet->contributors->contains(auth()->user()->id) ? 'true' : 'false' }}"
                                         data-task-id="{{ $task->id }}"
-                                        ondragstart="dragTask(event)">
+                                        ondragstart="dragTask(event)"
+                                        @mousedown.stop>
                                                             
 
 
                                     <!-- Add a small "⋯" menu -->
-                                    <div class="absolute top-3 right-3" x-data="{ openMenu: false }">
-                                        <button @click="openMenu = !openMenu"
+                                    <div 
+                                        class="absolute top-3 right-3 "
+                                        x-data="{ openMenu: false }"
+                                        @click.stop
+                                        @click.outside="openMenu = false"
+                                    >
+                                        <!-- Button -->
+                                        <button
+                                            @click.stop="openMenu = !openMenu"
+                                            type="button"
                                             class="p-1 hover:bg-gray-100 rounded transition-all"
                                             title="Options"
+                                            draggable="false"
                                         >
-                                            <!-- Three dots icon -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v.01M12 12v.01M12 18v.01" />
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-6 w-6 text-gray-500"
+                                                fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 6v.01M12 12v.01M12 18v.01" />
                                             </svg>
                                         </button>
 
-                                        <!-- Dropdown menu -->
-                                        <div x-show="openMenu" @click.outside="openMenu = false" x-transition
-                                            class="absolute right-0 mt-2 w-36 bg-white border rounded-xl shadow-lg z-50 "
-                                        >
-                                            <button @click="openTaskModal({{ $task->id }}); openMenu=false"
-                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                                                Ouvrir tâche
+                                        <!-- Dropdown -->
+                                        <div
+                                            x-cloak
+                                            x-show="openMenu"
+                                            @click.outside="openMenu = false"
+                                            x-transition.origin.top.right
+                                            class="absolute right-0 mt-2 w-40 bg-white border rounded-xl shadow-lg z-[999]">
+                                        
+                                            <button
+                                                @click="openTaskModal({{ $task->id }}); openMenu=false"
+                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                                            >
+                                               <img src="images/eye.png" alt="View Task" class="w-4 h-4 inline mr-2">  Ouvrir 
                                             </button>
 
                                             @if($role == 2)
-                                                <!-- Divider -->
                                                 <div class="border-t my-1"></div>
 
-                                                
-                                                
-                                                <button @click="openUpdateModal({{ $task->id }}); openMenu=false"
-                                                        class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                                                    Modifier tâche
+                                                <button
+                                                    @click="openUpdateModal({{ $task->id }}); openMenu=false"
+                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                                                >
+                                                    <img src="images/pencil.png" alt="View Task" class="w-4 h-4 inline mr-2"> Modifier
                                                 </button>
 
-                                                <!-- Divider -->
                                                 <div class="border-t my-1"></div>
 
-
-                                                <form method="POST" action="{{ route('tasks.archive', $task->id) }}">
+                                               <form method="POST" action="{{ route('tasks.archive', $task->id) }}">
                                                     @csrf
-                                                    <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 openMenu=false">
-                                                        {{ $task->id_etat == 4 ? '♻️ Désarchiver' : '📦 Archiver' }}
+
+                                                    <button
+                                                        type="submit"
+                                                        @click="openMenuId = null"
+                                                        class="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100"
+                                                    >
+                                                        @if($task->id_etat == 4)
+                                                            <img src="{{ asset('images/unarchive.png') }}" class="w-4 h-4">
+                                                            <span>Désarchiver</span>
+                                                        @else
+                                                            <img src="{{ asset('images/box.png') }}" class="w-4 h-4">
+                                                            <span>Archiver</span>
+                                                        @endif
                                                     </button>
                                                 </form>
 
 
-                                                 <!-- Divider -->
                                                 <div class="border-t my-1"></div>
 
-                                                <!-- Delete -->
                                                 <form method="POST" action="{{ route('tasks.destroy', $task->id) }}"
                                                     onsubmit="return confirm('Delete this task?')">
                                                     @csrf
                                                     @method('DELETE')
 
-                                                    <button type="submit"
-                                                        class="w-full flex items-center gap-3 px-4 py-2 text-sm
-                                                            text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                        @click="openMenu=false">
-                                                        🗑️ Supprimer tâche
+                                                    <button
+                                                        type="submit"
+                                                        @click="openMenu=false"
+                                                        class="w-full flex text-left gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                                    >
+                                                        <img src="images/trash.png" alt="View Task" class="w-4 h-4 inline mr-2"> Supprimer
                                                     </button>
                                                 </form>
                                             @endif
-
                                         </div>
-                                        
                                     </div>
-
-
 
 
                                     <!-- PRIORITY -->
@@ -791,9 +822,6 @@
         document.getElementById('task-create-modal').classList.add('hidden');
     }
 
-
-
-    
 </script>
 
 <script>
@@ -833,12 +861,13 @@
         })
         .then(res => {
             if (!res.ok) throw new Error();
-            // optionally show a small success message
+            window.location.reload();
+           
         })
         .catch(() => {
             alert('Could not move task');
             // revert back if error
-            location.reload();
+            window.location.reload();
         });
     }
 

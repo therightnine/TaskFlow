@@ -1,13 +1,32 @@
 @php
-    $layout = auth()->user()->id_role === 3
-        ? 'layouts.chef_layout'
-        : 'layouts.superviseur_layout';
+    $roleId = auth()->user()->id_role;
+
+    switch ($roleId) {
+        case 1: // Admin
+            $layout = 'layouts.admin_layout';
+            break;
+
+        case 3: // Chef de projet
+            $layout = 'layouts.chef_layout';
+            break;
+
+        case 2: // Superviseur
+            $layout = 'layouts.superviseur_layout';
+            break;
+
+        case 4: // Contributeur
+            $layout = 'layouts.contributeur_layout';
+            break;
+
+        default:
+            $layout = 'layouts.app'; // fallback safety
+    }
 @endphp
 
 @extends($layout)
 
-@section('title', 'Taches')
-@section('page-title', content: 'Taches')
+@section('title', 'Tâches')
+@section('page-title', 'Tâches')
 
 @section('content')
 
@@ -24,6 +43,7 @@
     ];
 @endphp
 
+
 <div class="p-6 space-y-6">
 
     <!-- HEADER -->
@@ -31,29 +51,36 @@
         <h1 class="text-xl font-semibold">
             @if($selectedProject && $projects->isNotEmpty()) 
                 <span> {{ $selectedProject->nom_projet }}</span>
+            @else
+                <span>Tâches</span>
             @endif
         </h1>
 
         <div class="flex items-center gap-3">
-            @if($projects->isNotEmpty())
-            <form method="GET">
-                <select name="project_id" onchange="this.form.submit()"
-                    class="min-w-[200px] px-4 py-2 rounded-xl border border-cyan-300 text-sm bg-white text-gray-700
-                    focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500">
-                    @foreach($projects as $project)
-                        <option value="{{ $project->id }}"
-                            {{ $selectedProject && $selectedProject->id == $project->id ? 'selected' : '' }}>
-                            {{ $project->nom_projet }}
-                        </option>
-                    @endforeach
+            @if($selectedProject && $projects->isNotEmpty())
+                <form method="GET">
+                    <select name="project_id" onchange="this.form.submit()"
+                        class="min-w-[200px] px-4 py-2 rounded-xl border border-cyan-300 text-sm bg-white text-gray-700
+                        focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500">
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}"
+                                {{ $selectedProject && $selectedProject->id == $project->id ? 'selected' : '' }}>
+                                {{ $project->nom_projet }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @else
+                <select disabled
+                    class="min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 text-sm bg-gray-100 text-gray-500 cursor-not-allowed">
+                    <option >Aucun projet </option>
                 </select>
-            </form>
             @endif
         </div>
     </div>
     
     <div class="bg-white rounded-3xl shadow-lg p-6">
-
+        
         <!-- TASK FILTER BAR -->
         <div class="flex items-center gap-6 mb-6 border-b border-gray-200 pb-3">
 
@@ -103,79 +130,88 @@
 
         </div>
 
-        <!-- CREATE TASK MODAL -->
-        <div id="task-create-modal" class="hidden fixed inset-0 z-50 overflow-auto">
-            <!-- Dark overlay -->
-            <div class="absolute inset-0 bg-black/40" onclick="closeCreateTaskModal()"></div>
+        @if($selectedProject)
+            <!-- CREATE TASK MODAL -->
+            <div id="task-create-modal" class="hidden fixed inset-0 z-50 overflow-auto">
+                <!-- Dark overlay -->
+                <div class="absolute inset-0 bg-black/40" onclick="closeCreateTaskModal()"></div>
 
-                <!-- Modal content -->
-                <div class="relative bg-white max-w-lg mx-auto mt-24 rounded-3xl shadow-xl p-6 space-y-4">
-                    <h2 class="text-2xl font-bold">Créer une tâche</h2>
+                    <!-- Modal content -->
+                    <div class="relative bg-white max-w-lg mx-auto mt-24 rounded-3xl shadow-xl p-6 space-y-4">
+                        <h2 class="text-2xl font-bold">Créer une tâche</h2>
 
-                    <form method="POST" action="{{ url(route('tasks.store')) }}">
-                    @csrf
+                        <form method="POST" action="{{ url(route('tasks.store')) }}">
+                            @csrf
 
-                    <input type="hidden" name="id_projet" value="{{ $selectedProject->id }}">
+                            @if($selectedProject) 
+                                <input type="hidden" name="id_projet" value="{{ $selectedProject->id }}"> 
+                            @endif
 
 
-                    <!-- Task Name -->
-                    <div>
-                        <label class="text-sm font-medium">Nom tâche</label>
-                        <input type="text" name="nom_tache" required
-                                class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label class="text-sm font-medium">Description</label>
-                        <textarea name="description" rows="3"
-                            class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200"></textarea>
-                    </div>
-                                            <!-- Priority -->
-                    <div>
-                        <label class="text-sm font-medium">Priorité</label>
-                            <select name="priorite" required
-                                    class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
-                                <option value="low">Faible</option>
-                                <option value="medium">Moyen</option>
-                                <option value="high">Élevé</option>
-                            </select>
-                    </div>
-                    <!-- Status for role 4 only -->
-                    @if($role == 4)
-                        <div>
-                            <label class="text-sm font-medium">Statut</label>
-                                <select name="id_etat" required
+                            <!-- Task Name -->
+                            <div>
+                                <label class="text-sm font-medium">Nom tâche</label>
+                                <input type="text" name="nom_tache" required
                                         class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
-                                    @foreach($etats as $etat)
-                                        <option value="{{ $etat->id }}">{{ $etat->etat }}</option>
-                                    @endforeach
-                                </select>
                             </div>
-                    @endif
-                    <!-- Deadline -->
-                    <div>
-                        <label class="text-sm font-medium">Deadline</label>
-                        <input type="date" name="deadline" required
-                            class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
-                    </div>
-                    <!-- Buttons -->
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button type="button" onclick="closeCreateTaskModal()"
-                                class="px-4 py-2 rounded-xl border hover:ring-2 hover:ring-cyan-400">
-                            Annuler
-                        </button>
 
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 text-white hover:bg-cyan-700">
-                            Créer
-                        </button>
-                    </div>
-                </form>
+                            <!-- Description -->
+                            <div>
+                                <label class="text-sm font-medium">Description</label>
+                                <textarea name="description" rows="3"
+                                    class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200"></textarea>
+                            </div>
+                                                    <!-- Priority -->
+                            <div>
+                                <label class="text-sm font-medium">Priorité</label>
+                                    <select name="priorite" required
+                                            class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
+                                        <option value="low">Faible</option>
+                                        <option value="medium">Moyen</option>
+                                        <option value="high">Élevé</option>
+                                    </select>
+                            </div>
+                            <!-- Status for role 4 only -->
+                            @if($role == 4)
+                                <div>
+                                    <label class="text-sm font-medium">Statut</label>
+                                        <select name="id_etat" required
+                                                class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
+                                            @foreach($etats as $etat)
+                                                <option value="{{ $etat->id }}">{{ $etat->etat }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            @endif
+                            <!-- Deadline -->
+                            <div>
+                                <label class="text-sm font-medium">Deadline</label>
+                                <input type="date" name="deadline" required
+                                    class="w-full border rounded-xl p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600 hover:ring-2 hover:ring-cyan-200">
+                            </div>
+                            <!-- Buttons -->
+                            <div class="flex justify-end gap-3 pt-4">
+                                <button type="button" onclick="closeCreateTaskModal()"
+                                        class="px-4 py-2 rounded-xl border hover:ring-2 hover:ring-cyan-400">
+                                    Annuler
+                                </button>
+
+                                <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 text-white hover:bg-cyan-700">
+                                    Créer
+                                </button>
+                            </div>
+                        </form>
             </div>
-        </div>
+        @else
+           <div class="text-center text-gray-400 py-20">
+                <h2 class="text-2xl font-semibold">Aucune tâche trouvée</h2>
+                <p class="mt-2">Vous n'êtes associé à aucune tâche pour le moment.</p>
+            </div>
+        @endif
+    </div>
 
         <!-- TASKS LIST -->
-        @if($selectedProject && $tasks->isNotEmpty())
+        @if($selectedProject && $tasks->isNotEmpty()) 
             <div class="flex gap-6 overflow-x-auto pb-4 z-0">
 
                 @php
@@ -237,9 +273,7 @@
                             <p class="text-gray-400 text-sm">Aucune tâche dans ce statut</p>
                         @else
                             @foreach($tasksForStatus as $task)
-                                {{-- 🔽 YOUR EXISTING TASK CARD CODE (UNCHANGED) --}}
-                                {{-- NOTHING REMOVED --}}
-
+                                {{--TASK CARD CODE  --}}
                                 <div class="relative bg-white rounded-xl p-4 mb-4 shadow flex flex-col justify-between hover:shadow-xl hover:scale-[1.02] transition-transform duration-200 cursor-pointer z-0"
                                         draggable="{{ $role == 4 && $task->projet->contributors->contains(auth()->user()->id) ? 'true' : 'false' }}"
                                         data-task-id="{{ $task->id }}"

@@ -36,7 +36,7 @@ class OptionalController extends Controller
         $user = User::findOrFail($user_id);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('photos', 'public');
+            $path = $request->file('photo')->store('images', 'public');
             $user->photo = $path;
         }
 

@@ -23,9 +23,9 @@
         </a>
 
         <!-- Inscription -->
-        <button class="border border-cyan-500 text-cyan-500 bg-white px-6 py-2 rounded-xl text-[16px]
+        <a href="{{ route('register') }}"  class="border border-cyan-500 text-cyan-500 bg-white px-6 py-2 rounded-xl text-[16px]
                        hover:bg-cyan-500 hover:text-white transition">
             Inscription
-        </button>
+        </a>
     </div>
 </header>

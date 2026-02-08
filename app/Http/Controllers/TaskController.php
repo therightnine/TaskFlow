@@ -266,7 +266,7 @@ class TaskController extends Controller
 
         $message = $task->id_etat == 4 ? 'Tâche archivée !' : 'Tâche désarchivée !';
 
-        return redirect()->route('tasks.index')
+        return redirect()->back()
                         ->with('success', $message);
     }
 

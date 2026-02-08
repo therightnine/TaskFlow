@@ -154,7 +154,7 @@
         const bio = bioInput.value;
 
         try {
-            const response = await fetch("{{ route('chef.updateBio') }}", {
+            const response = await fetch("{{ route('profile.updateBio') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -18,15 +18,17 @@
 
         <div class="mt-10 flex gap-6">
             <!-- Get Started Button -->
-            <button class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px]
+             <a href="{{ route('register') }}"
+              class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px]
                           hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500 transition">
                 Commencer
-            </button>
+            </a>
+           
 
             <!-- Login Link as Button -->
             <a href="{{ route('login') }}"
               class="border border-black px-10 py-4 rounded-xl text-[16px] inline-block text-center
-                      hover:bg-cyan-500 hover:text-white transition">
+                      hover:bg-black hover:text-white transition">
                 Connexion
             </a>
         </div>

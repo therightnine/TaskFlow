@@ -1,9 +1,27 @@
-@php 
-        $layout = auth()->user()->id_role === 3
-        ? 'layouts.chef_layout'
-        : 'layouts.superviseur_layout';
-@endphp
+@php
+    $roleId = auth()->user()->id_role;
 
+    switch ($roleId) {
+        case 1: // Admin
+            $layout = 'layouts.admin_layout';
+            break;
+
+        case 3: // Chef de projet
+            $layout = 'layouts.chef_layout';
+            break;
+
+        case 2: // Superviseur
+            $layout = 'layouts.superviseur_layout';
+            break;
+
+        case 4: // Contributeur
+            $layout = 'layouts.contributeur_layout';
+            break;
+
+        default:
+            $layout = 'layouts.app'; // fallback safety
+    }
+@endphp
 
 @extends($layout)
 
@@ -11,6 +29,16 @@
 @section('page-title', 'Équipes')
 
 @section('content')
+@if($projets->isEmpty())
+    <div class="w-full py-6 px-6">
+        <div class="bg-white rounded-3xl shadow-lg p-6">
+            <div class="text-center text-gray-400 py-20">
+                <h2 class="text-2xl font-semibold">Aucune equipe trouvée</h2>
+                <p class="mt-2">Vous n'êtes associé à aucune equipe pour le moment.</p>
+            </div>
+        </div>
+    </div>
+@else
 <div class="container mx-auto p-6 bg-gray-50 rounded-3xl">
 
     <div class="flex items-center justify-between mb-10">
@@ -71,6 +99,7 @@
 
     </div>
 </div>
+@endif
 
 
 {{-- JS for Project Filter --}}
@@ -79,7 +108,7 @@
     const teamMembers = document.querySelectorAll('.team-member');
     const selectedProjectName = document.getElementById('selectedProjectName');
 
-    projectSelect.addEventListener('change', function() {
+projectSelect.addEventListener('change', function() {
     const selectedId = this.value;
 
     // Update heading

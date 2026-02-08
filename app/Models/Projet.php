@@ -37,16 +37,7 @@ class Projet extends Model
         );
     }
 
-    // Supervisors
-    public function superviseurs()
-    {
-        return $this->belongsToMany(
-            User::class,
-            'projet_superviseur',
-            'projet_id',
-            'user_id'
-        );
-    }
+
 
     // Superviseurs
     public function superviseurs()
@@ -78,6 +69,11 @@ class Projet extends Model
         $done = $this->taches->where('id_etat', 3)->count();
 
         return (int) round(($done / $total) * 100);
+    }
+
+    public function etat()
+    {
+        return $this->belongsTo(Etat::class, 'id_etat');
     }
 
    

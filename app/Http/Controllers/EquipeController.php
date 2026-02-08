@@ -17,9 +17,9 @@ class EquipeController extends Controller
         $userId = Auth::id();
 
         // Fetch all projects related to the user
-        $projets = Projet::with(['owner', 'superviseurs', 'contributeurs'])
+        $projets = Projet::with(['owner', 'superviseurs', 'contributors'])
             ->where('id_user', $userId)
-            ->orWhereHas('contributeurs', fn($q) => $q->where('user_id', $userId))
+            ->orWhereHas('contributors', fn($q) => $q->where('user_id', $userId))
             ->orWhereHas('superviseurs', fn($q) => $q->where('user_id', $userId))
             ->get();
 

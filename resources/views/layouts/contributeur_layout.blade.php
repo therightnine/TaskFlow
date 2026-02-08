@@ -52,18 +52,18 @@
            @php
                 $menuItems = [
                     ['route' => 'dashboard.contributeur', 'icon' => 'ic_dashboard.png', 'label' => 'Tableau de bord'],
-                    ['route' => 'contributeur.projects', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
-                    ['route' => 'contributeur.tasks', 'icon' => 'ic_tasks.png', 'label' => 'Taches'],
+                    ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
+                    ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Taches'],
                     ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Equipes'],
-                    ['route' => 'contributeur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramétres'],
+                    ['route' => 'settings', 'icon' => 'ic_settings.png', 'label' => 'Paramétres'],
                 ];
             @endphp
 
 
             @foreach($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'chef.settings'
-                        ? Route::is('chef.settings') || Route::is('chef.profile')
+                    $active = $item['route'] === 'settings'
+                        ? Route::is('settings') || Route::is('profile')
                         : Route::is($item['route']);
                 @endphp
                 <li>
@@ -131,14 +131,14 @@
                          class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
                         <ul class="py-2">
                             <li>
-                                <a href="{{ route('chef.settings') }}"
+                                <a href="{{ route('settings') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
                                     Gérer Compte
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('chef.profile') }}"
+                                <a href="{{ route('profile') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
                                     Voir Profil
@@ -147,7 +147,7 @@
                             <li>
                                 <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
-                                    Journal D'activité
+                                    Journal d'activité
                                 </a>
                             </li>
                             <li>

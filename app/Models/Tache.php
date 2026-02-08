@@ -24,15 +24,6 @@ class Tache extends Model
     }
     
 
-    protected $fillable = [
-        'nom_tache',
-        'description',
-        'priorite',
-        'deadline',
-        'id_projet',
-        'id_etat',
-    ];
-
     public function commentaires()
     {
         return $this->hasMany(Commentaire::class, 'id_tache');
@@ -46,6 +37,11 @@ class Tache extends Model
             'id_tache',
             'id_user'
         );
+    }
+
+    public function etat()
+    {
+        return $this->belongsTo(Etat::class, 'id_etat');
     }
 
 }

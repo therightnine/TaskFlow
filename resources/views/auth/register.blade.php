@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Register - TaskFlow')
+@section('title', 'Inscription - TaskFlow')
 
 @section('content')
 <div class="w-full max-w-[1600px] mx-auto h-[900px] flex rounded-[60px] mt-[100px]">
     <div class="w-full flex justify-center items-center bg-white">
         <div class="w-[520px] p-12 bg-white rounded-[60px] shadow-2xl shadow-black/20">
-            <h1 class="text-5xl font-bold text-zinc-900 mb-10 text-center">Register</h1>
+            <h1 class="text-5xl font-bold text-zinc-900 mb-10 text-left">Etape 1 : Inscription</h1>
 
             @if ($errors->any())
                 <div class="mb-6 text-red-600">

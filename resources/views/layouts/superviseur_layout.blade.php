@@ -56,14 +56,14 @@
                 ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
                 ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tâches'],
                 ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Équipes'],
-                ['route' => 'superviseur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
+                ['route' => 'settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
             ];
             @endphp
 
             @foreach($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'superviseur.settings'
-                        ? Route::is('superviseur.settings') || Route::is('superviseur.profile')
+                    $active = $item['route'] === 'settings'
+                        ? Route::is('settings') || Route::is('profile')
                         : Route::is($item['route']);
                 @endphp
                 <li>
@@ -126,14 +126,14 @@
                          class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
                         <ul class="py-2">
                             <li>
-                                <a href="{{ route('superviseur.settings') }}"
+                                <a href="{{ route('settings') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
                                     Gérer le compte
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('superviseur.profile') }}"
+                                <a href="{{ route('profile') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
                                     Voir le profil
@@ -142,7 +142,7 @@
                             <li>
                                 <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
-                                    Historique des activités
+                                    Journal d'activité
                                 </a>
                             </li>
                             <li>

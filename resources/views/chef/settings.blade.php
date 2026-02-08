@@ -125,7 +125,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('chef.settings.update') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-2 gap-6">
 

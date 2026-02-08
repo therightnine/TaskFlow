@@ -6,45 +6,40 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\OptionalController;
 use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\AdminUsersController;
 use App\Models\Role;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EquipeController;
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Page d'accueil
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/', function () {
-        return view('home');
-    })->name('home');
-    /*
+/*
+|--------------------------------------------------------------------------
+| Page d'accueil
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    return view('home');
+})->name('home');
 
 
-    
-    |--------------------------------------------------------------------------
-    | Dashboard Admin 
-    |--------------------------------------------------------------------------
-    | Abonnements---------------------------------------
-    */
-    // GET /abonnements  →  AbonnementController@index_abonnement
-    Route::get('/abonnements', [AbonnementController::class, 'index_abonnement'])
-        ->name('abonnements.index');
+/*
+|--------------------------------------------------------------------------
+| Abonnements
+|--------------------------------------------------------------------------*/
 
-    Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
-        ->name('abonnements.choose');
+// GET /abonnements  →  AbonnementController@index_abonnement
+Route::get('/abonnements', [AbonnementController::class, 'index_abonnement'])
+    ->name('abonnements.index');
 
-    // Gestion des abonnements (Admin)
-    Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
-        ->name('admin.abonnements.gest_abonnements')
-        ->middleware('auth');
+Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
+    ->name('abonnements.choose');
+
+// Gestion des abonnements (Admin)
+Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
+    ->name('admin.abonnements.gest_abonnements')
+    ->middleware('auth');
 
     // Create
     Route::get('/admin/abonnements/create', [AbonnementController::class, 'create'])
@@ -66,8 +61,6 @@ use App\Http\Controllers\EquipeController;
     Route::delete('/admin/abonnements/{abonnement}', [AbonnementController::class, 'destroy'])
         ->name('admin.abonnements.destroy');
 
-
-
     /*
     |Roles--------------------------------------------------------------------------*/
     // Gestion des roles (Admin)
@@ -75,315 +68,198 @@ use App\Http\Controllers\EquipeController;
         ->name('admin.roles.gest_roles')
         ->middleware('auth');
 
-    // Create
-    Route::get('/admin/roles/create', [RoleController::class, 'create'])
-        ->name('admin.roles.create');
+        // Create
+        Route::get('/admin/roles/create', [RoleController::class, 'create'])
+            ->name('admin.roles.create');
 
-    // Store
-    Route::post('/admin/roles', [RoleController::class, 'store'])
-        ->name('admin.roles.store');
+        // Store
+        Route::post('/admin/roles', [RoleController::class, 'store'])
+            ->name('admin.roles.store');
 
-    // Edit
-    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])
-        ->name('admin.roles.edit');
-    // Update
-    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])
-        ->name('admin.roles.update');
+        // Edit
+        Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])
+            ->name('admin.roles.edit');
+        // Update
+        Route::put('/admin/roles/{role}', [RoleController::class, 'update'])
+            ->name('admin.roles.update');
 
-    // Destroy
-    Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])
-        ->name('admin.roles.destroy');
-
-
-
-    /* Utilisateurs--------------------------------------------------------------------------*/
-
-    // Gestion des utilisateurs (Admin)
-
-    // Routes admin pour la gestion des utilisateurs
-    Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-        
-        // Liste des utilisateurs
-        Route::get('/utilisateurs', [AdminUsersController::class, 'index'])
-            ->name('utilisateurs.index');
-        
-        // Mise à jour d'un utilisateur
-        Route::put('/users/{user}', [AdminUsersController::class, 'update'])
-            ->name('users.update');
-        
-        // Suppression d'un utilisateur
-        Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])
-            ->name('users.destroy');
-    });
-
-    /*
-    |--------------------------------------------------------------------------*/
-    //settings admin
-    /*--------------------------------------------------------------------------*/
-
-    Route::get('/admin/settings', [SettingsController::class, 'index'])
-    ->name('admin.settings');
+        // Destroy
+        Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])
+            ->name('admin.roles.destroy');
 
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authentification
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    /*
+/*|Utilisateurs--------------------------------------------------------------------------*/
 
+// Gestion des utilisateurs (Admin)
 
-    |--------------------------------------------------------------------------
-    | Registration (First page + Optional page)
-    |--------------------------------------------------------------------------
-    */
+// Routes admin pour la gestion des utilisateurs
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Liste des utilisateurs
+    Route::get('/utilisateurs', [AdminUsersController::class, 'index'])
+        ->name('utilisateurs.index');
+    
+    // Mise à jour d'un utilisateur
+    Route::put('/users/{user}', [AdminUsersController::class, 'update'])
+        ->name('users.update');
+    
+    // Suppression d'un utilisateur
+    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])
+        ->name('users.destroy');
+});
 
+/*
+|--------------------------------------------------------------------------*/
+//settings admin
+/*--------------------------------------------------------------------------*/
 
-        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])
-            ->name('register');
+Route::get('/admin/settings', [SettingsController::class, 'index'])
+->name('admin.settings');
 
-        Route::post('/register', [RegisterController::class, 'store'])
-            ->name('register.store');
+/*-------------------------------------------------------------------------*/
 
-        Route::get('/register/optional/{user_id}', [OptionalController::class, 'show'])
-            ->name('register.optional');
+// Login routes
 
-        Route::post('/register/optional/{user_id}', [OptionalController::class, 'store'])
-            ->name('register.optional.store');
-    /**/
+/*
+|--------------------------------------------------------------------------
+| Authentification
+|--------------------------------------------------------------------------
+*/
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
-
-    //Dashboard routes
-    Route::middleware(['auth'])->group(function() {
-        Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->
-        name('dashboard.chef');
-        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->
-        name('dashboard.admin');
-        Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])-> name('dashboard.supervisor');
-        Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
-        
-    });
-    /**/
-
-   
-    /*
-    |--------------------------------------------------------------------------
-    | Routes protégées (AUTH)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])
-        ->name('dashboard.chef');
-    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])
-        ->name('dashboard.contributeur');
-    Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
-        ->name('dashboard.superviseur');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboards par rôle
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->name('dashboard.chef');
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+/*
+|--------------------------------------------------------------------------
+| Dashboard selon role
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function() {
+    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->
+    name('dashboard.chef');
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->
+    name('dashboard.admin');
     Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->name('dashboard.supervisor');
     Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
+});
 
-    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])->name('dashboard.contributeur');
 
-    Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
-        ->name('dashboard.superviseur');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Projets (CRUD)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/projects', [ProjetController::class, 'index'])->name('projects.index');
-    Route::get('/projects/create', [ProjetController::class, 'create'])->name('projects.create');
-    Route::post('/projects', [ProjetController::class, 'store'])->name('projects.store');
-    Route::get('/projects/{project}/edit', [ProjetController::class, 'edit'])->name('projects.edit');
-    Route::put('/projects/{project}', [ProjetController::class, 'update'])->name('projects.update');
-    Route::delete('/projects/{project}', [ProjetController::class, 'destroy'])->name('projects.destroy');
+/*
+|--------------------------------------------------------------------------
+| Projets (CRUD) → ProjetController
+|--------------------------------------------------------------------------
+*/
+Route::get('/projects', [ProjetController::class, 'index'])
+    ->name('projects.index');
 
-    Route::post('/projects/{project}/archive', [ProjetController::class, 'archive'])->name('projects.archive');
-    Route::post('/projects/{project}/favorite', [ProjetController::class, 'toggleFavorite'])->name('projects.favorite');
+Route::get('/projects/create', [ProjetController::class, 'create'])
+    ->name('projects.create');
 
-    Route::post('/projects/{project}/add-supervisor', [ProjetController::class, 'addSupervisor'])
-        ->name('projects.updateSupervisor');
+Route::post('/projects', [ProjetController::class, 'store'])
+    ->name('projects.store');
 
-    Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
-        ->name('projects.addContributor');
+Route::get('/projects/{project}/edit', [ProjetController::class, 'edit'])
+    ->name('projects.edit');
 
-    Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
-    Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
+Route::put('/projects/{project}', [ProjetController::class, 'update'])
+    ->name('projects.update');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tâches
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+Route::delete('/projects/{project}', [ProjetController::class, 'destroy'])
+    ->name('projects.destroy');
 
-    Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
-        ->name('projects.addContributor');
-    Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
-    Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
+Route::post('/projects/{project}/archive', [ProjetController::class, 'archive'])
+    ->name('projects.archive');
+
+Route::post('/projects/{project}/favorite', [ProjetController::class, 'toggleFavorite'])
+    ->name('projects.favorite');
+
+Route::post('/projects/{project}/add-supervisor', [ProjetController::class, 'addSupervisor'])
+    ->name('projects.updateSupervisor');
+
+Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
+    ->name('projects.addContributor');
+Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
+Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
 
 
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pages Createur (DashboardController)
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| Pages Createur (DashboardController)
+|--------------------------------------------------------------------------
+*/
 
-        Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])
-            ->name('tasks.toggleContributor');
+Route::get('/tasks', [DashboardController::class, 'tasks'])
+    ->name('chef.tasks');
 
-        Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask'])
-            ->name('tasks.archive');
+Route::get('/reports', [DashboardController::class, 'reports'])
+    ->name('chef.reports');
 
-        Route::post('/tasks/{task}/comment', [TaskController::class, 'addComment'])
-            ->name('tasks.comment.add');
+Route::get('/messages', [DashboardController::class, 'messages'])
+    ->name('chef.messages');
 
-    /*
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pages Superviseur (DashboardController)
-    |--------------------------------------------------------------------------
-    */
+/*
 
 
-    Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
-        ->name('superviseur.tasks');
 
-    Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
-        ->name('superviseur.reports');
-
-    Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
-        ->name('superviseur.messages');
-    /*
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pages Equipe  (EquipeController)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/equipe', [EquipeController::class, 'index'])
-        ->name('equipe');
-
-    Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
-        ->name('equipe.partials.profile');
-    /*
+/*
+|--------------------------------------------------------------------------
+| Pages Superviseur (DashboardController)
+|--------------------------------------------------------------------------
+*/
 
 
-    |--------------------------------------------------------------------------
-    | Paramètres & Profil Createur (SettingsController & ProfileController)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/settings', [SettingsController::class, 'index'])
-        ->name('chef.settings');
+Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
+    ->name('superviseur.tasks');
 
-    Route::put('/comments/{commentaire}', [TaskController::class, 'updateComment'])
-        ->name('comments.update');
+Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
+    ->name('superviseur.reports');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pages Superviseur
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
-        ->name('superviseur.tasks');
+Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
+    ->name('superviseur.messages');
 
-    Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
-        ->name('superviseur.reports');
 
-    Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
-        ->name('superviseur.messages');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pages Contributeur
-    |--------------------------------------------------------------------------
-    */
+/*--------------------------------------------------------------------------
+| Pages Contributeur (DashboardController)
+|--------------------------------------------------------------------------*/
+
     Route::get('/contributeur/tasks', [TaskController::class, 'tasks'])
         ->name('contributeur.tasks');
     
     Route::get('/contributeur/projects', [ProjetController::class, 'index'])
         ->name('contributeur.projects');
 
-   
 
 
+/*
+|--------------------------------------------------------------------------
+| Pages Equipe  (EquipeController)
+|--------------------------------------------------------------------------
+*/
+Route::get('/equipe', [EquipeController::class, 'index'])
+    ->name('equipe');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Équipe
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/equipe', [EquipeController::class, 'index'])->name('equipe');
-    Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
-        ->name('equipe.partials.profile');
+Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
+    ->name('equipe.partials.profile');
+/*
 
-    /*
-    |--------------------------------------------------------------------------
-    | Paramètres – Chef
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/settings', [SettingsController::class, 'index'])->name('chef.settings');
-    Route::post('/settings', [SettingsController::class, 'update'])->name('chef.settings.update');
-    Route::get('/settings/profile', [ProfileController::class, 'index'])->name('chef.profile');
-    Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])->name('chef.updateBio');
-    Route::get('settings/tasks', action: [TaskController::class, 'index'])->name('chef.tasks');
-    Route::get('settings/team', [EquipeController::class, 'index'])->name('chef.team');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Paramètres – Superviseur
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/superviseur/settings', [SettingsController::class, 'index'])
-        ->name('superviseur.settings');
+|--------------------------------------------------------------------------
+| Paramètres & Profil Createur (SettingsController & ProfileController)
+|--------------------------------------------------------------------------
+*/
+Route::get('/settings', [SettingsController::class, 'index'])
+    ->name('chef.settings');
 
-    Route::post('/superviseur/settings', [SettingsController::class, 'update'])
-        ->name('superviseur.settings.update');
+Route::post('/settings', [SettingsController::class, 'update'])
+    ->name('chef.settings.update');
 
-    Route::get('/superviseur/settings/profile', [ProfileController::class, 'index'])
-        ->name('superviseur.profile');
-
-    Route::post('/superviseur/settings/update-bio', [ProfileController::class, 'updateBio'])
-        ->name('superviseur.updateBio');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Paramètres – Contributeur
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/contributeur/settings', [SettingsController::class, 'index'])
-        ->name('contributeur.settings');
-
-    Route::post('/contributeur/settings', [SettingsController::class, 'update'])
-        ->name('contributeur.settings.update');
-
-    Route::get('/contributeur/settings/profile', [ProfileController::class, 'index'])
-        ->name('contributeur.profile');
-
-    Route::post('/contributeur/settings/update-bio', [ProfileController::class, 'updateBio'])
-        ->name('contributeur.updateBio');
-
-});
+Route::get('/settings/profile', [ProfileController::class, 'index'])
+    ->name('chef.profile');
 
 Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])
     ->name('chef.updateBio');
@@ -406,7 +282,7 @@ Route::post('/superviseur/settings/update-bio', [ProfileController::class, 'upda
     ->name('superviseur.updateBio');
 
 
- /// Pages Taches
+/// Pages Taches
 
 Route::middleware('auth')->group(function () {
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
@@ -423,6 +299,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask']) ->name('tasks.archive');
 
 });
+
 
 
 

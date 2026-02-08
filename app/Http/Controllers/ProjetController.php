@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 class ProjetController extends Controller
 {
 
-
-
-
+   
     // Liste des projets
     public function index(Request $request)
     {
@@ -60,12 +58,13 @@ class ProjetController extends Controller
             $assignables = collect();
         }
 
+
         return view('projects.index', compact('projects', 'filter', 'users', 'assignables', 'userRole'));
-{
+
 
     }
-    }
 
+    
 
 
 
@@ -122,7 +121,8 @@ class ProjetController extends Controller
 
 
 
-    public function addContributeur(Request $request, Projet $project)
+    
+    public function addContributor(Request $request, Projet $project)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -177,6 +177,7 @@ class ProjetController extends Controller
         return view('projects.form', compact('project', 'superviseurs'));
     }
 
+    
 
 
     // Enregistrer un projet
@@ -220,6 +221,7 @@ class ProjetController extends Controller
 
 
 
+   
 
     // Mettre à jour un projet
     public function update(Request $request, Projet $project)
@@ -249,7 +251,7 @@ class ProjetController extends Controller
             'id_etat'    => $validated['id_etat'],
         ]);
 
-
+        
         // Sync supervisor pivot
         $project->superviseurs()->sync([$validated['id_user']]);
 

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 use App\Models\Role;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;    
 class RoleController extends Controller
 {
-
+    
     public function gest_roles()
     {
         $roles = Role::all();
@@ -27,7 +27,7 @@ class RoleController extends Controller
         return redirect()->route('admin.roles.gest_roles')->with('success', 'Rôle créé.');
     }
 
-
+    
 // Edit: afficher le formulaire
 
 // Edit: affiche le formulaire (déjà correct)
@@ -64,5 +64,11 @@ public function update(Request $request, Role $role) {
 
     // fallback (cas non-AJAX)
     return redirect()->route('admin.roles.gest_roles')->with('success', 'Rôle supprimé.');
+
+
+
     }
+
+
+
 }

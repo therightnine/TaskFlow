@@ -55,13 +55,29 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'id_role');
     }
 
-
+    
 
     // Projects I own
     public function projetsOwned()
     {
         return $this->hasMany(Projet::class, 'id_user');
     }
+    
+    public function abonnements()
+    {
+        return $this->hasMany(UserAbonnement::class, 'id_inscri');
+    }
+
+      public function currentAbonnement()
+    {
+    return $this->hasOne(UserAbonnement::class, 'id_inscri')
+        ->where(function($query) {
+            $query->where('date_fin', '>=', now())
+                  ->orWhereNull('date_fin');
+        })
+        ->latest('date_debut');
+    }
+
 
     public function ownedProjects()
     {
@@ -79,7 +95,7 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
-    // Projets que je supervise
+    // Projects I supervise
     public function projetsSupervised()
     {
         return $this->belongsToMany(
@@ -100,15 +116,26 @@ class User extends Authenticatable
     }
 
 
+
+    public function contributedTasks()
+    {
+        return $this->belongsToMany(
+            Tache::class,
+            'tache_contributeur',
+            'user_id',
+            'tache_id'
+        );
+    }
+
     public function projetsContributes()
-{
-    return $this->belongsToMany(
-        Projet::class,
-        'projet_contributeur',
-        'user_id',
-        'projet_id'
-    )->withTimestamps();
-}
+    {
+        return $this->belongsToMany(
+            Projet::class,
+            'projet_contributeur',
+            'user_id',
+            'projet_id'
+        )->withTimestamps();
+    }
 
     public function isSuperviseur()
     {
@@ -127,5 +154,5 @@ class User extends Authenticatable
 
 
 
-}
 
+}

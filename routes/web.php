@@ -6,53 +6,182 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\EquipeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\OptionalController;
-
-/*
-|--------------------------------------------------------------------------
-| Page d'accueil
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return view('home');
-})->name('home');
-
-/*
-|--------------------------------------------------------------------------
-| Authentification
-|--------------------------------------------------------------------------
-*/
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
- /*
-|--------------------------------------------------------------------------
-| Registration (First page + Optional page)
-|--------------------------------------------------------------------------
-*/
+use App\Http\Controllers\AbonnementController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\AdminUsersController;
+use App\Models\Role;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\EquipeController;
 
 
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])
-        ->name('register');
+    /*
+    |--------------------------------------------------------------------------
+    | Page d'accueil
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/', function () {
+        return view('home');
+    })->name('home');
+    /*
 
-    Route::post('/register', [RegisterController::class, 'store'])
-        ->name('register.store');
 
-    Route::get('/register/optional/{user_id}', [OptionalController::class, 'show'])
-        ->name('register.optional');
+    
+    |--------------------------------------------------------------------------
+    | Dashboard Admin 
+    |--------------------------------------------------------------------------
+    | Abonnements---------------------------------------
+    */
+    // GET /abonnements  →  AbonnementController@index_abonnement
+    Route::get('/abonnements', [AbonnementController::class, 'index_abonnement'])
+        ->name('abonnements.index');
 
-    Route::post('/register/optional/{user_id}', [OptionalController::class, 'store'])
-        ->name('register.optional.store');
+    Route::post('/abonnements/choisir', [AbonnementController::class, 'choose'])
+        ->name('abonnements.choose');
 
-/*
-|--------------------------------------------------------------------------
-| Routes protégées (AUTH)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth'])->group(function () {
+    // Gestion des abonnements (Admin)
+    Route::get('/admin/abonnements/', [AbonnementController::class, 'gest_abonnement'])
+        ->name('admin.abonnements.gest_abonnements')
+        ->middleware('auth');
+
+    // Create
+    Route::get('/admin/abonnements/create', [AbonnementController::class, 'create'])
+        ->name('admin.abonnements.create');
+
+    // Store
+    Route::post('/admin/abonnements', [AbonnementController::class, 'store'])
+        ->name('admin.abonnements.store');
+
+    // Edit
+    Route::get('/admin/abonnements/{abonnement}/edit', [AbonnementController::class, 'edit'])
+        ->name('admin.abonnements.edit');
+
+    // Update
+    Route::put('/admin/abonnements/{abonnement}', [AbonnementController::class, 'update'])
+        ->name('admin.abonnements.update');
+
+    // Destroy
+    Route::delete('/admin/abonnements/{abonnement}', [AbonnementController::class, 'destroy'])
+        ->name('admin.abonnements.destroy');
+
+
+
+    /*
+    |Roles--------------------------------------------------------------------------*/
+    // Gestion des roles (Admin)
+    Route::get('/admin/roles', [RoleController::class, 'gest_roles'])
+        ->name('admin.roles.gest_roles')
+        ->middleware('auth');
+
+    // Create
+    Route::get('/admin/roles/create', [RoleController::class, 'create'])
+        ->name('admin.roles.create');
+
+    // Store
+    Route::post('/admin/roles', [RoleController::class, 'store'])
+        ->name('admin.roles.store');
+
+    // Edit
+    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])
+        ->name('admin.roles.edit');
+    // Update
+    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])
+        ->name('admin.roles.update');
+
+    // Destroy
+    Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])
+        ->name('admin.roles.destroy');
+
+
+
+    /* Utilisateurs--------------------------------------------------------------------------*/
+
+    // Gestion des utilisateurs (Admin)
+
+    // Routes admin pour la gestion des utilisateurs
+    Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+        
+        // Liste des utilisateurs
+        Route::get('/utilisateurs', [AdminUsersController::class, 'index'])
+            ->name('utilisateurs.index');
+        
+        // Mise à jour d'un utilisateur
+        Route::put('/users/{user}', [AdminUsersController::class, 'update'])
+            ->name('users.update');
+        
+        // Suppression d'un utilisateur
+        Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])
+            ->name('users.destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------*/
+    //settings admin
+    /*--------------------------------------------------------------------------*/
+
+    Route::get('/admin/settings', [SettingsController::class, 'index'])
+    ->name('admin.settings');
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentification
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    /*
+
+
+    |--------------------------------------------------------------------------
+    | Registration (First page + Optional page)
+    |--------------------------------------------------------------------------
+    */
+
+
+        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])
+            ->name('register');
+
+        Route::post('/register', [RegisterController::class, 'store'])
+            ->name('register.store');
+
+        Route::get('/register/optional/{user_id}', [OptionalController::class, 'show'])
+            ->name('register.optional');
+
+        Route::post('/register/optional/{user_id}', [OptionalController::class, 'store'])
+            ->name('register.optional.store');
+    /**/
+
+
+
+    //Dashboard routes
+    Route::middleware(['auth'])->group(function() {
+        Route::get('/dashboard/chef', [DashboardController::class, 'chef'])->
+        name('dashboard.chef');
+        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->
+        name('dashboard.admin');
+        Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])-> name('dashboard.supervisor');
+        Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
+        
+    });
+    /**/
+
+   
+    /*
+    |--------------------------------------------------------------------------
+    | Routes protégées (AUTH)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard/chef', [DashboardController::class, 'chef'])
+        ->name('dashboard.chef');
+    Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])
+        ->name('dashboard.contributeur');
+    Route::get('/dashboard/superviseur', [DashboardController::class, 'superviseur'])
+        ->name('dashboard.superviseur');
 
     /*
     |--------------------------------------------------------------------------
@@ -103,20 +232,69 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    Route::post('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
-        ->name('tasks.updateStatus');
+    Route::post('/projects/{project}/add-contributor', [ProjetController::class, 'addContributor'])
+        ->name('projects.addContributor');
+    Route::post('/projects/{project}/contributor-toggle', [ProjetController::class, 'toggleContributor']);
+    Route::post('/projects/{project}/supervisor-toggle', [ProjetController::class, 'toggleSupervisor']);
 
-    Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])
-        ->name('tasks.toggleContributor');
 
-    Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask'])
-        ->name('tasks.archive');
 
-    Route::post('/tasks/{task}/comment', [TaskController::class, 'addComment'])
-        ->name('tasks.comment.add');
 
-    Route::delete('/comments/{commentaire}', [TaskController::class, 'deleteComment'])
-        ->name('comments.destroy');
+    /*
+    |--------------------------------------------------------------------------
+    | Pages Createur (DashboardController)
+    |--------------------------------------------------------------------------
+    */
+
+        Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])
+            ->name('tasks.toggleContributor');
+
+        Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask'])
+            ->name('tasks.archive');
+
+        Route::post('/tasks/{task}/comment', [TaskController::class, 'addComment'])
+            ->name('tasks.comment.add');
+
+    /*
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pages Superviseur (DashboardController)
+    |--------------------------------------------------------------------------
+    */
+
+
+    Route::get('/superviseur/tasks', [DashboardController::class, 'tasks'])
+        ->name('superviseur.tasks');
+
+    Route::get('/superviseur/reports', [DashboardController::class, 'reports'])
+        ->name('superviseur.reports');
+
+    Route::get('/superviseur/messages', [DashboardController::class, 'messages'])
+        ->name('superviseur.messages');
+    /*
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pages Equipe  (EquipeController)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/equipe', [EquipeController::class, 'index'])
+        ->name('equipe');
+
+    Route::get('/equipe/membre/{user}', [EquipeController::class, 'show'])
+        ->name('equipe.partials.profile');
+    /*
+
+
+    |--------------------------------------------------------------------------
+    | Paramètres & Profil Createur (SettingsController & ProfileController)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/settings', [SettingsController::class, 'index'])
+        ->name('chef.settings');
 
     Route::put('/comments/{commentaire}', [TaskController::class, 'updateComment'])
         ->name('comments.update');
@@ -207,4 +385,51 @@ Route::middleware(['auth'])->group(function () {
         ->name('contributeur.updateBio');
 
 });
+
+Route::post('/settings/update-bio', [ProfileController::class, 'updateBio'])
+    ->name('chef.updateBio');
+
+/*
+|--------------------------------------------------------------------------
+| Paramètres & Profil Superviseur (SettingsController & ProfileController)
+|--------------------------------------------------------------------------
+*/
+Route::get('/superviseur/settings', [SettingsController::class, 'index'])
+    ->name('superviseur.settings');
+
+Route::post('/superviseur/settings', [SettingsController::class, 'update'])
+    ->name('superviseur.settings.update');
+
+Route::get('/superviseur/settings/profile', [ProfileController::class, 'index'])
+    ->name('superviseur.profile');
+
+Route::post('/superviseur/settings/update-bio', [ProfileController::class, 'updateBio'])
+    ->name('superviseur.updateBio');
+
+
+ /// Pages Taches
+
+Route::middleware('auth')->group(function () {
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{id}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{id}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::post('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
+    Route::post('/tasks/{task}/add-contributor', [TaskController::class, 'addContributor'])->name('tasks.addContributor');
+    Route::post('/tasks/{task}/remove-contributor', [TaskController::class, 'removeContributor'])->name('tasks.removeContributor');
+    Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])->name('tasks.toggleContributor');
+
+
+    Route::post('/tasks/{task}/archive', [TaskController::class, 'archiveTask']) ->name('tasks.archive');
+
+});
+
+
+
+
+
+
+
+
 

@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-
+    
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -56,8 +56,6 @@
                 ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
                 ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tâches'],
                 ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Équipes'],
-                ['route' => 'superviseur.reports', 'icon' => 'ic_reports.png', 'label' => 'Rapports'],
-                ['route' => 'superviseur.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
                 ['route' => 'superviseur.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
             ];
             @endphp
@@ -177,7 +175,9 @@
         <main class="flex-1 p-6 overflow-y-auto">
             @yield('content')
         </main>
+
     </div>
 </div>
+
 </body>
 </html>

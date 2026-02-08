@@ -5,7 +5,7 @@
 @section('content')
 
     <!-- Hero Section -->
-      <section class="relative h-[700px] pt-[180px] px-[120px]">
+    <section class="relative h-[700px] pt-[180px] px-[120px]">
 
         <h1 class="text-[56px] font-medium leading-[72px] text-black max-w-[720px]">
           Planifiez Mieux, <br> Avancez Plus Vite <br> Avec TaskFlow.
@@ -27,7 +27,7 @@
             <a href="{{ route('login') }}"
               class="border border-black px-10 py-4 rounded-xl text-[16px] inline-block text-center
                       hover:bg-cyan-500 hover:text-white transition">
-                connexion
+                Connexion
             </a>
         </div>
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Abonnement extends Model
 {
-
+    
     protected $table = 'abonnements'; // correspond à ta table existante
 
     // champs modifiables (si tu fais du CRUD)
@@ -19,8 +19,9 @@ class Abonnement extends Model
     protected $casts = [
         'prix'       => 'float',
     ];
-
+    
 // Désactive les colonnes created_at / updated_at
     public $timestamps = false;
+
 
 }

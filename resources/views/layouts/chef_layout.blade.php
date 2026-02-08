@@ -17,7 +17,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-
+    
+    <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -50,17 +51,14 @@
         {{-- Menu --}}
         <ul class="flex-1 space-y-4 text-gray-600 text-lg">
            @php
-$menuItems = [
-    ['route' => 'dashboard.chef', 'icon' => 'ic_dashboard.png', 'label' => 'Dashboard'],
-    ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projects'],
-    ['route' => 'chef.tasks', 'icon' => 'ic_teams.png', 'label' => 'Tasks'],
-    ['route' => 'chef.team', 'icon' => 'ic_teams.png', 'label' => 'Teams'],
-    ['route' => 'chef.reports', 'icon' => 'ic_reports.png', 'label' => 'Reports'],
-    ['route' => 'chef.messages', 'icon' => 'ic_messages.png', 'label' => 'Messages'],
-    ['route' => 'chef.settings', 'icon' => 'ic_settings.png', 'label' => 'Settings'],
-];
-@endphp
-
+            $menuItems = [
+                ['route' => 'dashboard.chef', 'icon' => 'ic_dashboard.png', 'label' => 'Tableau de bord'],
+                ['route' => 'projects.index', 'icon' => 'ic_projects.png', 'label' => 'Projets'],
+                ['route' => 'tasks.index', 'icon' => 'ic_tasks.png', 'label' => 'Tâches'],
+                ['route' => 'equipe', 'icon' => 'ic_teams.png', 'label' => 'Équipes'],
+                ['route' => 'chef.settings', 'icon' => 'ic_settings.png', 'label' => 'Paramètres'],
+            ];
+            @endphp
 
             @foreach($menuItems as $item)
                 @php
@@ -80,41 +78,41 @@ $menuItems = [
                 </li>
             @endforeach
 
-            {{-- Sign Out --}}
+            {{-- Déconnexion --}}
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"
                             class="flex items-center gap-4 py-3 px-4 w-full text-gray-600 hover:text-primary rounded transition">
                         <img src="{{ asset('images/ic_signout.png') }}" class="w-6 h-6 transition-all">
-                        Sign Out
+                        Se déconnecter
                     </button>
                 </form>
             </li>
         </ul>
     </aside>
 
-    {{-- MAIN AREA --}}
+    {{-- ZONE PRINCIPALE --}}
     <div class="flex-1 flex flex-col">
 
-        {{-- TOP MENU --}}
+        {{-- MENU HAUT --}}
         <header class="h-20 bg-white shadow-sm flex items-center px-8">
             <h1 class="text-xl font-semibold text-gray-800">
-                @yield('page-title', 'Projets')
+                @yield('page-title', 'Dashboard')
             </h1>
 
-            {{-- SEARCH --}}
+            {{-- RECHERCHE --}}
             <div class="flex-1 flex justify-center">
                 <div class="relative w-[420px]">
                     <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
-                    <input type="text" placeholder="Search here..."
+                    <input type="text" placeholder="Rechercher..."
                            class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
             </div>
 
-            {{-- USER INFO --}}
+            {{-- INFO UTILISATEUR --}}
             <div class="flex items-center gap-6">
                 <div class="relative">
                     <button id="userDropdownBtn" class="flex items-center gap-3 cursor-pointer focus:outline-none">
@@ -136,20 +134,20 @@ $menuItems = [
                                 <a href="{{ route('chef.settings') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_manageaccount.png') }}" class="w-5 h-5">
-                                    Manage Account
+                                    Gérer le compte
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('chef.profile') }}"
                                    class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_showprofile.png') }}" class="w-5 h-5">
-                                    Show Profile
+                                    Voir le profil
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
                                     <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
-                                    Activity Log
+                                    Historique des activités
                                 </a>
                             </li>
                             <li>
@@ -157,7 +155,7 @@ $menuItems = [
                                     @csrf
                                     <button type="submit" class="flex items-center gap-3 px-4 py-2 w-full text-gray-700 hover:bg-gray-100">
                                         <img src="{{ asset('images/ic_logout.png') }}" class="w-5 h-5">
-                                        Log Out
+                                        Se déconnecter
                                     </button>
                                 </form>
                             </li>
@@ -167,7 +165,7 @@ $menuItems = [
             </div>
         </header>
 
-        {{-- Dropdown JS --}}
+        {{-- JS DROPDOWN --}}
         <script>
             const dropdownBtn = document.getElementById('userDropdownBtn');
             const dropdownMenu = document.getElementById('userDropdownMenu');
@@ -179,7 +177,7 @@ $menuItems = [
             });
         </script>
 
-        {{-- CONTENT --}}
+        {{-- CONTENU --}}
         <main class="flex-1 p-6 overflow-y-auto">
             @yield('content')
         </main>

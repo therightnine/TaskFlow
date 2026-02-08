@@ -10,7 +10,7 @@ class UserAbonnement extends Model
     use HasFactory;
 
     protected $table = 'user_abonnement'; // Ajustez selon votre nom de table
-
+    
     protected $fillable = [
         'id_inscri',       // ID de l'utilisateur
         'id_abonnement',   // ID de l'abonnement
@@ -43,7 +43,7 @@ class UserAbonnement extends Model
         if (!$this->date_fin) {
             return true; // Abonnement illimité
         }
-
+        
         return $this->date_fin >= now();
     }
 
@@ -53,7 +53,7 @@ class UserAbonnement extends Model
         if (!$this->date_fin) {
             return false;
         }
-
+        
         $daysRemaining = now()->diffInDays($this->date_fin, false);
         return $daysRemaining >= 0 && $daysRemaining <= 7;
     }
@@ -64,7 +64,7 @@ class UserAbonnement extends Model
         if (!$this->date_fin) {
             return null; // Illimité
         }
-
+        
         return max(0, now()->diffInDays($this->date_fin, false));
     }
 

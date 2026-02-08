@@ -7,7 +7,7 @@
 
     <div class="grid grid-cols-1 gap-6">
       <div class="flex flex-wrap gap-6">
-
+       
         {{-- Box 1: Statistiques des abonnements (AFFICHAGE + GRAPHE ANNEAU DES INSCRIPTIONS ACTIVES) --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
@@ -87,7 +87,7 @@
             };
             document.head.appendChild(script);
 
-            function initDonut()
+            function initDonut() 
             {
                 const canvas = document.getElementById('abonnementsActifsDonut');
                 if (!canvas) return;
@@ -137,16 +137,16 @@
                     }
                 });
             }
-         })();
+            })();
         </script>
         </div>
        <!--{{-- Box 2: Gestion des abonnements --}}
-
+ 
 
         {{-- Box 3: Gestion des rôles --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-
+                
                 <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z" />
@@ -158,7 +158,7 @@
         {{-- Box 4: Gestion & suivi des utilisateurs --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
-
+                
                 <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-4-4h-1M7 20h6v-2a4 4 0 00-4-4H7m5-9a4 4 0 11-8 0 4 4 0 018 0z" />

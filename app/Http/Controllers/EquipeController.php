@@ -53,7 +53,7 @@ class EquipeController extends Controller
         // Determine projects based on role
         switch ($user->role->id) {
 
-            case 3: // chef de projet
+            case 3: // chef de projet   
                 $projets = Projet::where('id_user', $user->id)->get();
                 break;
 
@@ -66,7 +66,7 @@ class EquipeController extends Controller
                 break;
         }
 
-        // --- Membre depuis (Option B, already discussed) ---
+        // --- Membre depuis ---
         $dates = collect();
 
         foreach ($user->projetsContributed as $projet) {
@@ -84,4 +84,7 @@ class EquipeController extends Controller
             compact('user', 'projets', 'membreDepuis')
         );
     }
+
+
+    
 }

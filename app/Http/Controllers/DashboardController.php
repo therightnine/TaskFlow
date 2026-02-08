@@ -10,7 +10,6 @@ use App\Models\Tache;
 use App\Models\Tache as ModelsTache;
 use Carbon\Carbon;
 use DB;
-use App\Models\Task;
 
 class DashboardController extends Controller
 {
@@ -74,16 +73,59 @@ class DashboardController extends Controller
             'overdueTasks'
         ));
     }
-public function messages()
+/*|--------------------------------------------------------------------------
+| Dashboard Admin - Abonnements
+|--------------------------------------------------------------------------*/
+public function admin()
 {
-    // Ici tu peux récupérer des messages depuis ta DB si tu en as
-    // Exemple minimal :
-    $messages = []; // Remplace par ta requête réelle si nécessaire
+    $user = auth()->user();
+    $abonnements = DB::table('abonnements')
+        ->orderBy('id', 'desc')
+        ->paginate(10);
 
-    return view('contributeur.message', compact('messages'));
+    // Date de référence (aujourd'hui)
+    $dateRef = now()->toDateString();
+
+// Récupérer les abonnements actifs
+    $rows = DB::table('user_abonnement')
+        ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
+        ->whereDate('user_abonnement.date_debut', '<=', $dateRef)
+        ->where(function ($q) use ($dateRef) {
+            $q->whereNull('user_abonnement.date_fin')
+              ->orWhereDate('user_abonnement.date_fin', '>=', $dateRef);
+        })
+        ->select(
+            'abonnements.abonnement',
+            DB::raw('COUNT(user_abonnement.id_inscri) AS active_count')
+        )
+        ->groupBy('abonnements.abonnement')
+        ->orderBy('abonnements.abonnement')
+        ->get();
+
+    // Préparer les données pour le graphe
+    $labels = [];
+    $values = [];
+    foreach ($rows as $r) {
+        $labels[] = $r->abonnement ?? 'Inconnu';
+        $values[] = (int) $r->active_count;
+    }
+    $total = array_sum($values);
+
+    return view('dashboard.admin', [
+        'user' => $user,
+        'subscriptionLabels' => $labels,
+        'subscriptionValues' => $values,
+        'subscriptionTotal'  => $total,
+        'abonnements'        => $abonnements,
+    ]);
 }
 
 
+
+
+
+
+    
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD SUPERVISEUR
@@ -95,7 +137,7 @@ public function messages()
 
     // Projects assigned to this supervisor
     $projects = $user->projetsSupervised()
-        ->with('taches', 'contributeurs')
+        ->with('taches', 'contributors')
         ->get();
 
     /*
@@ -197,124 +239,76 @@ public function messages()
     ));
 }
 
+    
+
+    
     /*
     |--------------------------------------------------------------------------
-    | AUTRES DASHBOARDS
+    | DASHBOARD CONTRIBUTEUR
     |--------------------------------------------------------------------------
     */
-    public function admin()
+    
+
+    public function contributeur()
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        $today = Carbon::today();
 
-        $abonnements = DB::table('abonnements')
-            ->orderBy('id', 'desc')
-            ->paginate(10);
-
-        $dateRef = now()->toDateString();
-
-        $rows = DB::table('user_abonnement')
-            ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
-            ->whereDate('user_abonnement.date_debut', '<=', $dateRef)
-            ->where(function ($q) use ($dateRef) {
-                $q->whereNull('user_abonnement.date_fin')
-                  ->orWhereDate('user_abonnement.date_fin', '>=', $dateRef);
-            })
-            ->select(
-                'abonnements.abonnement',
-                DB::raw('COUNT(user_abonnement.id_inscri) AS active_count')
-            )
-            ->groupBy('abonnements.abonnement')
-            ->orderBy('abonnements.abonnement')
+        // 🔹 Tâches assignées directement au contributeur
+        $tasks = Tache::with(['etat', 'projet'])
+            ->where('id_contributeur', $user->id)
+            ->orderBy('deadline')
             ->get();
 
-        $labels = [];
-        $values = [];
+        // 🔢 Statistiques
+        $totalTasks = $tasks->count();
 
-        foreach ($rows as $r) {
-            $labels[] = $r->abonnement ?? 'Inconnu';
-            $values[] = (int) $r->active_count;
-        }
+        $inProgressTasks = $tasks->filter(fn ($t) =>
+            $t->etat && $t->etat->etat === 'en cours'
+        )->count();
 
-        $total = array_sum($values);
+        $completedTasksCount = $tasks->filter(fn ($t) =>
+            $t->etat && $t->etat->etat === 'terminé'
+        )->count();
 
-        return view('dashboard.admin', [
-            'user' => $user,
-            'subscriptionLabels' => $labels,
-            'subscriptionValues' => $values,
-            'subscriptionTotal'  => $total,
-            'abonnements'        => $abonnements,
-        ]);
+        $overdueTasks = $tasks->filter(fn ($t) =>
+            $t->deadline < $today &&
+            $t->etat &&
+            $t->etat->etat !== 'terminé'
+        );
+
+        // 📊 IMPORTANT : données pour Chart.js
+        $tasksByStatus = $tasks
+            ->groupBy(fn ($t) => $t->etat->etat ?? 'Inconnu')
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        // 🕒 Activité récente
+        $recentTasks = $tasks->sortByDesc('updated_at')->take(5);
+
+        return view('dashboard.contributeur', compact(
+            'tasks',
+            'totalTasks',
+            'inProgressTasks',
+            'completedTasksCount',
+            'overdueTasks',
+            'tasksByStatus',
+            'recentTasks'
+        ));
     }
-public function reports()
-{
-    return view('contributeur.reports');
-}
-public function settings()
-{
-    return view('contributeur.settings');
-}
+    public function index()
+    {
+        $user = Auth::user();
 
-        /**
-     * Dashboard Contributeur
-     */
+        // tâches assignées au contributeur
+        $tasks = Tache::with('projet')
+            ->where('id_contributeur', $user->id)
+            ->orderBy('deadline', 'asc')
+            ->get();
 
-       public function contributeur()
-{
-    $user = Auth::user();
-    $today = Carbon::today();
+        return view('dashboard.contributeur', compact('tasks'));
+    }
 
-    // 🔹 Tâches assignées directement au contributeur
-    $tasks = Tache::with(['etat', 'projet'])
-        ->where('id_contributeur', $user->id)
-        ->orderBy('deadline')
-        ->get();
 
-    // 🔢 Statistiques
-    $totalTasks = $tasks->count();
 
-    $inProgressTasks = $tasks->filter(fn ($t) =>
-        $t->etat && $t->etat->etat === 'en cours'
-    )->count();
-
-    $completedTasksCount = $tasks->filter(fn ($t) =>
-        $t->etat && $t->etat->etat === 'terminé'
-    )->count();
-
-    $overdueTasks = $tasks->filter(fn ($t) =>
-        $t->deadline < $today &&
-        $t->etat &&
-        $t->etat->etat !== 'terminé'
-    );
-
-    // 📊 IMPORTANT : données pour Chart.js
-    $tasksByStatus = $tasks
-        ->groupBy(fn ($t) => $t->etat->etat ?? 'Inconnu')
-        ->map(fn ($group) => $group->count())
-        ->toArray();
-
-    // 🕒 Activité récente
-    $recentTasks = $tasks->sortByDesc('updated_at')->take(5);
-
-    return view('dashboard.contributeur', compact(
-        'tasks',
-        'totalTasks',
-        'inProgressTasks',
-        'completedTasksCount',
-        'overdueTasks',
-        'tasksByStatus',
-        'recentTasks'
-    ));
-}
-public function index()
-{
-    $user = Auth::user();
-
-    // tâches assignées au contributeur
-    $tasks = Tache::with('projet')
-        ->where('id_contributeur', $user->id)
-        ->orderBy('deadline', 'asc')
-        ->get();
-
-    return view('dashboard.contributeur', compact('tasks'));
-}
 }

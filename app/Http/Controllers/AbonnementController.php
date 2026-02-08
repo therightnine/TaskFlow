@@ -11,7 +11,7 @@ class AbonnementController extends Controller
 
         return view('dashboard.admin', compact('abonnements'/*, 'subscriptionLabels', 'subscriptionValues', 'subscriptionTotal'*/));
     }
-
+    
     public function index_abonnement()
     {
         $abonnements = Abonnement::orderBy('id', 'asc')->take(3)->get();
@@ -22,7 +22,7 @@ class AbonnementController extends Controller
         $abonnements = Abonnement::all();
         return view('abonnements.gest_abonnements', compact('abonnements'));
     }
-
+    
 
     public function create()
     {
@@ -40,7 +40,6 @@ class AbonnementController extends Controller
         Abonnement::create($validated);
         return redirect()->route('admin.abonnements.gest_abonnements')->with('success', 'Offre créée.');
     }
-
 
 // Edit: afficher le formulaire
 

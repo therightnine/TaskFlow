@@ -34,6 +34,16 @@ Route::get('/fonctionalites', function () {
     return view('fonctionalite');
 })->name('fonctionalite');
 
+/*
+|--------------------------------------------------------------------------
+| Page Contact
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
 
 /*
 |--------------------------------------------------------------------------

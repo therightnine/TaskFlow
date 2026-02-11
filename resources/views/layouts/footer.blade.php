@@ -69,11 +69,9 @@
         </div>
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="bg-cyan-700 py-6 mt-10">
-        <div class="max-w-[1440px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-orange-50 text-lg font-normal space-y-4 md:space-y-0">
-            <span>© 2025 TaskFlow, Inc.</span>
-            <span>Terms & Privacy</span>
-        </div>
-    </div>
+
+    <footer class="p-6 text-center bg-cyan-500 bg-opacity-80 backdrop-blur-md mt-10 text-white">
+        &copy; {{ date('Y') }} TaskFlow. Tous droits réservés.
+    </footer>
+    
 </footer>

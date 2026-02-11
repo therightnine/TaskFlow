@@ -4,69 +4,114 @@
 
 @section('content')
 
-    <!-- Hero Section -->
-    <section class="relative h-[700px] pt-[180px] px-[120px]">
+<!-- HERO SECTION -->
+<!-- HERO SECTION -->
+<section class="relative py-24 px-[120px] overflow-hidden bg-white">
 
-        <h1 class="text-[56px] font-medium leading-[72px] text-black max-w-[720px]">
-          Planifiez Mieux, <br> Avancez Plus Vite <br> Avec TaskFlow.
+    <!-- Decorative blur -->
+    <div class="absolute -top-32 -left-32 w-[360px] h-[360px] bg-cyan-400/20 rounded-full blur-[120px]"></div>
+
+    <div class="relative z-10 max-w-[720px]">
+        <h1 class="text-[56px] font-medium leading-[72px] text-black">
+            Planifiez Mieux, <br>
+            Avancez Plus Vite <br>
+            Avec <span class="text-cyan-500">TaskFlow</span>.
         </h1>
 
         <p class="mt-6 text-[18px] leading-[28px] text-gray-600 max-w-[640px]">
-          Votre espace pour créer, planifier et livrer.
-          <br> Une plateforme. Tous vos projets.
+            Votre espace pour créer, planifier et livrer.
+            <br> Une plateforme. Tous vos projets.
         </p>
 
         <div class="mt-10 flex gap-6">
-            <!-- Get Started Button -->
-             <a href="{{ route('register') }}"
-              class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px]
-                          hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500 transition">
+            <a href="{{ route('register') }}"
+               class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px]
+                      transition hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500">
                 Commencer
             </a>
-           
 
-            <!-- Login Link as Button -->
             <a href="{{ route('login') }}"
-              class="border border-black px-10 py-4 rounded-xl text-[16px] inline-block text-center
-                      hover:bg-black hover:text-white transition">
+               class="border border-black px-10 py-4 rounded-xl text-[16px]
+                      transition hover:bg-black hover:text-white">
                 Connexion
             </a>
         </div>
+    </div>
+
+    <!-- Hero Image -->
+    <div class="absolute right-[120px] top-[140px] w-[420px] h-[420px] rounded-xl overflow-hidden">
+        <img src="{{ asset('images/hero.png') }}"
+             alt="Hero Image"
+             class="w-full h-full object-cover hover-scale-105 transition duration-500">
+    </div>
+</section>
 
 
-        <!-- Hero Image -->
-        <div class="absolute right-[120px] top-[200px] w-[420px] h-[420px] rounded-xl overflow-hidden">
-            <img src="{{ asset('images/hero.png') }}" alt="Hero Image" class="w-full h-full object-cover">
+
+<!-- SHOWCASE IMAGE -->
+<section class="py-20 px-8 bg-white flex justify-center">
+    <div class="max-w-6xl rounded-3xl overflow-hidden shadow-md
+                hover:shadow-xl transition duration-500">
+        <img src="{{ asset('images/features.png') }}"
+             alt="Fonctionnalités"
+             class="w-full h-full object-cover">
+    </div>
+</section>
+
+
+<!-- FEATURES SECTION -->
+<section class="relative px-[120px] py-[120px] bg-white">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-[40px]">
+
+        <!-- Card 1 -->
+        <div class="group p-10 border rounded-2xl
+                    transition-all duration-300
+                    hover:-translate-y-2 hover:shadow-xl">
+            <div class="w-12 h-12 mb-6">
+                <img src="{{ asset('images/folder-star.png') }}" alt="Gestion">
+            </div>
+            <h3 class="text-xl font-medium mb-3">
+                Gestion Simple
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+                Organisez vos tâches et projets sans effort,
+                avec une interface claire et intuitive.
+            </p>
         </div>
 
-
-      </section>
-
-      <section class="py-12 px-8 bg-white flex justify-center">
-        <div class=" rounded-xl overflow-hidden">
-            <img src="{{ asset('images/features.png') }}" alt="Section Image" class="w-full h-full object-cover">
+        <!-- Card 2 -->
+        <div class="group p-10 border rounded-2xl
+                    transition-all duration-300
+                    hover:-translate-y-2 hover:shadow-xl">
+            <div class="w-12 h-12 mb-6">
+                <img src="{{ asset('images/users-group.png') }}" alt="Collaboration">
+            </div>
+            <h3 class="text-xl font-medium mb-3">
+                Collaboration Fluide
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+                Travaillez en équipe, partagez l’avancement
+                et restez synchronisés en temps réel.
+            </p>
         </div>
-    </section>
 
-
-    <!-- Features Section -->
-    <section class="relative px-[120px] py-[120px] grid grid-cols-3 gap-[40px]">
-        <div class="p-8 border rounded-2xl">
-            <h3 class="text-xl font-medium mb-3">Gestion Simple</h3>
-            <p class="text-gray-600">Organisez vos tâches et projets sans effort.</p>
+        <!-- Card 3 -->
+        <div class="group p-10 border rounded-2xl
+                    transition-all duration-300
+                    hover:-translate-y-2 hover:shadow-xl">
+            <div class="w-12 h-12 mb-6">
+                <img src="{{ asset('images/layout-dashboard.png') }}" alt="Suivi">
+            </div>
+            <h3 class="text-xl font-medium mb-3">
+                Suivi Intelligent
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+                Visualisez l’état de vos projets et prenez
+                les bonnes décisions au bon moment.
+            </p>
         </div>
-        <div class="p-8 border rounded-2xl">
-            <h3 class="text-xl font-medium mb-3">Collaboration</h3>
-            <p class="text-gray-600">Travaillez en équipe en temps réel.</p>
-        </div>
-        <div class="p-8 border rounded-2xl">
-            <h3 class="text-xl font-medium mb-3">Suivi Intelligent</h3>
-            <p class="text-gray-600">Visualisez l’avancement facilement.</p>
-        </div>
-    </section>
+    </div>
+</section>
 
 @endsection
-
-
-
-

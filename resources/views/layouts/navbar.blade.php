@@ -10,7 +10,7 @@
         <a href="{{ route('home') }}" class="text-black hover:text-cyan-500 transition">Accueil</a>
         <a href="{{ route('fonctionalite') }}" class="text-black hover:text-cyan-500 transition">Fonctionnalités</a>
         <a href="{{ route('abonnements.index') }}" class="text-black hover:text-cyan-500 transition">Tarifs</a>
-        <a href="#" class="text-black hover:text-cyan-500 transition">Contact</a>
+        <a href="{{ route('contact') }}" class="text-black hover:text-cyan-500 transition">Contact</a>
     </nav>
 
     <!-- Boutons -->

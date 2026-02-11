@@ -12,10 +12,10 @@
     <div class="absolute -top-32 -left-32 w-[360px] h-[360px] bg-cyan-400/20 rounded-full blur-[120px]"></div>
 
     <div class="relative z-10 max-w-[720px]">
-        <h1 class="text-[56px] font-medium leading-[72px] text-black">
+        <h1 class="text-[56px] font-medium leading-[72px] text-black animate-bounce">
             Planifiez Mieux, <br>
             Avancez Plus Vite <br>
-            Avec <span class="text-cyan-500">TaskFlow</span>.
+            Avec <span class="text-cyan-500 ">TaskFlow</span>.
         </h1>
 
         <p class="mt-6 text-[18px] leading-[28px] text-gray-600 max-w-[640px]">
@@ -56,7 +56,40 @@
              alt="Fonctionnalités"
              class="w-full h-full object-cover">
     </div>
+    
 </section>
+
+ <section class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    
+            <div class="space-y-6 animate-fade-in">
+                <h2 class="text-5xl font-bold leading-tight text-gray-900">
+                    Construisons des expériences digitales modernes
+                </h2>
+
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    Nous sommes une équipe passionnée par l'innovation et la technologie.
+                    Notre mission est de créer des solutions performantes,
+                    intuitives et centrées sur l'utilisateur.
+                </p>
+
+                <div class="pt-4">
+                    <button class="px-8 py-3 bg-cyan-600 text-white font-semibold rounded-full shadow-md 
+                                   hover:bg-cyan-700 transition duration-300 transform hover:scale-105">
+                        Découvrir davantage
+                    </button>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="flex justify-center animate-fade-in">
+                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692"
+                     alt="Équipe au travail"
+                     class="rounded-3xl shadow-xl w-full max-w-md object-cover">
+            </div>
+        </section>
+</section>
+
+
 
 
 <!-- FEATURES SECTION -->

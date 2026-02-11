@@ -94,7 +94,7 @@
             <p class="text-gray-700 max-w-2xl mx-auto">
                 Contactez notre équipe sécurité pour comprendre comment nous protégeons vos données et garantir votre tranquillité d’esprit.
             </p>
-            <a href="{{ route('contact') }}" class="inline-block bg-cyan-500 hover:bg-white text-white hover:text-cyan-600 font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300">
+            <a href="{{ route('support') }}" class="inline-block bg-cyan-500 hover:bg-white text-white hover:text-cyan-600 font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300">
                 Contactez-nous
             </a>
         </section>

@@ -64,20 +64,36 @@
 <div class="p-6 space-y-6">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center mb-6 h-[80px] bg-white rounded-3xl shadow-md px-6">
-        <h1 class="text-xl font-semibold">
-            @if($selectedProject && $projects->isNotEmpty()) 
-                <span> {{ $selectedProject->nom_projet }}</span>
-            @else
-                <span>Tâches</span>
-            @endif
-        </h1>
+    <div class="mb-6 bg-white rounded-3xl shadow-md px-6 py-5 border border-slate-100">
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">
+                @if($selectedProject && $projects->isNotEmpty()) 
+                    <span> {{ $selectedProject->nom_projet }}</span> 
+                    <span class="text-xs font-medium text-cyan-700 bg-white/70 border border-cyan-200 rounded-full px-3 py-1 w-fit">
+                        Suivi en temps reel
+                    </span>
+                @else
+                    <span>Tâches</span>
+                @endif
+            </h1>
+        <br>
+        <p class="text-sm text-slate-500 mt-1">Pilotez les taches et leur avancement depuis une vue unique.</p>
+        <br> 
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+                        <p class="text-amber-700">Echeance projet</p>
+                        <p class="text-sm font-semibold text-amber-800">{{ \Carbon\Carbon::parse($selectedProject->deadline)->format('d/m/Y') }}</p>
+        </div>
 
-        <div class="flex items-center gap-3">
+        
+    
+    </div>
+
+        <div class="flex flex-col items-start lg:items-end gap-2 w-full lg:w-auto">
             @if($selectedProject && $projects->isNotEmpty())
                 <form method="GET">
                     <select name="project_id" onchange="this.form.submit()"
-                        class="min-w-[200px] px-4 py-2 rounded-xl border border-cyan-300 text-sm bg-white text-gray-700
+                        class="w-full lg:min-w-[260px] px-4 py-2.5 rounded-xl border border-cyan-300 text-sm bg-white text-gray-700
                         focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500">
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}"
@@ -89,10 +105,11 @@
                 </form>
             @else
                 <select disabled
-                    class="min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 text-sm bg-gray-100 text-gray-500 cursor-not-allowed">
+                    class="w-full lg:min-w-[260px] px-4 py-2.5 rounded-xl border border-gray-300 text-sm bg-gray-100 text-gray-500 cursor-not-allowed">
                     <option >Aucun projet </option>
                 </select>
             @endif
+        </div>
         </div>
     </div>
     
@@ -146,6 +163,8 @@
             @endif
 
         </div>
+
+        
 
         @if($selectedProject)
             <div class="mb-6 grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -975,5 +994,6 @@
 
 
 @endsection
+
 
 

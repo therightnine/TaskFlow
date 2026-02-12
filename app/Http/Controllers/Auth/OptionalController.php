@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Abonnement;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OptionalController extends Controller
 {
@@ -36,8 +37,10 @@ class OptionalController extends Controller
         $user = User::findOrFail($user_id);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('images', 'public');
-            $user->photo = $path;
+            $file = $request->file('photo');
+            $filename = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $user->photo = 'images/' . $filename;
         }
 
         $user->phone = $request->phone;

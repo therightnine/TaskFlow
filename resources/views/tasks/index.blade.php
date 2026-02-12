@@ -80,10 +80,17 @@
         <br>
         <p class="text-sm text-slate-500 mt-1">Pilotez les taches et leur avancement depuis une vue unique.</p>
         <br> 
-        <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
-                        <p class="text-amber-700">Echeance projet</p>
-                        <p class="text-sm font-semibold text-amber-800">{{ \Carbon\Carbon::parse($selectedProject->deadline)->format('d/m/Y') }}</p>
-        </div>
+        @if($selectedProject && $projects->isNotEmpty() && $selectedProject->deadline)
+            <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+                <p class="text-amber-700">Echeance projet</p>
+                <p class="text-sm font-semibold text-amber-800">{{ \Carbon\Carbon::parse($selectedProject->deadline)->format('d/m/Y') }}</p>
+            </div>
+        @else
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <p class="text-slate-500">Echeance projet</p>
+                <p class="text-sm font-semibold text-slate-600">Aucun projet selectionne</p>
+            </div>
+        @endif
 
         
     

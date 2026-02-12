@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Projet;
 
 class ProfileController extends Controller
 {
@@ -12,8 +11,25 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Fetch projects assigned to this user
-        $projects = Projet::where('id_user', $user->id)->get();
+        // Load projects according to the current user's role.
+        $projects = match ((int) $user->id_role) {
+            // Chef / createur: owned projects
+            3 => $user->projetsOwned()->get(),
+
+            // Superviseur: supervised projects
+            2 => $user->projetsSupervised()->get(),
+
+            // Contributeur: contributed projects
+            4 => $user->projetsContributed()->get(),
+
+            // Fallback (admin/other): all linked projects
+            default => $user->allProjects(),
+        };
+
+        $projects = collect($projects)
+            ->unique('id')
+            ->sortByDesc('date_debut')
+            ->values();
 
         return view('chef.profile', compact('user', 'projects'));
     }

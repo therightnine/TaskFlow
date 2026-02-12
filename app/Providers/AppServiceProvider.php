@@ -15,6 +15,10 @@ use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private bool $hasProjetContributeurCreatedAt = false;
+    private bool $hasProjetSuperviseurCreatedAt = false;
+    private bool $hasTacheContributeurCreatedAt = false;
+
     public function register(): void
     {
         //
@@ -22,7 +26,22 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        View::composer('*', function ($view) {
+        $this->initSchemaCapabilities();
+
+        View::composer([
+            'layouts.chef_layout',
+            'layouts.superviseur_layout',
+            'layouts.contributeur_layout',
+            'layouts.admin_layout',
+        ], function ($view) {
+            static $resolved = false;
+            static $sharedPayload = null;
+
+            if ($resolved && is_array($sharedPayload)) {
+                $view->with($sharedPayload);
+                return;
+            }
+
             $notifications = collect();
             $recentTasks = collect();
 
@@ -31,10 +50,13 @@ class AppServiceProvider extends ServiceProvider
                 $recentTasks = $notifications;
             }
 
-            $view->with([
+            $sharedPayload = [
                 'notifications' => $notifications,
                 'recentTasks' => $recentTasks,
-            ]);
+            ];
+            $resolved = true;
+
+            $view->with($sharedPayload);
         });
     }
 
@@ -67,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
         $notifications = collect();
 
         if ($projectIds->isNotEmpty()) {
-            if (Schema::hasTable('projet_contributeur') && Schema::hasColumn('projet_contributeur', 'created_at')) {
+            if ($this->hasProjetContributeurCreatedAt) {
                 $recentAssignments = DB::table('projet_contributeur')
                     ->join('users', 'users.id', '=', 'projet_contributeur.user_id')
                     ->join('projets', 'projets.id', '=', 'projet_contributeur.projet_id')
@@ -126,7 +148,7 @@ class AppServiceProvider extends ServiceProvider
         $notifications = collect();
 
         if ($projectIds->isNotEmpty()) {
-            if (Schema::hasTable('projet_superviseur') && Schema::hasColumn('projet_superviseur', 'created_at')) {
+            if ($this->hasProjetSuperviseurCreatedAt) {
                 $assignedProjects = DB::table('projet_superviseur')
                     ->join('projets', 'projets.id', '=', 'projet_superviseur.projet_id')
                     ->where('projet_superviseur.user_id', $userId)
@@ -180,7 +202,7 @@ class AppServiceProvider extends ServiceProvider
         $notifications = collect();
 
         if ($projectIds->isNotEmpty()) {
-            if (Schema::hasTable('projet_contributeur') && Schema::hasColumn('projet_contributeur', 'created_at')) {
+            if ($this->hasProjetContributeurCreatedAt) {
                 $assignedProjects = DB::table('projet_contributeur')
                     ->join('projets', 'projets.id', '=', 'projet_contributeur.projet_id')
                     ->where('projet_contributeur.user_id', $userId)
@@ -204,7 +226,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if ($assignedTasks->isNotEmpty()) {
-            if (Schema::hasTable('tache_contributeur') && Schema::hasColumn('tache_contributeur', 'created_at')) {
+            if ($this->hasTacheContributeurCreatedAt) {
                 $taskAssignments = DB::table('tache_contributeur')
                     ->join('taches', 'taches.id', '=', 'tache_contributeur.id_tache')
                     ->where('tache_contributeur.id_user', $userId)
@@ -407,5 +429,17 @@ class AppServiceProvider extends ServiceProvider
             ->sortByDesc(fn ($item) => $item['time']->timestamp ?? 0)
             ->values()
             ->take(8);
+    }
+
+    private function initSchemaCapabilities(): void
+    {
+        $this->hasProjetContributeurCreatedAt = Schema::hasTable('projet_contributeur')
+            && Schema::hasColumn('projet_contributeur', 'created_at');
+
+        $this->hasProjetSuperviseurCreatedAt = Schema::hasTable('projet_superviseur')
+            && Schema::hasColumn('projet_superviseur', 'created_at');
+
+        $this->hasTacheContributeurCreatedAt = Schema::hasTable('tache_contributeur')
+            && Schema::hasColumn('tache_contributeur', 'created_at');
     }
 }

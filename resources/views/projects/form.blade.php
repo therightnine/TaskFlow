@@ -88,19 +88,19 @@
             </div>
         </div>
 
-        <!-- Superviseur -->
+        <!-- Superviseurs -->
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Superviseur (obligatoire)</label>
-            <select name="id_user" required
-                    class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-primary">
-                <option value="">-- Choisir un superviseur --</option>
+            <label class="block text-gray-700 font-semibold mb-2">Superviseurs (obligatoire)</label>
+            <select name="id_users[]" multiple required
+                    class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-primary min-h-[140px]">
                 @foreach($superviseurs as $user)
                     <option value="{{ $user->id }}"
-                        {{ isset($project) && $project->id_user == $user->id ? 'selected' : '' }}>
+                        {{ isset($project) && $project->superviseurs->contains($user->id) ? 'selected' : '' }}>
                         {{ $user->prenom }} {{ $user->nom }}
                     </option>
                 @endforeach
             </select>
+            <p class="text-xs text-gray-500 mt-1">Maintenez Ctrl (Windows) ou Cmd (Mac) pour selection multiple.</p>
         </div>
 
         <!-- Boutons -->

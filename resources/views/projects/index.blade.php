@@ -41,14 +41,14 @@
         <div class="flex items-center gap-6 mb-8 border-b border-gray-200 pb-3">
 
             @if($role == 3)
-                <a href="{{ route('projects.create') }}" class="btn-primary">
-                    <button
-                            class="px-5 py-2 rounded-xl bg-cyan-600 text-white font-medium
-                                hover:bg-cyan-700 hover:shadow-md
-                                focus:outline-none focus:ring-2 focus:ring-cyan-400 transition">
+                <button
+                    type="button"
+                    onclick="openCreateProjectModal()"
+                    class="px-5 py-2 rounded-xl bg-cyan-600 text-white font-medium
+                        hover:bg-cyan-700 hover:shadow-md
+                        focus:outline-none focus:ring-2 focus:ring-cyan-400 transition">
                     + Nouveau Projet
-                    </button>
-                </a>
+                </button>
             @endif
 
 
@@ -148,10 +148,11 @@
                                         class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border overflow-hidden">
 
                                         @if($role == 3)
-                                            <a href="{{ route('projects.edit', $project->id) }}"
-                                                class="block px-4 py-2 text-sm hover:bg-gray-100">
-                                                ✏️ Modifier
-                                            </a>
+                                            <button type="button"
+                                                onclick="openEditProjectModal({{ $project->id }})"
+                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                                                Modifier
+                                            </button>
                                         @endif
 
                                         <form method="POST" action="{{ route('projects.favorite', $project->id) }}">
@@ -341,7 +342,146 @@
     </div> 
 </div>
 
+@if($role == 3)
+    <div id="createProjectModal" class="hidden fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/40" onclick="closeCreateProjectModal()"></div>
+        <div class="relative mx-auto mt-16 bg-white rounded-2xl shadow-xl w-[760px] p-6">
+            <h3 class="text-xl font-semibold mb-5">Nouveau projet</h3>
+
+            <form method="POST" action="{{ route('projects.store') }}" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nom du projet</label>
+                    <input type="text" name="nom_projet" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Description</label>
+                    <textarea name="description" rows="3" class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Date de debut</label>
+                        <input type="date" name="date_debut" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Date de fin</label>
+                        <input type="date" name="deadline" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Superviseurs</label>
+                    <select name="id_users[]" multiple required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary min-h-[120px]">
+                        @foreach($superviseurs as $superviseur)
+                            <option value="{{ $superviseur->id }}">{{ $superviseur->prenom }} {{ $superviseur->nom }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Maintenez Ctrl (Windows) ou Cmd (Mac) pour selection multiple.</p>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeCreateProjectModal()" class="px-4 py-2 rounded-lg border hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700">
+                        Creer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @foreach($projects as $project)
+        <div id="editProjectModal-{{ $project->id }}" class="hidden fixed inset-0 z-50">
+            <div class="absolute inset-0 bg-black/40" onclick="closeEditProjectModal({{ $project->id }})"></div>
+            <div class="relative mx-auto mt-16 bg-white rounded-2xl shadow-xl w-[760px] p-6">
+                <h3 class="text-xl font-semibold mb-5">Modifier le projet</h3>
+
+                <form method="POST" action="{{ route('projects.update', $project->id) }}" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nom du projet</label>
+                        <input type="text" name="nom_projet" value="{{ $project->nom_projet }}" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Description</label>
+                        <textarea name="description" rows="3" class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">{{ $project->description }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Date de debut</label>
+                            <input type="date" name="date_debut" value="{{ $project->date_debut }}" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Date de fin</label>
+                            <input type="date" name="deadline" value="{{ $project->deadline }}" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Etat</label>
+                            <select name="id_etat" required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                                <option value="1" {{ $project->id_etat == 1 ? 'selected' : '' }}>En cours</option>
+                                <option value="2" {{ $project->id_etat == 2 ? 'selected' : '' }}>Termine</option>
+                                <option value="3" {{ $project->id_etat == 3 ? 'selected' : '' }}>En attente</option>
+                                <option value="4" {{ $project->id_etat == 4 ? 'selected' : '' }}>Archive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Superviseurs</label>
+                        <select name="id_users[]" multiple required class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary min-h-[120px]">
+                            @foreach($superviseurs as $superviseur)
+                                <option
+                                    value="{{ $superviseur->id }}"
+                                    {{ $project->superviseurs->contains($superviseur->id) ? 'selected' : '' }}>
+                                    {{ $superviseur->prenom }} {{ $superviseur->nom }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Maintenez Ctrl (Windows) ou Cmd (Mac) pour selection multiple.</p>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeEditProjectModal({{ $project->id }})" class="px-4 py-2 rounded-lg border hover:bg-gray-50">
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-5 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endforeach
+@endif
+
 <script>
+    function openCreateProjectModal() {
+        const modal = document.getElementById('createProjectModal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCreateProjectModal() {
+        const modal = document.getElementById('createProjectModal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function openEditProjectModal(projectId) {
+        const modal = document.getElementById(`editProjectModal-${projectId}`);
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeEditProjectModal(projectId) {
+        const modal = document.getElementById(`editProjectModal-${projectId}`);
+        if (modal) modal.classList.add('hidden');
+    }
+
     function toggleContributor(id){
         document.getElementById('add-'+id).classList.toggle('hidden')
     }

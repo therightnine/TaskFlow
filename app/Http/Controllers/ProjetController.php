@@ -59,7 +59,9 @@ class ProjetController extends Controller
         }
 
 
-        return view('projects.index', compact('projects', 'filter', 'users', 'assignables', 'userRole'));
+        $superviseurs = User::whereHas('role', fn($q) => $q->where('role', 'Superviseur'))->get();
+
+        return view('projects.index', compact('projects', 'filter', 'users', 'assignables', 'userRole', 'superviseurs'));
 
 
     }
@@ -177,53 +179,44 @@ class ProjetController extends Controller
         return view('projects.form', compact('project', 'superviseurs'));
     }
 
-    
-
-
     // Enregistrer un projet
     public function store(Request $request)
     {
-        // Validate input
         $validated = $request->validate([
             'nom_projet' => 'required|unique:projets,nom_projet',
             'description'=> 'nullable|string',
             'date_debut' => 'required|date',
             'deadline'   => 'required|date|after_or_equal:date_debut',
-            'id_user'    => 'required|exists:users,id', // chef de projet ( owner )
+            'id_users'   => 'required|array|min:1',
+            'id_users.*' => 'exists:users,id',
         ]);
 
-        // Make sure selected user is a supervisor
-        $superviseur = User::where('id', $validated['id_user'])
-                            ->whereHas('role', fn($q) => $q->where('role', 'Superviseur'))
-                            ->first();
+        $superviseurIds = User::whereIn('id', $validated['id_users'])
+            ->whereHas('role', fn($q) => $q->where('role', 'Superviseur'))
+            ->pluck('id')
+            ->values();
 
-        if (!$superviseur) {
-            return back()->withErrors(['id_user' => 'L’utilisateur assigné doit être un superviseur.'])
-                        ->withInput();
+        if ($superviseurIds->isEmpty()) {
+            return back()->withErrors(['id_users' => 'Selectionnez au moins un superviseur valide.'])
+                ->withInput();
         }
 
-        // Create project (owner = logged-in user)
         $project = Projet::create([
             'nom_projet' => $validated['nom_projet'],
             'description'=> $validated['description'],
             'date_debut' => $validated['date_debut'],
             'deadline'   => $validated['deadline'],
-            'id_user'    => auth()->id(), // owner / chef de projet
-            'id_etat'    => 1, // default: En Attente
+            'id_user'    => auth()->id(),
+            'id_etat'    => 1,
         ]);
 
-        // Attach the supervisor to pivot table
-        $project->superviseurs()->attach($superviseur->id);
+        $project->superviseurs()->attach($superviseurIds->all());
 
         return redirect()->route('projects.index')
-                        ->with('success', 'Projet créé avec succès !');
+                        ->with('success', 'Projet cree avec succes !');
     }
 
-
-
-   
-
-    // Mettre à jour un projet
+    // Mettre a jour un projet
     public function update(Request $request, Projet $project)
     {
         $validated = $request->validate([
@@ -231,16 +224,18 @@ class ProjetController extends Controller
             'deadline'   => 'required|date',
             'date_debut' => 'required|date',
             'id_etat'    => 'required|in:1,2,3,4',
-            'id_user'    => 'required|exists:users,id',
+            'id_users'   => 'required|array|min:1',
+            'id_users.*' => 'exists:users,id',
         ]);
 
-        $superviseur = User::where('id', $validated['id_user'])
-                           ->whereHas('role', fn($q) => $q->where('role', 'Superviseur'))
-                           ->first();
+        $superviseurIds = User::whereIn('id', $validated['id_users'])
+            ->whereHas('role', fn($q) => $q->where('role', 'Superviseur'))
+            ->pluck('id')
+            ->values();
 
-        if (!$superviseur) {
-            return back()->withErrors(['id_user' => 'L’utilisateur assigné doit être un superviseur.'])
-                         ->withInput();
+        if ($superviseurIds->isEmpty()) {
+            return back()->withErrors(['id_users' => 'Selectionnez au moins un superviseur valide.'])
+                ->withInput();
         }
 
         $project->update([
@@ -251,12 +246,10 @@ class ProjetController extends Controller
             'id_etat'    => $validated['id_etat'],
         ]);
 
-        
-        // Sync supervisor pivot
-        $project->superviseurs()->sync([$validated['id_user']]);
+        $project->superviseurs()->sync($superviseurIds->all());
 
         return redirect()->route('projects.index')
-                         ->with('success', 'Projet mis à jour avec succès !');
+                         ->with('success', 'Projet mis a jour avec succes !');
     }
 
     // Supprimer un projet
@@ -296,4 +289,7 @@ class ProjetController extends Controller
         return redirect()->back();
     }
 }
+
+
+
 

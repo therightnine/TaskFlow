@@ -124,49 +124,67 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         @foreach($projectsByEtat[$etatId] as $project)
 
-                        <div class="bg-white rounded-xl shadow-md p-6 flex flex-col justify-between relative    ">
+                        <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between relative transition-all duration-300 hover:shadow-xl hover:border-cyan-200">
                             
-                        <!-- CARD TOP ACTIONS -->
+                                                <!-- CARD TOP ACTIONS -->
                             <div class="absolute top-4 left-4 z-10">
                                 <form method="POST" action="{{ route('projects.favorite', $project->id) }}">
                                     @csrf
-                                    <button class="text-xl">
-                                        {{ $project->is_favorite ? '⭐' : '☆' }}
+                                    <button class="w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center text-amber-500 hover:scale-105 transition">
+                                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="{{ $project->is_favorite ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.7">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.16 3.57a1 1 0 00.95.69h3.754c.969 0 1.371 1.24.588 1.81l-3.036 2.206a1 1 0 00-.364 1.118l1.16 3.57c.3.921-.755 1.688-1.54 1.118l-3.036-2.206a1 1 0 00-1.176 0l-3.036 2.206c-.784.57-1.838-.197-1.539-1.118l1.16-3.57a1 1 0 00-.364-1.118L2.597 8.997c-.783-.57-.38-1.81.588-1.81h3.754a1 1 0 00.95-.69l1.16-3.57z"/>
+                                        </svg>
                                     </button>
                                 </form>
                             </div>
 
                             <div class="absolute top-4 right-4 z-10">
-                                <div class="relative">
-                                    <button onclick="toggleMenu({{ $project->id }})"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full
-                                            hover:bg-gray-100 text-gray-500">
-                                        ⋯
+                                <div class="relative project-menu-container" data-project-menu-container>
+                                    <button onclick="toggleMenu({{ $project->id }}, event)"
+                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-white/90 shadow hover:bg-gray-100 text-gray-600 transition">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="5" r="1.8"></circle>
+                                            <circle cx="12" cy="12" r="1.8"></circle>
+                                            <circle cx="12" cy="19" r="1.8"></circle>
+                                        </svg>
                                     </button>
 
                                     <div id="menu-{{ $project->id }}"
-                                        class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border overflow-hidden">
+                                        class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border overflow-hidden">
 
                                         @if($role == 3)
                                             <button type="button"
                                                 onclick="openEditProjectModal({{ $project->id }})"
-                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M12 20h9"></path>
+                                                    <path d="M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                                                </svg>
                                                 Modifier
                                             </button>
                                         @endif
 
                                         <form method="POST" action="{{ route('projects.favorite', $project->id) }}">
                                             @csrf
-                                            <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                                {{ $project->is_favorite ? '⭐ Défavorisé' : '☆ Favori' }}
+                                            <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-amber-500" viewBox="0 0 20 20" fill="{{ $project->is_favorite ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.7">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.16 3.57a1 1 0 00.95.69h3.754c.969 0 1.371 1.24.588 1.81l-3.036 2.206a1 1 0 00-.364 1.118l1.16 3.57c.3.921-.755 1.688-1.54 1.118l-3.036-2.206a1 1 0 00-1.176 0l-3.036 2.206c-.784.57-1.838-.197-1.539-1.118l1.16-3.57a1 1 0 00-.364-1.118L2.597 8.997c-.783-.57-.38-1.81.588-1.81h3.754a1 1 0 00.95-.69l1.16-3.57z"/>
+                                                </svg>
+                                                {{ $project->is_favorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
                                             </button>
                                         </form>
 
                                         @if($role == 3)
                                             <form method="POST" action="{{ route('projects.archive', $project->id) }}">
                                                 @csrf
-                                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                                    {{ $project->id_etat == 4 ? '♻️ Désarchiver' : '📦 Archiver' }}
+                                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 7h18"></path>
+                                                        <path d="M5 7l1 12h12l1-12"></path>
+                                                        <path d="M9 11v5M15 11v5"></path>
+                                                        <path d="M10 3h4l1 4H9l1-4z"></path>
+                                                    </svg>
+                                                    {{ $project->id_etat == 4 ? 'Desarchiver' : 'Archiver' }}
                                                 </button>
                                             </form>
 
@@ -175,17 +193,20 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button"
-                                                    class="delete-btn w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                                    🗑️ Supprimer
+                                                    class="delete-btn w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 6h18"></path>
+                                                        <path d="M8 6V4h8v2"></path>
+                                                        <path d="M19 6l-1 14H6L5 6"></path>
+                                                        <path d="M10 11v6M14 11v6"></path>
+                                                    </svg>
+                                                    Supprimer
                                                 </button>
                                             </form>
                                         @endif
                                     </div>
                                 </div>
                             </div>
-
-
-
 
                             <!-- CENTER CONTENT -->
                             <div class="text-center space-y-3">
@@ -198,7 +219,7 @@
                                 </div>
 
                                 <!-- TITLE -->
-                                <h3 class="text-lg font-bold text-gray-800 break-words">
+                                <h3 class="text-lg font-bold text-gray-800 break-words transition-colors group-hover:text-cyan-700">
                                     {{ $project->nom_projet }}
                                 </h3>
 
@@ -261,7 +282,7 @@
 
 
                                         @if($role == 2 || $role == 3)
-                                        <button onclick="openProjectModal({{ $project->id }})"
+                                        <button onclick="openProjectModal({{ $project->id }}, event)"
                                             class="w-6 h-6 flex items-center justify-center
                                                 rounded-full bg-cyan-500 text-white text-sm font-bold
                                                 transition-all duration-200
@@ -307,12 +328,12 @@
 
                                                 </div>
 
-                                                <div class="flex justify-end gap-3 mt-6">
-                                                    <button onclick="saveProjectAssignment({{ $project->id }})" class="px-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600">
+                                                <div class="flex justify-center gap-3 mt-6">
+                                                    <button type="button" onclick="saveProjectAssignment({{ $project->id }}, event)" class="px-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600">
                                                         Enregistrer
                                                     </button>
 
-                                                    <button onclick="closeProjectModal({{ $project->id }})"
+                                                    <button type="button" onclick="closeProjectModal({{ $project->id }}, event)"
                                                         class="px-5 py-2 rounded-xl border hover:ring-2 hover:ring-cyan-400">
                                                         Annuler
                                                     </button>
@@ -514,7 +535,12 @@
 
     const projectContributorState = {};
 
-    function openProjectModal(projectId) {
+    function openProjectModal(projectId, event = null) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         const modal = document.getElementById('modal-' + projectId);
         if (!modal) return;
         modal.classList.remove('hidden');
@@ -529,7 +555,12 @@
         }
     }
 
-    function closeProjectModal(projectId) {
+    function closeProjectModal(projectId, event = null) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         const modal = document.getElementById('modal-' + projectId);
         if (modal) modal.classList.add('hidden');
     }
@@ -548,7 +579,12 @@
         }
     }
 
-    function saveProjectAssignment(projectId){
+    function saveProjectAssignment(projectId, event = null){
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         const state = projectContributorState[projectId];
         const toAdd = [...state.pending].filter(id => !state.original.has(id));
         const toRemove = [...state.original].filter(id => !state.pending.has(id));
@@ -587,7 +623,12 @@
 </script>
 
 <script>
-    function toggleMenu(id) {
+    function toggleMenu(id, event = null) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         document.querySelectorAll('[id^="menu-"]').forEach(m => {
             if (m.id !== 'menu-' + id) m.classList.add('hidden');
         });
@@ -596,7 +637,7 @@
 
     // Close menus on outside click
     document.addEventListener('click', function (e) {
-        if (!e.target.closest('.relative')) {
+        if (!e.target.closest('[data-project-menu-container]')) {
             document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
         }
     });
@@ -605,3 +646,4 @@
 
 
 @endsection
+

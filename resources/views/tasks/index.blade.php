@@ -51,6 +51,13 @@
         'done'     => 'Terminé',
         'archived' => 'Archivé',
     ];
+    $statusTotals = [
+        'En attente' => $tasks->get('En attente')?->count() ?? 0,
+        'En cours'   => $tasks->get('En cours')?->count() ?? 0,
+        'Terminé'    => $tasks->get('Terminé')?->count() ?? 0,
+        'Archivé'    => $tasks->get('Archivé')?->count() ?? 0,
+    ];
+    $totalTasksCount = array_sum($statusTotals);
 @endphp
 
 
@@ -141,6 +148,29 @@
         </div>
 
         @if($selectedProject)
+            <div class="mb-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs text-gray-500">Total</p>
+                    <p class="text-lg font-semibold text-gray-800" data-summary-count="total">{{ $totalTasksCount }}</p>
+                </div>
+                <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs text-gray-500">En attente</p>
+                    <p class="text-lg font-semibold text-gray-700" data-summary-count="1">{{ $statusTotals['En attente'] }}</p>
+                </div>
+                <div class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3">
+                    <p class="text-xs text-cyan-700">En cours</p>
+                    <p class="text-lg font-semibold text-cyan-700" data-summary-count="2">{{ $statusTotals['En cours'] }}</p>
+                </div>
+                <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                    <p class="text-xs text-emerald-700">Terminé</p>
+                    <p class="text-lg font-semibold text-emerald-700" data-summary-count="3">{{ $statusTotals['Terminé'] }}</p>
+                </div>
+                <div class="rounded-xl border border-purple-200 bg-purple-50 px-4 py-3">
+                    <p class="text-xs text-purple-700">Archivé</p>
+                    <p class="text-lg font-semibold text-purple-700" data-summary-count="4">{{ $statusTotals['Archivé'] }}</p>
+                </div>
+            </div>
+
             <!-- CREATE TASK MODAL -->
             <div id="task-create-modal" class="hidden fixed inset-0 z-50 overflow-auto">
                 <!-- Dark overlay -->
@@ -222,7 +252,7 @@
 
         <!-- TASKS LIST -->
         @if($selectedProject && $tasks->isNotEmpty()) 
-            <div class="flex gap-6 overflow-x-auto overflow-y-visible pb-4 relative ">
+            <div class="flex gap-5 overflow-x-auto overflow-y-visible pb-4 relative snap-x snap-mandatory">
 
                 @php
                     $statuses = [
@@ -258,7 +288,7 @@
 
                     <div
                         class="
-                            bg-gray-50 rounded-2xl p-4 shadow
+                            bg-gray-50/80 rounded-2xl p-4 shadow-sm border border-gray-200 snap-start
                             {{ $taskFilter === 'all' ? 'flex-shrink-0 w-80' : 'flex-1' }}"
                         data-etat-id="{{ $etats->firstWhere('etat', $statusName)->id }}"
                         ondragover="allowDrop(event)"
@@ -266,24 +296,30 @@
                     >
 
                         <!-- HEADER -->
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full {{ $style['dot'] }}"></span>
-                            <h2 class="font-semibold text-base {{ $style['text'] }}">
-                                {{ $statusName }}
-                            </h2>
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full {{ $style['dot'] }}"></span>
+                                <h2 class="font-semibold text-base {{ $style['text'] }}">
+                                    {{ $statusName }}
+                                </h2>
+                            </div>
+                            @php $tasksForStatus = $tasks->get($statusName) ?? collect(); @endphp
+                            <span class="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600" data-column-count>
+                                {{ $tasksForStatus->count() }}
+                            </span>
                         </div>
 
                         <div class="h-[2px] rounded-full bg-gradient-to-r {{ $style['line'] }}"></div>
                         <br>
 
-                        @php $tasksForStatus = $tasks->get($statusName) ?? collect(); @endphp
-
                         @if($tasksForStatus->isEmpty())
-                            <p class="text-gray-400 text-sm">Aucune tâche dans ce statut</p>
+                            <div class="task-empty-placeholder rounded-xl border border-dashed border-gray-300 bg-white/70 px-4 py-6 text-center">
+                                <p class="text-gray-400 text-sm">Aucune tâche dans ce statut</p>
+                            </div>
                         @else
                             @foreach($tasksForStatus as $task)
                                 {{--TASK CARD CODE  --}}
-                                <div class="relative bg-white rounded-xl p-4 mb-4 shadow flex flex-col justify-between hover:shadow-xl  cursor-pointer"
+                                <div class="relative bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm flex flex-col justify-between hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                                         draggable="{{ $role == 4 && $task->projet->contributors->contains(auth()->user()->id) ? 'true' : 'false' }}"
                                         data-task-id="{{ $task->id }}"
                                         ondragstart="dragTask(event)"
@@ -396,7 +432,7 @@
 
                                     <!-- FOOTER -->
                                     <div class="flex justify-between text-xs text-gray-500 mt-2">
-                                        <span>{{ $task->commentaires->count() }} commentaires</span>
+                                        <span>{{ $task->commentaires_count ?? 0 }} commentaires</span>
                                         <span>{{ $task->deadline }}</span>
                                     </div>
 
@@ -706,7 +742,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                            .
                         @endif
                     </div>
 
@@ -826,9 +861,11 @@
 
 <script>
     let draggedTaskId = null;
+    let draggedFromColumn = null;
 
     function dragTask(e) {
         draggedTaskId = e.currentTarget.dataset.taskId;
+        draggedFromColumn = e.currentTarget.closest('[data-etat-id]');
     }
 
     function allowDrop(e) {
@@ -847,31 +884,96 @@
         const draggedTask = document.querySelector(`[data-task-id='${draggedTaskId}']`);
         if (!draggedTask) return;
 
+        const fromColumn = draggedFromColumn || draggedTask.closest('[data-etat-id]');
+        const oldEtatId = fromColumn?.dataset?.etatId;
+        if (String(oldEtatId) === String(newEtatId)) {
+            draggedTaskId = null;
+            draggedFromColumn = null;
+            return;
+        }
+
         // Append the task to the new column immediately
+        const previousParent = draggedTask.parentElement;
+        const previousNextSibling = draggedTask.nextElementSibling;
         column.appendChild(draggedTask);
+        updateBoardCounters(fromColumn, column, oldEtatId, newEtatId);
+        syncEmptyState(fromColumn);
+        syncEmptyState(column);
 
         // Send the request to update backend
         fetch(`/tasks/${draggedTaskId}/status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({ id_etat: newEtatId })
         })
         .then(res => {
             if (!res.ok) throw new Error();
-            window.location.reload();
-           
+            draggedTaskId = null;
+            draggedFromColumn = null;
         })
         .catch(() => {
             alert('Could not move task');
-            // revert back if error
-            window.location.reload();
+            // Revert optimistic move if backend update fails
+            if (previousParent) {
+                if (previousNextSibling && previousNextSibling.parentNode === previousParent) {
+                    previousParent.insertBefore(draggedTask, previousNextSibling);
+                } else {
+                    previousParent.appendChild(draggedTask);
+                }
+            }
+            updateBoardCounters(column, fromColumn, newEtatId, oldEtatId);
+            syncEmptyState(fromColumn);
+            syncEmptyState(column);
+            draggedTaskId = null;
+            draggedFromColumn = null;
         });
+    }
+
+    function updateBoardCounters(fromColumn, toColumn, fromEtatId, toEtatId) {
+        adjustColumnCount(fromColumn, -1);
+        adjustColumnCount(toColumn, 1);
+        adjustSummaryCount(fromEtatId, -1);
+        adjustSummaryCount(toEtatId, 1);
+    }
+
+    function adjustColumnCount(column, delta) {
+        if (!column) return;
+        const countEl = column.querySelector('[data-column-count]');
+        if (!countEl) return;
+        const current = Number.parseInt(countEl.textContent.trim(), 10) || 0;
+        countEl.textContent = Math.max(0, current + delta);
+    }
+
+    function adjustSummaryCount(etatId, delta) {
+        if (!etatId) return;
+        const countEl = document.querySelector(`[data-summary-count="${etatId}"]`);
+        if (!countEl) return;
+        const current = Number.parseInt(countEl.textContent.trim(), 10) || 0;
+        countEl.textContent = Math.max(0, current + delta);
+    }
+
+    function syncEmptyState(column) {
+        if (!column) return;
+        const taskCards = column.querySelectorAll(':scope > [data-task-id]');
+        const existingEmpty = column.querySelector(':scope > .task-empty-placeholder');
+
+        if (taskCards.length === 0 && !existingEmpty) {
+            const empty = document.createElement('div');
+            empty.className = 'task-empty-placeholder rounded-xl border border-dashed border-gray-300 bg-white/70 px-4 py-6 text-center';
+            empty.innerHTML = '<p class="text-gray-400 text-sm">Aucune tache dans ce statut</p>';
+            column.appendChild(empty);
+        } else if (taskCards.length > 0 && existingEmpty) {
+            existingEmpty.remove();
+        }
     }
 
 </script>
 
 
 @endsection
+
+

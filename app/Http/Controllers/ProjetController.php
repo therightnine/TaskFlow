@@ -137,7 +137,7 @@ class ProjetController extends Controller
             return back()->withErrors('Cet utilisateur n’est pas un contributeur.');
         }
 
-        $project->contributeurs()->syncWithoutDetaching([$user->id]);
+        $project->contributors()->syncWithoutDetaching([$user->id]);
 
         return back()->with('success', 'Contributeur ajouté.');
     }
@@ -277,7 +277,7 @@ class ProjetController extends Controller
         if (
             ($user->id_role == 3 && $project->id_user != $user->id) ||
             ($user->id_role == 2 && !$project->superviseurs->contains($user->id)) ||
-            ($user->id_role == 4 && !$project->contributeurs->contains($user->id))
+            ($user->id_role == 4 && !$project->contributors->contains($user->id))
         ) {
             abort(403);
         }
@@ -289,7 +289,3 @@ class ProjetController extends Controller
         return redirect()->back();
     }
 }
-
-
-
-

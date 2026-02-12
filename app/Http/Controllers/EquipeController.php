@@ -31,8 +31,8 @@ class EquipeController extends Controller
                 $members->push($projet->owner);
             }
 
-            if ($projet->contributeurs) {
-                $members = $members->merge($projet->contributeurs);
+            if ($projet->contributors) {
+                $members = $members->merge($projet->contributors);
             }
 
             if ($projet->superviseurs) {

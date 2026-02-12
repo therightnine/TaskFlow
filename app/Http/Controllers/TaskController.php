@@ -19,7 +19,13 @@ class TaskController extends Controller
         $selectedProject = null;
 
         // Base task query with relationships
-        $query = Tache::with(['projet.contributors', 'contributors', 'etat', 'commentaires']);
+        $query = Tache::with([
+            'projet:id,nom_projet,id_user',
+            'projet.contributors:id,prenom,nom,photo',
+            'contributors:id,prenom,nom,photo',
+            'etat:id,etat',
+            'commentaires.user:id,prenom,nom,photo',
+        ])->withCount('commentaires');
 
         // Task status filter
         if ($request->filter) {
@@ -190,7 +196,14 @@ class TaskController extends Controller
         $task->id_etat = $request->id_etat;
         $task->save();
 
-        // <-- redirect back to refresh page
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'task_id' => $task->id,
+                'id_etat' => (int) $task->id_etat,
+            ]);
+        }
+
         return redirect()->back();
         
     }

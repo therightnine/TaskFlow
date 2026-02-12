@@ -433,13 +433,26 @@ class AppServiceProvider extends ServiceProvider
 
     private function initSchemaCapabilities(): void
     {
-        $this->hasProjetContributeurCreatedAt = Schema::hasTable('projet_contributeur')
-            && Schema::hasColumn('projet_contributeur', 'created_at');
+        $resolver = function () {
+            return [
+                'projet_contributeur_created_at' => Schema::hasTable('projet_contributeur')
+                    && Schema::hasColumn('projet_contributeur', 'created_at'),
+                'projet_superviseur_created_at' => Schema::hasTable('projet_superviseur')
+                    && Schema::hasColumn('projet_superviseur', 'created_at'),
+                'tache_contributeur_created_at' => Schema::hasTable('tache_contributeur')
+                    && Schema::hasColumn('tache_contributeur', 'created_at'),
+            ];
+        };
 
-        $this->hasProjetSuperviseurCreatedAt = Schema::hasTable('projet_superviseur')
-            && Schema::hasColumn('projet_superviseur', 'created_at');
+        try {
+            $capabilities = cache()->remember('schema_capabilities_v1', now()->addHours(12), $resolver);
+        } catch (\Throwable $e) {
+            // Fallback when cache store is unavailable (e.g. database driver without cache table).
+            $capabilities = $resolver();
+        }
 
-        $this->hasTacheContributeurCreatedAt = Schema::hasTable('tache_contributeur')
-            && Schema::hasColumn('tache_contributeur', 'created_at');
+        $this->hasProjetContributeurCreatedAt = (bool) ($capabilities['projet_contributeur_created_at'] ?? false);
+        $this->hasProjetSuperviseurCreatedAt = (bool) ($capabilities['projet_superviseur_created_at'] ?? false);
+        $this->hasTacheContributeurCreatedAt = (bool) ($capabilities['tache_contributeur_created_at'] ?? false);
     }
 }

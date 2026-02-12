@@ -283,20 +283,44 @@ class DashboardController extends Controller
 public function admin()
 {
     $user = auth()->user();
-    $abonnements = DB::table('abonnements')
-        ->orderBy('id', 'desc')
-        ->paginate(10);
+    $today = Carbon::today();
+    $in7Days = Carbon::today()->addDays(7);
 
-    // Date de référence (aujourd'hui)
-    $dateRef = now()->toDateString();
+    $totalUsers = DB::table('users')->count();
+    $totalRoles = DB::table('roles')->count();
+    $totalPlans = DB::table('abonnements')->count();
+    $totalProjects = DB::table('projets')->count();
+    $totalTasks = DB::table('taches')->count();
 
-// Récupérer les abonnements actifs
-    $rows = DB::table('user_abonnement')
-        ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
-        ->whereDate('user_abonnement.date_debut', '<=', $dateRef)
-        ->where(function ($q) use ($dateRef) {
+    $activeSubscriptions = DB::table('user_abonnement')
+        ->whereDate('date_debut', '<=', $today)
+        ->where(function ($q) use ($today) {
+            $q->whereNull('date_fin')
+                ->orWhereDate('date_fin', '>=', $today);
+        })
+        ->count();
+
+    $expiringSoon = DB::table('user_abonnement')
+        ->whereNotNull('date_fin')
+        ->whereDate('date_fin', '>=', $today)
+        ->whereDate('date_fin', '<=', $in7Days)
+        ->count();
+
+    $monthlyRecurringRevenue = DB::table('user_abonnement')
+        ->join('abonnements', 'abonnements.id', '=', 'user_abonnement.id_abonnement')
+        ->whereDate('user_abonnement.date_debut', '<=', $today)
+        ->where(function ($q) use ($today) {
             $q->whereNull('user_abonnement.date_fin')
-              ->orWhereDate('user_abonnement.date_fin', '>=', $dateRef);
+                ->orWhereDate('user_abonnement.date_fin', '>=', $today);
+        })
+        ->sum('abonnements.prix');
+
+    $subscriptionRows = DB::table('user_abonnement')
+        ->join('abonnements', 'user_abonnement.id_abonnement', '=', 'abonnements.id')
+        ->whereDate('user_abonnement.date_debut', '<=', $today)
+        ->where(function ($q) use ($today) {
+            $q->whereNull('user_abonnement.date_fin')
+                ->orWhereDate('user_abonnement.date_fin', '>=', $today);
         })
         ->select(
             'abonnements.abonnement',
@@ -306,30 +330,107 @@ public function admin()
         ->orderBy('abonnements.abonnement')
         ->get();
 
-    // Préparer les données pour le graphe
-    $labels = [];
-    $values = [];
-    foreach ($rows as $r) {
-        $labels[] = $r->abonnement ?? 'Inconnu';
-        $values[] = (int) $r->active_count;
+    $subscriptionLabels = [];
+    $subscriptionValues = [];
+    foreach ($subscriptionRows as $row) {
+        $subscriptionLabels[] = $row->abonnement ?? 'Inconnu';
+        $subscriptionValues[] = (int) $row->active_count;
     }
-    $total = array_sum($values);
+    $subscriptionTotal = array_sum($subscriptionValues);
 
-    return view('dashboard.admin', [
-        'user' => $user,
-        'subscriptionLabels' => $labels,
-        'subscriptionValues' => $values,
-        'subscriptionTotal'  => $total,
-        'abonnements'        => $abonnements,
-    ]);
+    $usersByRoleRows = DB::table('users')
+        ->join('roles', 'roles.id', '=', 'users.id_role')
+        ->select('roles.role', DB::raw('COUNT(users.id) as total'))
+        ->groupBy('roles.role')
+        ->orderBy('roles.role')
+        ->get();
+
+    $roleLabels = [];
+    $roleValues = [];
+    foreach ($usersByRoleRows as $row) {
+        $roleLabels[] = $row->role;
+        $roleValues[] = (int) $row->total;
+    }
+
+    $startMonth = Carbon::now()->startOfMonth()->subMonths(5);
+    $monthKeys = [];
+    $monthLabels = [];
+    for ($i = 0; $i < 6; $i++) {
+        $d = $startMonth->copy()->addMonths($i);
+        $monthKeys[] = $d->format('Y-m');
+        $monthLabels[] = $d->translatedFormat('M Y');
+    }
+
+    $monthlySubscriptionRows = DB::table('user_abonnement')
+        ->select(DB::raw("DATE_FORMAT(date_debut, '%Y-%m') as ym"), DB::raw('COUNT(*) as total'))
+        ->whereDate('date_debut', '>=', $startMonth)
+        ->groupBy('ym')
+        ->pluck('total', 'ym');
+
+    $monthlySubscriptions = [];
+    foreach ($monthKeys as $key) {
+        $monthlySubscriptions[] = (int) ($monthlySubscriptionRows[$key] ?? 0);
+    }
+
+    $monthlyUserRegistrations = array_fill(0, count($monthKeys), 0);
+    if (Schema::hasColumn('users', 'created_at')) {
+        $monthlyUserRows = DB::table('users')
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as ym"), DB::raw('COUNT(*) as total'))
+            ->whereDate('created_at', '>=', $startMonth)
+            ->groupBy('ym')
+            ->pluck('total', 'ym');
+
+        foreach ($monthKeys as $idx => $key) {
+            $monthlyUserRegistrations[$idx] = (int) ($monthlyUserRows[$key] ?? 0);
+        }
+    }
+
+    $recentSubscriptionActivity = DB::table('user_abonnement')
+        ->join('users', 'users.id', '=', 'user_abonnement.id_inscri')
+        ->join('abonnements', 'abonnements.id', '=', 'user_abonnement.id_abonnement')
+        ->orderByDesc('user_abonnement.date_debut')
+        ->limit(8)
+        ->get([
+            'users.prenom',
+            'users.nom',
+            'abonnements.abonnement',
+            'user_abonnement.date_debut',
+            'user_abonnement.date_fin',
+        ])
+        ->map(function ($item) {
+            $fullName = trim(($item->prenom ?? '') . ' ' . ($item->nom ?? ''));
+            $startsAt = Carbon::parse($item->date_debut);
+            $endsAt = $item->date_fin ? Carbon::parse($item->date_fin)->format('d/m/Y') : 'Illimite';
+
+            return [
+                'title' => 'Abonnement active',
+                'message' => "{$fullName} a pris le plan {$item->abonnement} (fin: {$endsAt}).",
+                'time' => $startsAt,
+            ];
+        });
+
+    return view('dashboard.admin', compact(
+        'user',
+        'totalUsers',
+        'totalRoles',
+        'totalPlans',
+        'totalProjects',
+        'totalTasks',
+        'activeSubscriptions',
+        'expiringSoon',
+        'monthlyRecurringRevenue',
+        'subscriptionLabels',
+        'subscriptionValues',
+        'subscriptionTotal',
+        'roleLabels',
+        'roleValues',
+        'monthLabels',
+        'monthlySubscriptions',
+        'monthlyUserRegistrations',
+        'recentSubscriptionActivity'
+    ));
 }
 
-
-
-
-
-
-    
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD SUPERVISEUR
@@ -537,3 +638,4 @@ public function admin()
         return null;
     }
 }
+

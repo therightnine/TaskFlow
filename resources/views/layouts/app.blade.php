@@ -36,7 +36,10 @@
     @include('layouts.navbar')
 
     <!-- PAGE CONTENT -->
-    <div class="min-h-screen overflow-x-auto pt-[100px]">
+    @php
+        $contentMinHeightClass = trim($__env->yieldContent('content_min_height_class', 'min-h-screen'));
+    @endphp
+    <div class="{{ $contentMinHeightClass }} overflow-x-auto pt-[100px]">
         @yield('content')
     </div>
 

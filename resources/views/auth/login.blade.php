@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'Connexion - TaskFlow')
+@section('content_min_height_class', '')
 
 @section('content')
 
-<div class="w-full max-w-[1600px] mx-auto h-[800px] flex rounded-[60px] mt-[100px]">
+<div class="w-full max-w-[1600px] mx-auto flex rounded-[60px] mt-8">
 
     <!-- GAUCHE : FORMULAIRE DE CONNEXION -->
     <div class="w-full flex justify-center items-center bg-white">
@@ -83,9 +84,9 @@
 
                 <!-- MOT DE PASSE OUBLIÉ -->
                 <div class="text-right mb-6">
-                    <a href="#" class="text-sky-900 text-lg font-medium hover:underline">
-                        Mot de passe oublié ?
-                    </a>
+                    <button type="button" id="forgotPasswordBtn" class="text-sky-900 text-lg font-medium hover:underline">
+                        Mot de passe oublie ?
+                    </button>
                 </div>
 
                 <!-- BOUTON CONNEXION -->
@@ -99,7 +100,7 @@
             <!-- INSCRIPTION -->
             <div class="mt-6 text-center text-lg">
                 <span class="text-zinc-900">Vous n'avez pas de compte ? </span>
-                <a href="#" class="text-sky-900 font-bold hover:underline">
+                <a href="{{ route('register') }}" class="text-sky-900 font-bold hover:underline">
                     Inscription
                 </a>
             </div>
@@ -112,5 +113,46 @@
     </div>
 
 </div>
+<br>
 
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotPasswordModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+        <h3 class="text-xl font-bold text-zinc-900">Email Envoyé</h3>
+        <p class="mt-2 text-zinc-600">
+            Un email de reinitialisation du mot de passe a ete envoyé.
+        </p>
+        <div class="mt-5 flex justify-end">
+            <button type="button" id="closeForgotModalBtn"
+                class="rounded-lg bg-cyan-500 px-4 py-2 text-white font-medium hover:bg-cyan-600 transition">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+    const closeForgotModalBtn = document.getElementById('closeForgotModalBtn');
+
+    if (forgotPasswordBtn && forgotPasswordModal && closeForgotModalBtn) {
+        forgotPasswordBtn.addEventListener('click', () => {
+            forgotPasswordModal.classList.remove('hidden');
+            forgotPasswordModal.classList.add('flex');
+        });
+
+        closeForgotModalBtn.addEventListener('click', () => {
+            forgotPasswordModal.classList.add('hidden');
+            forgotPasswordModal.classList.remove('flex');
+        });
+
+        forgotPasswordModal.addEventListener('click', (event) => {
+            if (event.target === forgotPasswordModal) {
+                forgotPasswordModal.classList.add('hidden');
+                forgotPasswordModal.classList.remove('flex');
+            }
+        });
+    }
+</script>
 @endsection

@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Inscription - TaskFlow')
+@section('content_min_height_class', '')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 py-14">
+<div class="max-w-7xl mx-auto px-6 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div class="order-2 lg:order-1">
             <div class="rounded-3xl bg-white border border-slate-100 shadow-2xl shadow-slate-900/10 p-8 md:p-10">
@@ -71,8 +72,8 @@
         </div>
 
         <div class="order-1 lg:order-2">
-            <div class="relative rounded-3xl overflow-hidden border border-cyan-100 bg-gradient-to-br from-cyan-50 via-sky-50 to-blue-50 p-10 min-h-[420px] flex items-center justify-center">
-                <img src="{{ asset('images/login-right.png') }}" class="h-[320px] object-contain" alt="Inscription">
+            <div class="relative rounded-3xl overflow-hidden   p-10 min-h-[340px] flex items-center justify-center">
+                <img src="{{ asset('images/login-right.png') }}" class="h-[500px] object-contain" alt="Inscription">
                 <div class="absolute bottom-5 left-5 right-5 rounded-2xl bg-white/80 backdrop-blur border border-white p-4">
                     <p class="text-sm text-slate-700">
                         Rejoignez TaskFlow et configurez votre espace en deux etapes simples.

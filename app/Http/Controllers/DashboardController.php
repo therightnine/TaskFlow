@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use App\Models\Projet;
 use App\Models\Tache;
-use App\Models\Tache as ModelsTache;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -22,55 +21,178 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $today = Carbon::today();
+        $weekStart = Carbon::now()->subDays(7);
 
-        $activeProjects = Projet::whereHas('etat', fn($q) =>
-            $q->where('etat', '!=', 'completed')
-        )->count();
-
-        $tasksDueToday = Tache::whereDate('deadline', $today)->count();
-
-        $pendingApprovals = Projet::whereHas('etat', fn($q) =>
-            $q->where('etat', 'pending')
-        )->count();
-
-        $newIssues = Tache::whereDate('created_at', $today)->count();
-
-        $tasksByStatus = Tache::selectRaw('etat.etat, COUNT(*) as total')
-            ->join('etat', 'etat.id', '=', 'taches.id_etat')
-            ->groupBy('etat.etat')
-            ->pluck('total', 'etat.etat');
-
-        $tasksPerMonth = Tache::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('SUM(CASE WHEN id_etat = 3 THEN 1 ELSE 0 END) as completed'),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN deadline < NOW() AND id_etat != 3 THEN 1 ELSE 0 END) as overdue')
-            )
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->orderBy(DB::raw('MONTH(created_at)'))
+        $projects = Projet::with(['owner', 'superviseurs.role', 'contributors.role', 'taches.etat'])
+            ->where('id_user', $user->id)
             ->get();
+
+        $projectIds = $projects->pluck('id');
+        $allTasks = $projects->flatMap(fn ($project) => $project->taches)->values();
+
+        $activeProjects = $projects->filter(function ($project) {
+            if (!$project->etat) {
+                return true;
+            }
+
+            return !$this->isCompletedStatus($project->etat->etat);
+        })->count();
+
+        $openTasks = $allTasks->filter(fn ($task) => !$this->isCompletedTask($task));
+
+        $tasksDueToday = $openTasks
+            ->filter(fn ($task) => !empty($task->deadline) && Carbon::parse($task->deadline)->isSameDay($today))
+            ->count();
+
+        $overdueTasksCount = $openTasks
+            ->filter(fn ($task) => !empty($task->deadline) && Carbon::parse($task->deadline)->lt($today))
+            ->count();
+
+        $completedProjects = $projects->filter(function ($project) {
+            $tasks = $project->taches ?? collect();
+            if ($tasks->isEmpty()) {
+                return false;
+            }
+
+            return $tasks->every(fn ($task) => $this->isCompletedTask($task));
+        })->count();
+
+        $completedTasksThisWeek = $allTasks
+            ->filter(fn ($task) => $this->isCompletedTask($task))
+            ->filter(function ($task) use ($weekStart) {
+                $time = $this->taskEventTime($task);
+                return $time && $time->gte($weekStart);
+            })
+            ->count();
+
+        $tasksByStatus = $allTasks
+            ->groupBy(function ($task) {
+                $status = optional($task->etat)->etat;
+                return $status ?: 'Inconnu';
+            })
+            ->map(fn ($group) => $group->count())
+            ->toArray();
 
         $completedTasks = array_fill(0, 12, 0);
         $newTasks = array_fill(0, 12, 0);
         $overdueTasks = array_fill(0, 12, 0);
+        $currentYear = (int) $today->year;
 
-        foreach ($tasksPerMonth as $task) {
-            $index = $task->month - 1;
-            $completedTasks[$index] = $task->completed;
-            $newTasks[$index] = $task->total;
-            $overdueTasks[$index] = $task->overdue;
+        foreach ($allTasks as $task) {
+            $eventDate = $this->taskEventTime($task);
+            if (!$eventDate) {
+                continue;
+            }
+            if ((int) $eventDate->year !== $currentYear) {
+                continue;
+            }
+
+            $index = (int) $eventDate->month - 1;
+            $newTasks[$index]++;
+
+            if ($this->isCompletedTask($task)) {
+                $completedTasks[$index]++;
+            }
+
+            if (!$this->isCompletedTask($task) && !empty($task->deadline) && Carbon::parse($task->deadline)->lt($today)) {
+                $overdueTasks[$index]++;
+            }
+        }
+
+        // Team members using the same relationship logic as EquipeController.
+        $teamMembers = $projects->flatMap(function ($project) {
+            $members = collect();
+
+            if ($project->owner) {
+                $members->push($project->owner);
+            }
+
+            $members = $members
+                ->merge($project->superviseurs ?? collect())
+                ->merge($project->contributors ?? collect());
+
+            return $members;
+        })->unique('id')->values();
+
+        $activityLabels = [];
+        $activityData = [];
+
+        if ($projectIds->isNotEmpty()) {
+            $projectIdsArray = $projectIds->all();
+
+            $newContributors = 0;
+            if (Schema::hasTable('projet_contributeur') && Schema::hasColumn('projet_contributeur', 'created_at')) {
+                $newContributors = DB::table('projet_contributeur')
+                    ->whereIn('projet_id', $projectIdsArray)
+                    ->where('created_at', '>=', $weekStart)
+                    ->count();
+            }
+
+            $newSuperviseurs = 0;
+            if (Schema::hasTable('projet_superviseur') && Schema::hasColumn('projet_superviseur', 'created_at')) {
+                $newSuperviseurs = DB::table('projet_superviseur')
+                    ->whereIn('projet_id', $projectIdsArray)
+                    ->where('created_at', '>=', $weekStart)
+                    ->count();
+            }
+
+            $newTaskAssignments = 0;
+            if (
+                Schema::hasTable('tache_contributeur') &&
+                Schema::hasColumn('tache_contributeur', 'created_at')
+            ) {
+                $newTaskAssignments = DB::table('tache_contributeur')
+                    ->join('taches', 'taches.id', '=', 'tache_contributeur.id_tache')
+                    ->whereIn('taches.id_projet', $projectIdsArray)
+                    ->where('tache_contributeur.created_at', '>=', $weekStart)
+                    ->count();
+            }
+
+            $activityLabels = [
+                'Nouveaux contributeurs',
+                'Nouveaux superviseurs',
+                'Nouvelles attributions',
+                'Taches terminees',
+                'Taches en retard',
+            ];
+
+            $activityData = [
+                $newContributors,
+                $newSuperviseurs,
+                $newTaskAssignments,
+                $completedTasksThisWeek,
+                $overdueTasksCount,
+            ];
+        }
+
+        if (empty(array_filter($activityData))) {
+            $roles = $teamMembers
+                ->groupBy(fn ($member) => optional($member->role)->role ?: 'Membre')
+                ->map(fn ($group) => $group->count());
+
+            $activityLabels = $roles->keys()->values()->all();
+            $activityData = $roles->values()->all();
+        }
+
+        if (empty($activityLabels) || empty($activityData)) {
+            $activityLabels = ['Aucune activite'];
+            $activityData = [1];
         }
 
         return view('dashboard.chef', compact(
             'user',
             'activeProjects',
             'tasksDueToday',
-            'pendingApprovals',
-            'newIssues',
+            'overdueTasksCount',
+            'completedProjects',
+            'completedTasksThisWeek',
             'tasksByStatus',
             'completedTasks',
             'newTasks',
-            'overdueTasks'
+            'overdueTasks',
+            'teamMembers',
+            'activityLabels',
+            'activityData'
         ));
     }
 /*|--------------------------------------------------------------------------
@@ -247,16 +369,16 @@ public function admin()
     | DASHBOARD CONTRIBUTEUR
     |--------------------------------------------------------------------------
     */
-    
-
     public function contributeur()
     {
         $user = Auth::user();
         $today = Carbon::today();
 
-        // 🔹 Tâches assignées directement au contributeur
+        // 🔹 Tâches assignées au contributeur via pivot table
         $tasks = Tache::with(['etat', 'projet'])
-            ->where('id_contributeur', $user->id)
+            ->whereHas('contributors', function ($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })
             ->orderBy('deadline')
             ->get();
 
@@ -277,7 +399,7 @@ public function admin()
             $t->etat->etat !== 'terminé'
         );
 
-        // 📊 IMPORTANT : données pour Chart.js
+        // 📊 Pour Chart.js
         $tasksByStatus = $tasks
             ->groupBy(fn ($t) => $t->etat->etat ?? 'Inconnu')
             ->map(fn ($group) => $group->count())
@@ -296,7 +418,40 @@ public function admin()
             'recentTasks'
         ));
     }
-    
 
+    private function isCompletedStatus(?string $status): bool
+    {
+        $value = Str::of((string) $status)->lower()->ascii()->value();
+        if ($value === '') {
+            return false;
+        }
 
+        return Str::contains($value, ['termine', 'complete', 'completed', 'done']);
+    }
+
+    private function isCompletedTask(Tache $task): bool
+    {
+        if ($this->isCompletedStatus(optional($task->etat)->etat)) {
+            return true;
+        }
+
+        return (int) $task->id_etat === 3;
+    }
+
+    private function taskEventTime(Tache $task): ?Carbon
+    {
+        if (!empty($task->updated_at)) {
+            return Carbon::parse($task->updated_at);
+        }
+
+        if (!empty($task->created_at)) {
+            return Carbon::parse($task->created_at);
+        }
+
+        if (!empty($task->deadline)) {
+            return Carbon::parse($task->deadline);
+        }
+
+        return null;
+    }
 }

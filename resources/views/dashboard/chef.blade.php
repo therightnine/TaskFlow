@@ -45,7 +45,7 @@
 
                     <h3 class="text-xl font-bold">{{ $activeProjects }}</h3>
                     <p class="text-sm text-slate-600 mt-1">Active Projects</p>
-                    <p class="text-xs text-blue-600 mt-2">+2 since last week</p>
+                    <p class="text-xs text-blue-600 mt-2">{{ $teamMembers->count() }} membres dans vos equipes</p>
                 </div>
 
                 {{-- Tasks Due Today --}}
@@ -60,10 +60,10 @@
 
                     <h3 class="text-xl font-bold">{{ $tasksDueToday }}</h3>
                     <p class="text-sm text-slate-600 mt-1">Tasks Due Today</p>
-                    <p class="text-xs text-blue-600 mt-2">+5 from yesterday</p>
+                    <p class="text-xs text-blue-600 mt-2">Echeances du jour sur vos projets</p>
                 </div>
 
-                {{-- Pending Approvals --}}
+                {{-- Overdue Tasks --}}
                 <div class="bg-emerald-100 rounded-2xl p-5">
                     <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
@@ -73,12 +73,12 @@
                         </svg>
                     </div>
 
-                    <h3 class="text-xl font-bold">{{ $pendingApprovals }}</h3>
-                    <p class="text-sm text-slate-600 mt-1">Pending Approvals</p>
-                    <p class="text-xs text-blue-600 mt-2">6 Approvals Waiting</p>
+                    <h3 class="text-xl font-bold">{{ $overdueTasksCount }}</h3>
+                    <p class="text-sm text-slate-600 mt-1">Overdue Tasks</p>
+                    <p class="text-xs text-blue-600 mt-2">Demandent une action rapide</p>
                 </div>
 
-                {{-- New Issues --}}
+                {{-- Completed Projects --}}
                 <div class="bg-violet-100 rounded-2xl p-5">
                     <div class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
@@ -88,9 +88,9 @@
                         </svg>
                     </div>
 
-                    <h3 class="text-xl font-bold">{{ $newIssues }}</h3>
-                    <p class="text-sm text-slate-600 mt-1">New Issues Raised</p>
-                    <p class="text-xs text-blue-600 mt-2">−1 from yesterday</p>
+                    <h3 class="text-xl font-bold">{{ $completedProjects }}</h3>
+                    <p class="text-sm text-slate-600 mt-1">Completed Projects</p>
+                    <p class="text-xs text-blue-600 mt-2">{{ $completedTasksThisWeek }} taches terminees cette semaine</p>
                 </div>
 
             </div>
@@ -119,26 +119,6 @@
             </div>
             <canvas id="tasksChart" height="200"></canvas>
 
-                <script>
-                const tasksData = @json($tasksByStatus);
-
-                new Chart(document.getElementById('tasksChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: Object.keys(tasksData),
-                        datasets: [{
-                            data: Object.values(tasksData),
-                            backgroundColor: [
-                                '#238899',
-                                '#60a5fa',
-                                '#f59e0b',
-                                '#ef4444'
-                            ]
-                        }]
-                    }
-                });
-                </script>
-
         </div>
 
 
@@ -161,6 +141,8 @@
 
 
 <script>
+    const tasksData = @json($tasksByStatus);
+
     /* Line Chart */
     new Chart(document.getElementById('performanceChart'), {
         type: 'line',
@@ -198,9 +180,9 @@
     new Chart(document.getElementById('tasksChart'), {
         type: 'pie',
         data: {
-            labels: ['Completed', 'In Review', 'In Progress', 'Blocked'],
+            labels: Object.keys(tasksData),
             datasets: [{
-                data: [32, 25, 25, 18],
+                data: Object.values(tasksData),
                 backgroundColor: ['#0f766e', '#6366f1', '#38bdf8', '#dc2626']
             }]
         },
@@ -213,9 +195,9 @@
     new Chart(document.getElementById('activityChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Design Tasks', 'Development Tasks', 'Documentation', 'QA Tasks', 'Meetings'],
+            labels: @json($activityLabels),
             datasets: [{
-                data: [30, 25, 15, 10, 20],
+                data: @json($activityData),
                 backgroundColor: ['#ef4444','#3b82f6','#22c55e','#f59e0b','#eab308']
             }]
         },

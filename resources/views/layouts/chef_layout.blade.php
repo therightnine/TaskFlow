@@ -112,6 +112,47 @@
                 </div>
             </div>
 
+            <span class="mx-4 h-6 border-l border-gray-300"></span>
+
+            {{-- NOTIFICATIONS --}}
+            <div class="relative">
+                <button id="notifDropdownBtn" class="relative cursor-pointer focus:outline-none">
+                    <img src="{{ asset('images/ic_bell.png') }}" class="w-6 h-6">
+                    @if($notifications->count())
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    @endif
+                </button>
+
+                <div id="notifDropdownMenu"
+                    class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden max-h-96 overflow-y-auto">
+                    <div class="p-4 border-b border-gray-100 font-semibold text-gray-700">
+                        Activité récente
+                    </div>
+                    <ul>
+                        @forelse ($notifications as $notification)
+                            <li class="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ $notification['title'] }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $notification['message'] }}</p>
+                                </div>
+                                <span class="text-xs text-gray-400 flex-shrink-0">
+                                    {{ $notification['time']->diffForHumans() }}
+                                </span>
+                            </li>
+                        @empty
+                            <li class="text-center py-4 text-gray-400 text-sm">Aucune activité récente</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+
+            <span class="mx-4 h-6 border-l border-gray-300"></span>
+
             {{-- USER INFO --}}
             <div class="flex items-center gap-6">
                 <div class="relative">
@@ -144,12 +185,7 @@
                                     Voir le profil
                                 </a>
                             </li>
-                            <li>
-                                <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    <img src="{{ asset('images/ic_activitylog.png') }}" class="w-5 h-5">
-                                    Journal d'activité
-                                </a>
-                            </li>
+                          
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -173,6 +209,22 @@
             document.addEventListener('click', e => {
                 if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
                     dropdownMenu.classList.add('hidden');
+                }
+            });
+        </script>
+
+         <script>
+            const notifBtn = document.getElementById('notifDropdownBtn');
+            const notifMenu = document.getElementById('notifDropdownMenu');
+
+            notifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
+                    notifMenu.classList.add('hidden');
                 }
             });
         </script>

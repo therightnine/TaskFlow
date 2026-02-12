@@ -127,6 +127,8 @@ class User extends Authenticatable
         );
     }
 
+    
+
     public function projetsContributes()
     {
         return $this->belongsToMany(
@@ -151,6 +153,8 @@ class User extends Authenticatable
     {
         return $this->role->name === 'contributeur';
     }
+
+    
 
 
 

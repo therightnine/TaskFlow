@@ -43,7 +43,6 @@ class OptionalController extends Controller
         $user->phone = $request->phone;
         $user->profession = $request->profession;
         $user->bio = $request->bio;
-        $user->id_abonnement = $request->id_abonnement;
         $user->id_role = $request->id_role;
         $user->save();
 

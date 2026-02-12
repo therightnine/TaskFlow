@@ -130,7 +130,49 @@
                     This Week
                 </span>
             </div>
-            <canvas id="activityChart" height="200"></canvas>
+
+            @if($teamActivityByEquipe->isNotEmpty())
+                <div class="mb-4">
+                    <label for="equipeFilter" class="block text-xs font-semibold text-gray-500 mb-2">Filtrer par equipe</label>
+                    <select id="equipeFilter" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        @foreach($teamActivityByEquipe as $equipeLog)
+                            <option value="{{ $equipeLog['project_id'] }}">
+                                {{ $equipeLog['project_name'] }} ({{ $equipeLog['entries']->count() }} activites)
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @foreach($teamActivityByEquipe as $equipeLog)
+                    <div
+                        class="team-log-panel space-y-3 max-h-64 overflow-y-auto pr-2 {{ $equipeLog['project_id'] == $defaultEquipeId ? '' : 'hidden' }}"
+                        data-equipe="{{ $equipeLog['project_id'] }}"
+                    >
+                        @forelse($equipeLog['entries'] as $entry)
+                            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
+                                    {{ $entry['type'] === 'overdue' ? 'bg-red-100 text-red-600' : '' }}
+                                    {{ $entry['type'] === 'done' ? 'bg-green-100 text-green-600' : '' }}
+                                    {{ $entry['type'] === 'assignment' ? 'bg-blue-100 text-blue-600' : '' }}
+                                    {{ in_array($entry['type'], ['update']) ? 'bg-amber-100 text-amber-600' : '' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800">{{ $entry['title'] }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $entry['message'] }}</p>
+                                </div>
+                                <span class="text-xs text-gray-400 flex-shrink-0">{{ $entry['time']->diffForHumans() }}</span>
+                            </div>
+                        @empty
+                            <div class="text-center py-8 text-gray-400 text-sm">Aucune activite recente pour cette equipe.</div>
+                        @endforelse
+                    </div>
+                @endforeach
+            @else
+                <div class="text-center py-8 text-gray-400 text-sm">Aucune equipe trouvee.</div>
+            @endif
         </div>
 
     </div>
@@ -191,20 +233,16 @@
         }
     });
 
-    /* Team Activity Doughnut */
-    new Chart(document.getElementById('activityChart'), {
-        type: 'doughnut',
-        data: {
-            labels: @json($activityLabels),
-            datasets: [{
-                data: @json($activityData),
-                backgroundColor: ['#ef4444','#3b82f6','#22c55e','#f59e0b','#eab308']
-            }]
-        },
-        options: {
-            plugins: { legend: { position: 'right' } }
-        }
-    });
+    const equipeFilter = document.getElementById('equipeFilter');
+    if (equipeFilter) {
+        equipeFilter.value = @json($defaultEquipeId);
+        equipeFilter.addEventListener('change', function () {
+            const panels = document.querySelectorAll('.team-log-panel');
+            panels.forEach((panel) => {
+                panel.classList.toggle('hidden', panel.dataset.equipe !== this.value);
+            });
+        });
+    }
 </script>
 
 @endsection

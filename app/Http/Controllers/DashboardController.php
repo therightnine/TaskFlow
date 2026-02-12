@@ -114,69 +114,151 @@ class DashboardController extends Controller
             return $members;
         })->unique('id')->values();
 
-        $activityLabels = [];
-        $activityData = [];
+        $teamActivityByEquipe = collect();
+        $defaultEquipeId = null;
 
         if ($projectIds->isNotEmpty()) {
             $projectIdsArray = $projectIds->all();
 
-            $newContributors = 0;
+            $contributorAssignmentsByProject = collect();
             if (Schema::hasTable('projet_contributeur') && Schema::hasColumn('projet_contributeur', 'created_at')) {
-                $newContributors = DB::table('projet_contributeur')
+                $contributorAssignmentsByProject = DB::table('projet_contributeur')
+                    ->join('users', 'users.id', '=', 'projet_contributeur.user_id')
                     ->whereIn('projet_id', $projectIdsArray)
                     ->where('created_at', '>=', $weekStart)
-                    ->count();
+                    ->orderByDesc('created_at')
+                    ->get([
+                        'projet_contributeur.projet_id',
+                        'projet_contributeur.created_at',
+                        'users.prenom',
+                        'users.nom',
+                    ])
+                    ->groupBy('projet_id');
             }
 
-            $newSuperviseurs = 0;
+            $supervisorAssignmentsByProject = collect();
             if (Schema::hasTable('projet_superviseur') && Schema::hasColumn('projet_superviseur', 'created_at')) {
-                $newSuperviseurs = DB::table('projet_superviseur')
+                $supervisorAssignmentsByProject = DB::table('projet_superviseur')
+                    ->join('users', 'users.id', '=', 'projet_superviseur.user_id')
                     ->whereIn('projet_id', $projectIdsArray)
                     ->where('created_at', '>=', $weekStart)
-                    ->count();
+                    ->orderByDesc('created_at')
+                    ->get([
+                        'projet_superviseur.projet_id',
+                        'projet_superviseur.created_at',
+                        'users.prenom',
+                        'users.nom',
+                    ])
+                    ->groupBy('projet_id');
             }
 
-            $newTaskAssignments = 0;
+            $taskAssignmentsByProject = collect();
             if (
                 Schema::hasTable('tache_contributeur') &&
                 Schema::hasColumn('tache_contributeur', 'created_at')
             ) {
-                $newTaskAssignments = DB::table('tache_contributeur')
+                $taskAssignmentsByProject = DB::table('tache_contributeur')
                     ->join('taches', 'taches.id', '=', 'tache_contributeur.id_tache')
+                    ->join('users', 'users.id', '=', 'tache_contributeur.id_user')
                     ->whereIn('taches.id_projet', $projectIdsArray)
                     ->where('tache_contributeur.created_at', '>=', $weekStart)
-                    ->count();
+                    ->orderByDesc('tache_contributeur.created_at')
+                    ->get([
+                        'taches.id_projet',
+                        'taches.nom_tache',
+                        'tache_contributeur.created_at',
+                        'users.prenom',
+                        'users.nom',
+                    ])
+                    ->groupBy('id_projet');
             }
 
-            $activityLabels = [
-                'Nouveaux contributeurs',
-                'Nouveaux superviseurs',
-                'Nouvelles attributions',
-                'Taches terminees',
-                'Taches en retard',
-            ];
+            $teamActivityByEquipe = $projects->map(function ($project) use (
+                $weekStart,
+                $today,
+                $contributorAssignmentsByProject,
+                $supervisorAssignmentsByProject,
+                $taskAssignmentsByProject
+            ) {
+                $entries = collect();
 
-            $activityData = [
-                $newContributors,
-                $newSuperviseurs,
-                $newTaskAssignments,
-                $completedTasksThisWeek,
-                $overdueTasksCount,
-            ];
-        }
+                foreach (($contributorAssignmentsByProject[$project->id] ?? collect()) as $assignment) {
+                    $name = trim(($assignment->prenom ?? '') . ' ' . ($assignment->nom ?? ''));
+                    $entries->push([
+                        'type' => 'assignment',
+                        'title' => 'Nouveau contributeur',
+                        'message' => "{$name} a rejoint l'equipe.",
+                        'time' => Carbon::parse($assignment->created_at),
+                    ]);
+                }
 
-        if (empty(array_filter($activityData))) {
-            $roles = $teamMembers
-                ->groupBy(fn ($member) => optional($member->role)->role ?: 'Membre')
-                ->map(fn ($group) => $group->count());
+                foreach (($supervisorAssignmentsByProject[$project->id] ?? collect()) as $assignment) {
+                    $name = trim(($assignment->prenom ?? '') . ' ' . ($assignment->nom ?? ''));
+                    $entries->push([
+                        'type' => 'assignment',
+                        'title' => 'Nouveau superviseur',
+                        'message' => "{$name} supervise maintenant l'equipe.",
+                        'time' => Carbon::parse($assignment->created_at),
+                    ]);
+                }
 
-            $activityLabels = $roles->keys()->values()->all();
-            $activityData = $roles->values()->all();
-        }
+                foreach (($taskAssignmentsByProject[$project->id] ?? collect()) as $assignment) {
+                    $name = trim(($assignment->prenom ?? '') . ' ' . ($assignment->nom ?? ''));
+                    $entries->push([
+                        'type' => 'assignment',
+                        'title' => 'Attribution de tache',
+                        'message' => "{$assignment->nom_tache} a ete assignee a {$name}.",
+                        'time' => Carbon::parse($assignment->created_at),
+                    ]);
+                }
 
-        if (empty($activityLabels) || empty($activityData)) {
-            $activityLabels = ['Aucune activite'];
-            $activityData = [1];
+                foreach ($project->taches ?? collect() as $task) {
+                    $eventTime = $this->taskEventTime($task);
+                    if (!$eventTime || $eventTime->lt($weekStart)) {
+                        continue;
+                    }
+
+                    if ($this->isCompletedTask($task)) {
+                        $entries->push([
+                            'type' => 'done',
+                            'title' => 'Tache terminee',
+                            'message' => "{$task->nom_tache} a ete terminee.",
+                            'time' => $eventTime,
+                        ]);
+                        continue;
+                    }
+
+                    if (!empty($task->deadline) && Carbon::parse($task->deadline)->lt($today)) {
+                        $entries->push([
+                            'type' => 'overdue',
+                            'title' => 'Tache en retard',
+                            'message' => "{$task->nom_tache} est en retard.",
+                            'time' => Carbon::parse($task->deadline),
+                        ]);
+                        continue;
+                    }
+
+                    $entries->push([
+                        'type' => 'update',
+                        'title' => 'Mise a jour de tache',
+                        'message' => "{$task->nom_tache} a ete mise a jour.",
+                        'time' => $eventTime,
+                    ]);
+                }
+
+                $entries = $entries
+                    ->sortByDesc(fn ($entry) => $entry['time']->timestamp)
+                    ->values()
+                    ->take(12);
+
+                return [
+                    'project_id' => $project->id,
+                    'project_name' => $project->nom_projet,
+                    'entries' => $entries,
+                ];
+            })->values();
+
+            $defaultEquipeId = optional($teamActivityByEquipe->first())['project_id'] ?? null;
         }
 
         return view('dashboard.chef', compact(
@@ -191,8 +273,8 @@ class DashboardController extends Controller
             'newTasks',
             'overdueTasks',
             'teamMembers',
-            'activityLabels',
-            'activityData'
+            'teamActivityByEquipe',
+            'defaultEquipeId'
         ));
     }
 /*|--------------------------------------------------------------------------

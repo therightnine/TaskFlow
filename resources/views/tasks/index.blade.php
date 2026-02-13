@@ -509,7 +509,7 @@
 
                                         <!-- Modal box -->
                                         <div class="relative mx-auto mt-24 bg-white rounded-2xl shadow-xl
-                                                    w-[420px] p-6">
+                                                    w-full max-w-[420px] p-6">
 
                                             <h3 class="text-lg font-semibold text-center text-black mb-4">
                                                 Sélectionner des contributeurs

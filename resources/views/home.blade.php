@@ -27,31 +27,31 @@
 </style>
 
 <!-- HERO SECTION -->
-<section class="relative py-24 px-[120px] overflow-hidden bg-white">
+<section class="relative py-16 md:py-24 px-4 md:px-[120px] overflow-hidden bg-white">
     <div class="absolute -top-32 -left-32 w-[360px] h-[360px] bg-cyan-400/20 rounded-full blur-[120px]"></div>
     <div class="absolute bottom-0 right-1/3 w-[280px] h-[280px] bg-cyan-200/30 rounded-full blur-[100px]"></div>
 
     <div class="relative z-10 max-w-[720px] home-reveal">
-        <h1 class="text-[56px] font-medium leading-[72px] text-black animate-bounce">
+        <h1 class="text-[36px] sm:text-[44px] md:text-[56px] font-medium leading-[46px] sm:leading-[56px] md:leading-[72px] text-black animate-bounce">
             Planifiez Mieux, <br>
             Avancez Plus Vite <br>
             Avec <span class="text-cyan-500">TaskFlow</span>.
         </h1>
 
-        <p class="mt-6 text-[18px] leading-[28px] text-gray-600 max-w-[640px]">
+        <p class="mt-6 text-[16px] md:text-[18px] leading-[26px] md:leading-[28px] text-gray-600 max-w-[640px]">
             Votre espace pour creer, planifier et livrer.
             <br> Une plateforme. Tous vos projets.
         </p>
 
-        <div class="mt-10 flex gap-6">
+        <div class="mt-8 md:mt-10 flex flex-wrap gap-3 md:gap-6">
             <a href="{{ route('register') }}"
-               class="bg-cyan-500 text-white px-10 py-4 rounded-xl text-[16px]
+               class="bg-cyan-500 text-white px-6 md:px-10 py-3 md:py-4 rounded-xl text-[15px] md:text-[16px]
                       transition hover:bg-white hover:text-cyan-500 hover:border hover:border-cyan-500">
                 Commencer
             </a>
 
             <a href="{{ route('login') }}"
-               class="border border-black px-10 py-4 rounded-xl text-[16px]
+               class="border border-black px-6 md:px-10 py-3 md:py-4 rounded-xl text-[15px] md:text-[16px]
                       transition hover:bg-black hover:text-white">
                 Connexion
             </a>
@@ -61,7 +61,7 @@
     </div>
 
      <!-- Hero Image -->
-    <div class="absolute right-[120px] top-[140px] w-[420px] h-[420px] rounded-xl overflow-hidden">
+    <div class="relative md:absolute md:right-[120px] md:top-[140px] w-full max-w-[320px] md:max-w-[420px] h-[240px] md:h-[420px] rounded-xl overflow-hidden mx-auto mt-8 md:mt-0">
         <img src="{{ asset('images/hero.png') }}"
              alt="Hero Image"
              class="w-full h-full object-cover hover-scale-105 transition duration-500">
@@ -79,7 +79,7 @@
 </section>
 
 <!-- SHOWCASE IMAGE -->
-<section class="py-8 px-8 bg-white flex justify-center">
+<section class="py-8 md:py-12 px-4 md:px-8 bg-white flex justify-center">
     <div class="max-w-6xl w-full space-y-6">
         <div class="rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition duration-500 home-reveal tilt-card js-tilt-card">
             <img src="{{ asset('images/features.png') }}"
@@ -110,7 +110,7 @@
 
 
 <!-- FEATURES SECTION -->
-<section class="relative px-[120px] py-[120px] bg-white">
+<section class="relative px-4 md:px-[120px] py-12 md:py-[120px] bg-white">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-[40px]">
         <div class="group p-10 border rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl home-reveal tilt-card js-tilt-card">
             <div class="w-12 h-12 mb-6">
@@ -153,13 +153,13 @@
     </div>
 </section>
 
-<section class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+<section class="max-w-6xl mx-auto px-4 md:px-0 grid md:grid-cols-2 gap-8 md:gap-12 items-center">
     <div class="space-y-6 animate-fade-in home-reveal">
-        <h2 class="text-5xl font-bold leading-tight text-gray-900">
+        <h2 class="text-3xl md:text-5xl font-bold leading-tight text-gray-900">
             Construisons des experiences digitales modernes
         </h2>
 
-        <p class="text-lg text-gray-600 leading-relaxed">
+        <p class="text-base md:text-lg text-gray-600 leading-relaxed">
             Nous sommes une equipe passionnee par l'innovation et la technologie.
             Notre mission est de creer des solutions performantes,
             intuitives et centrees sur l'utilisateur.
@@ -185,7 +185,7 @@
 
 
 <!-- ADDITIONAL ELEMENTS (without moving existing sections) -->
-<section class="px-8 pb-20 bg-white">
+<section class="px-4 md:px-8 pb-16 md:pb-20 bg-white">
     <div class="max-w-6xl mx-auto rounded-3xl border border-cyan-100 bg-gradient-to-r from-cyan-50 via-white to-cyan-50 p-8 home-reveal">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>

@@ -5,13 +5,13 @@
 
 @section('content')
 
-<div class="w-full max-w-[1600px] mx-auto flex rounded-[60px] mt-8">
+<div class="w-full max-w-[1600px] mx-auto flex flex-col lg:flex-row rounded-[32px] lg:rounded-[60px] mt-4 md:mt-8 px-4 md:px-6 lg:px-0 gap-6 lg:gap-0">
 
     <!-- GAUCHE : FORMULAIRE DE CONNEXION -->
     <div class="w-full flex justify-center items-center bg-white">
-        <div class="w-[500px] p-12 bg-white rounded-[60px] shadow-2xl shadow-black/20">
+        <div class="w-full max-w-[500px] p-6 md:p-10 lg:p-12 bg-white rounded-[28px] md:rounded-[44px] lg:rounded-[60px] shadow-xl lg:shadow-2xl shadow-black/20">
 
-            <h1 class="text-5xl font-bold text-zinc-900 mb-12 text-center font-vietnam">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 mb-8 md:mb-10 lg:mb-12 text-center font-vietnam">
                 Connexion
             </h1>
 
@@ -19,7 +19,7 @@
                 @csrf
 
                 <!-- EMAIL -->
-                <label for="email" class="block text-2xl mb-3 text-zinc-900 font-vietnam">
+                <label for="email" class="block text-lg md:text-2xl mb-3 text-zinc-900 font-vietnam">
                     Email
                 </label>
                 <div class="w-full mb-6">
@@ -31,7 +31,7 @@
                             value="{{ old('email') }}"
                             required
                             class="w-full bg-transparent border-b-2 border-zinc-400
-                                   py-3 pr-12 text-lg text-zinc-900
+                                   py-3 pr-12 text-base md:text-lg text-zinc-900
                                    focus:outline-none focus:border-cyan-500"
                         />
                         <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 text-zinc-700"
@@ -51,7 +51,7 @@
                 </div>
 
                 <!-- MOT DE PASSE -->
-                <label for="password" class="block text-2xl mb-3 text-zinc-900 font-vietnam">
+                <label for="password" class="block text-lg md:text-2xl mb-3 text-zinc-900 font-vietnam">
                     Mot de passe
                 </label>
                 <div class="w-full mb-6">
@@ -62,7 +62,7 @@
                             id="password"
                             required
                             class="w-full bg-transparent border-b-2 border-zinc-400
-                                   py-3 pr-12 text-lg text-zinc-900
+                                   py-3 pr-12 text-base md:text-lg text-zinc-900
                                    focus:outline-none focus:border-cyan-500"
                         />
                         <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 text-zinc-700"
@@ -84,21 +84,21 @@
 
                 <!-- MOT DE PASSE OUBLIÉ -->
                 <div class="text-right mb-6">
-                    <button type="button" id="forgotPasswordBtn" class="text-sky-900 text-lg font-medium hover:underline">
+                    <button type="button" id="forgotPasswordBtn" class="text-sky-900 text-base md:text-lg font-medium hover:underline">
                         Mot de passe oublie ?
                     </button>
                 </div>
 
                 <!-- BOUTON CONNEXION -->
                 <button type="submit"
-                        class="w-full py-4 bg-cyan-500 text-white text-2xl font-bold
+                        class="w-full py-3.5 md:py-4 bg-cyan-500 text-white text-lg md:text-2xl font-bold
                                rounded-lg hover:bg-sky-700 transition">
                     Connexion
                 </button>
             </form>
 
             <!-- INSCRIPTION -->
-            <div class="mt-6 text-center text-lg">
+            <div class="mt-6 text-center text-base md:text-lg">
                 <span class="text-zinc-900">Vous n'avez pas de compte ? </span>
                 <a href="{{ route('register') }}" class="text-sky-900 font-bold hover:underline">
                     Inscription
@@ -108,8 +108,8 @@
     </div>
 
     <!-- IMAGE DROITE -->
-    <div class="w-full flex items-center justify-center -ml-20">
-        <img src="{{ asset('images/login-right.png') }}" class="h-[520px] object-contain">
+    <div class="w-full hidden lg:flex items-center justify-center -ml-10 xl:-ml-20">
+        <img src="{{ asset('images/login-right.png') }}" class="h-[420px] xl:h-[520px] object-contain">
     </div>
 
 </div>

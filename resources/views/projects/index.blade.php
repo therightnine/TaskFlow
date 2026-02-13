@@ -301,7 +301,7 @@
                                             <div class="absolute inset-0 bg-black/40" onclick="closeProjectModal({{ $project->id }})"></div>
 
                                             <!-- Modal box -->
-                                            <div class="relative mx-auto mt-24 bg-white rounded-2xl shadow-xl w-[420px] p-6">
+                                            <div class="relative mx-auto mt-24 bg-white rounded-2xl shadow-xl w-full max-w-[420px] p-6">
 
                                                 <h3 class="text-lg font-semibold text-center mb-4">
                                                     {{ $userRole == 2 ? 'Sélectionner les contributeurs' : 'Sélectionner les superviseurs' }}
@@ -646,4 +646,3 @@
 
 
 @endsection
-

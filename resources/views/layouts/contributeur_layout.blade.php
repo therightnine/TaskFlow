@@ -36,11 +36,30 @@
 </head>
 
 <body class="bg-gray-100 font-vietnam min-h-screen">
+<style>
+    @media (max-width: 1023px) {
+        .app-shell { display: block; height: auto; min-height: 100vh; }
+        .app-sidebar { position: fixed; inset: 0 auto 0 0; width: 18rem; transform: translateX(-100%); transition: transform .2s ease; z-index: 60; }
+        body.sidebar-open .app-sidebar { transform: translateX(0); }
+        .app-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 50; }
+        body.sidebar-open .app-overlay { display: block; }
+        .app-header { height: auto; padding: .75rem 1rem; flex-wrap: wrap; gap: .75rem; }
+        .app-search { order: 3; width: 100%; justify-content: stretch; }
+        .app-search-wrap { width: 100% !important; }
+        .app-divider { display: none; }
+        .app-content { padding: 1rem; }
+    }
+    @media (min-width: 1024px) {
+        .mobile-menu-btn { display: none !important; }
+        .app-overlay { display: none !important; }
+    }
+</style>
 
-<div class="flex h-screen">
+<div class="app-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+<div class="flex h-screen app-shell">
 
     {{-- SIDEBAR --}}
-    <aside class="w-72 bg-white shadow-lg flex flex-col px-8 py-6">
+    <aside class="w-72 bg-white shadow-lg flex flex-col px-8 py-6 app-sidebar">
 
         {{-- Logo --}}
         <div class="mb-12 flex justify-center">
@@ -96,14 +115,20 @@
     <div class="flex-1 flex flex-col">
 
         {{-- TOP MENU --}}
-        <header class="h-20 bg-white shadow-sm flex items-center px-8">
+        <header class="h-20 bg-white shadow-sm flex items-center px-8 app-header">
+            <button type="button" class="mobile-menu-btn inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 text-gray-700"
+                    onclick="document.body.classList.add('sidebar-open')">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
             <h1 class="text-xl font-semibold text-gray-800">
                 @yield('page-title', 'Projets')
             </h1>
 
             {{-- SEARCH --}}
-            <div class="flex-1 flex justify-center">
-                <div class="relative w-[420px]">
+            <div class="flex-1 flex justify-center app-search">
+                <div class="relative w-[420px] app-search-wrap">
                     <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
@@ -113,7 +138,7 @@
                 </div>
             </div>
 
-            <span class="mx-4 h-6 border-l border-gray-300"></span>
+            <span class="mx-4 h-6 border-l border-gray-300 app-divider"></span>
 
             {{-- NOTIFICATIONS --}}
             <div class="relative">
@@ -125,7 +150,7 @@
                 </button>
 
                 <div id="notifDropdownMenu"
-                    class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden max-h-96 overflow-y-auto">
+                    class="absolute right-0 mt-2 w-[min(92vw,20rem)] bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden max-h-96 overflow-y-auto">
                     <div class="p-4 border-b border-gray-100 font-semibold text-gray-700">
                         Activité récente
                     </div>
@@ -152,7 +177,7 @@
                 </div>
             </div>
 
-            <span class="mx-4 h-6 border-l border-gray-300"></span>
+            <span class="mx-4 h-6 border-l border-gray-300 app-divider"></span>
 
             {{-- USER INFO --}}
             <div class="flex items-center gap-6">
@@ -296,7 +321,7 @@
         </script>
 
         {{-- CONTENT --}}
-        <main class="flex-1 p-6 overflow-y-auto">
+        <main class="flex-1 p-6 overflow-y-auto app-content">
             @yield('content')
         </main>
 

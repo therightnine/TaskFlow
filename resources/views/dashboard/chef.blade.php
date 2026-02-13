@@ -99,9 +99,11 @@
 
         {{-- Performance Line Chart --}}
         
-        <div class="bg-white rounded-2xl p-6 shadow">
+        <div class="bg-white rounded-2xl p-6 shadow h-full">
             <h2 class="font-semibold text-lg mb-4">Project Performance Insights</h2>
-            <canvas id="performanceChart" height="180"></canvas>
+            <div class="h-[240px]">
+                <canvas id="performanceChart"></canvas>
+            </div>
             
         </div>
     </div>
@@ -162,23 +164,25 @@
     </div>
 
     {{-- BOTTOM ROW --}}
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
 
         {{-- Tasks Pie --}}
-        <div class="bg-white rounded-2xl p-6 shadow">
+        <div class="bg-white rounded-2xl p-6 shadow h-[430px] flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-semibold text-lg">Tasks</h2>
                 <span class="bg-blue-50 text-blue-600 text-sm px-3 py-1 rounded-full">
                     This Week
                 </span>
             </div>
-            <canvas id="tasksChart" height="200"></canvas>
+            <div class="flex-1 min-h-0">
+                <canvas id="tasksChart"></canvas>
+            </div>
 
         </div>
 
 
         {{-- Team Activity --}}
-        <div class="bg-white rounded-2xl p-6 shadow">
+        <div class="bg-white rounded-2xl p-6 shadow h-[430px] flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-semibold text-lg">Team Activity Log</h2>
                 <span class="bg-blue-50 text-blue-600 text-sm px-3 py-1 rounded-full">
@@ -200,7 +204,7 @@
 
                 @foreach($teamActivityByEquipe as $equipeLog)
                     <div
-                        class="team-log-panel space-y-3 max-h-64 overflow-y-auto pr-2 {{ $equipeLog['project_id'] == $defaultEquipeId ? '' : 'hidden' }}"
+                        class="team-log-panel flex-1 min-h-0 space-y-3 max-h-[300px] overflow-y-auto pr-2 {{ $equipeLog['project_id'] == $defaultEquipeId ? '' : 'hidden' }}"
                         data-equipe="{{ $equipeLog['project_id'] }}"
                     >
                         @forelse($equipeLog['entries'] as $entry)
@@ -304,6 +308,7 @@
             ]
         },
         options: {
+            maintainAspectRatio: false,
             plugins: { legend: { position: 'bottom' } },
             responsive: true
         }
@@ -321,6 +326,7 @@
             }]
         },
         options: {
+            maintainAspectRatio: false,
             plugins: { legend: { position: 'right' } }
         }
     });

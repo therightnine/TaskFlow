@@ -262,7 +262,13 @@ class DashboardController extends Controller
                 ];
             })->values();
 
-            $defaultEquipeId = optional($teamActivityByEquipe->first())['project_id'] ?? null;
+            $firstWithActivity = $teamActivityByEquipe->first(function ($item) {
+                return isset($item['entries']) && $item['entries']->isNotEmpty();
+            });
+
+            $defaultEquipeId = $firstWithActivity['project_id']
+                ?? optional($teamActivityByEquipe->first())['project_id']
+                ?? null;
         }
 
         return view('dashboard.chef', compact(

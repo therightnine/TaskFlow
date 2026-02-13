@@ -34,7 +34,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                 {{-- Active Projects --}}
-                <div class="bg-rose-100 rounded-2xl p-5">
+                <div class="bg-rose-100 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                     <div class="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
@@ -49,7 +49,7 @@
                 </div>
 
                 {{-- Tasks Due Today --}}
-                <div class="bg-amber-100 rounded-2xl p-5">
+                <div class="bg-amber-100 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                     <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
@@ -64,7 +64,7 @@
                 </div>
 
                 {{-- Overdue Tasks --}}
-                <div class="bg-emerald-100 rounded-2xl p-5">
+                <div class="bg-emerald-100 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                     <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
@@ -79,7 +79,7 @@
                 </div>
 
                 {{-- Completed Projects --}}
-                <div class="bg-violet-100 rounded-2xl p-5">
+                <div class="bg-violet-100 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                     <div class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
@@ -103,6 +103,61 @@
             <h2 class="font-semibold text-lg mb-4">Project Performance Insights</h2>
             <canvas id="performanceChart" height="180"></canvas>
             
+        </div>
+    </div>
+
+    @php
+        $totalProjects = (int) $activeProjects + (int) $completedProjects;
+        $totalTasks = array_sum(array_map('intval', $tasksByStatus ?? []));
+        $completionRate = $totalProjects > 0 ? round(($completedProjects / $totalProjects) * 100) : 0;
+        $overdueRate = $totalTasks > 0 ? round(($overdueTasksCount / $totalTasks) * 100) : 0;
+        $todayRate = $totalTasks > 0 ? round(($tasksDueToday / $totalTasks) * 100) : 0;
+        $throughputScore = min(100, (int) $completedTasksThisWeek * 10);
+        $statusRows = collect($tasksByStatus ?? [])
+            ->sortDesc()
+            ->take(4);
+    @endphp
+
+    {{-- KPI STRIP --}}
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        <div class="rounded-2xl p-4 bg-gradient-to-br from-cyan-500 to-cyan-700 text-white shadow transition-all duration-300 hover:-translate-y-1">
+            <p class="text-xs uppercase tracking-wide text-slate-200">Execution Rate</p>
+            <div class="mt-2 flex items-end justify-between">
+                <h3 class="text-3xl font-bold">{{ $completionRate }}%</h3>
+                <span class="text-xs bg-white/20 px-2 py-1 rounded-full">{{ $completedProjects }}/{{ $totalProjects ?: 0 }} projets</span>
+            </div>
+            <div class="mt-3 h-2 rounded-full bg-white/20 overflow-hidden">
+                <div class="h-full bg-emerald-300" style="width: {{ $completionRate }}%"></div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl p-4 bg-white shadow border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Risque Retard</p>
+            <div class="mt-2 flex items-end justify-between">
+                <h3 class="text-3xl font-bold text-rose-600">{{ $overdueRate }}%</h3>
+                <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded-full">{{ $overdueTasksCount }} en retard</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">Part des taches en retard sur l'ensemble de vos taches.</p>
+        </div>
+
+        <div class="rounded-2xl p-4 bg-white shadow border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Charge Du Jour</p>
+            <div class="mt-2 flex items-end justify-between">
+                <h3 class="text-3xl font-bold text-amber-600">{{ $todayRate }}%</h3>
+                <span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full">{{ $tasksDueToday }} aujourd'hui</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">Taches avec echeance aujourd'hui par rapport au total.</p>
+        </div>
+
+        <div class="rounded-2xl p-4 bg-white shadow border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Weekly Throughput</p>
+            <div class="mt-2 flex items-end justify-between">
+                <h3 class="text-3xl font-bold text-cyan-700">{{ $completedTasksThisWeek }}</h3>
+                <span class="text-xs bg-cyan-50 text-cyan-700 px-2 py-1 rounded-full">score {{ $throughputScore }}/100</span>
+            </div>
+            <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full bg-cyan-500" style="width: {{ $throughputScore }}%"></div>
+            </div>
         </div>
     </div>
 
@@ -175,6 +230,43 @@
             @endif
         </div>
 
+    </div>
+
+    {{-- STATUS SNAPSHOT --}}
+    <div class="bg-white rounded-2xl p-6 shadow">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-lg">Task Status Snapshot</h2>
+            <span class="bg-slate-100 text-slate-600 text-sm px-3 py-1 rounded-full">
+                Temps reel
+            </span>
+        </div>
+
+        @if($statusRows->isNotEmpty())
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($statusRows as $label => $count)
+                    @php
+                        $count = (int) $count;
+                        $pct = $totalTasks > 0 ? round(($count / $totalTasks) * 100) : 0;
+                        $labelKey = \Illuminate\Support\Str::lower((string) $label);
+                        $barClass = str_contains($labelKey, 'term') || str_contains($labelKey, 'done') ? 'bg-emerald-500'
+                            : (str_contains($labelKey, 'retard') || str_contains($labelKey, 'bloq') ? 'bg-rose-500'
+                            : 'bg-cyan-500');
+                    @endphp
+                    <div class="p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-semibold text-slate-700">{{ $label }}</span>
+                            <span class="text-slate-500">{{ $count }} taches</span>
+                        </div>
+                        <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full {{ $barClass }}" style="width: {{ $pct }}%"></div>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">{{ $pct }}% du portefeuille de taches</p>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-sm text-slate-500">Aucune donnee de statut disponible.</p>
+        @endif
     </div>
 
 </div>

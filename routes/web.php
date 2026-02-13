@@ -274,6 +274,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/tasks/{task}/add-contributor', [TaskController::class, 'addContributor'])->name('tasks.addContributor');
         Route::post('/tasks/{task}/remove-contributor', [TaskController::class, 'removeContributor'])->name('tasks.removeContributor');
         Route::post('/tasks/{task}/contributor-toggle', [TaskController::class, 'toggleContributor'])->name('tasks.toggleContributor');
+        Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+        Route::put('/comments/{comment}', [TaskController::class, 'updateComment'])->name('tasks.comments.update');
+        Route::delete('/comments/{comment}', [TaskController::class, 'destroyComment'])->name('tasks.comments.destroy');
 
 
         /*

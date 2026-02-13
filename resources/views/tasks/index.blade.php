@@ -657,11 +657,16 @@
                                         <hr class="border-gray-300"/>
 
                                         <!-- COMMENTS SECTION -->
-                                        <div>
+                                        <div data-task-comments="{{ $task->id }}">
                                             <h3 class="font-semibold mb-2">Commentaires</h3>
 
                                             <!-- Add Comment -->
-                                            <form method="POST" action="" class="flex gap-2 items-center mb-4">
+                                            <form method="POST"
+                                                action="{{ route('tasks.comments.store', $task->id) }}"
+                                                class="flex gap-2 items-center mb-4 js-comment-create-form"
+                                                data-task-id="{{ $task->id }}"
+                                                data-user-name="{{ auth()->user()->prenom }}"
+                                                data-user-photo="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('images/default-avatar.png') }}">
                                                 @csrf
                                                 <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('images/default-avatar.png') }}" class="w-8 h-8 rounded-full"/>
                                                 <input type="text" name="comment" placeholder="Ajouter un commentaire..." required
@@ -670,14 +675,44 @@
                                             </form>
 
                                             <!-- Existing Comments -->
-                                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                                            <div class="space-y-3 max-h-64 overflow-y-auto js-comment-list" data-task-id="{{ $task->id }}">
                                                 @foreach($task->commentaires as $comment)
-                                                    <div class="flex gap-2 items-start text-sm">
+                                                    <div class="flex gap-2 items-start text-sm js-comment-item" data-comment-id="{{ $comment->id }}">
                                                         <img src="{{ $comment->user->photo ? asset($comment->user->photo) : asset('images/default-avatar.png') }}" class="w-8 h-8 rounded-full"/>
-                                                        <div>
-                                                            <span class="font-semibold">{{ $comment->user->prenom }}</span>
-                                                            <span class="text-gray-400 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
-                                                            <p class="text-gray-600">{{ $comment->texte }}</p>
+                                                        <div class="flex-1">
+                                                            <div class="flex items-center justify-between gap-2">
+                                                                <div>
+                                                                    <span class="font-semibold">{{ $comment->user->prenom }}</span>
+                                                                    <span class="text-gray-400 text-xs ml-1">{{ $comment->created_at?->diffForHumans() }}</span>
+                                                                </div>
+                                                                @if((int) $comment->id_user === (int) auth()->id())
+                                                                    <div class="flex items-center gap-2">
+                                                                        <button type="button" class="text-xs text-cyan-700 hover:underline js-comment-edit-toggle">Modifier</button>
+                                                                        <form method="POST"
+                                                                            action="{{ route('tasks.comments.destroy', $comment->id) }}"
+                                                                            class="js-comment-delete-form">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" class="text-xs text-red-600 hover:underline">Supprimer</button>
+                                                                        </form>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+
+                                                            <p class="text-gray-600 js-comment-text">{{ $comment->texte }}</p>
+
+                                                            @if((int) $comment->id_user === (int) auth()->id())
+                                                                <form method="POST"
+                                                                    action="{{ route('tasks.comments.update', $comment->id) }}"
+                                                                    class="mt-2 flex gap-2 items-center hidden js-comment-update-form">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <input type="text" name="comment" value="{{ $comment->texte }}" required
+                                                                        class="flex-1 border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600"/>
+                                                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs hover:bg-cyan-700">Enregistrer</button>
+                                                                    <button type="button" class="px-3 py-1.5 rounded-lg border text-xs js-comment-edit-cancel">Annuler</button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 @endforeach
@@ -778,15 +813,31 @@
 </div>
 
 <script>
+    function setOpenTaskInUrl(taskId) {
+        const url = new URL(window.location.href);
+        if (taskId) {
+            url.searchParams.set('open_task', taskId);
+        } else {
+            url.searchParams.delete('open_task');
+        }
+        window.history.replaceState({}, '', url);
+    }
+
     // TASK DETAIL MODAL
     function openTaskModal(id) {
         const modal = document.getElementById('task-modal-' + id);
-        if(modal) modal.classList.remove('hidden');
+        if(modal) {
+            modal.classList.remove('hidden');
+            setOpenTaskInUrl(id);
+        }
     }
 
     function closeTaskModal(id) {
         const modal = document.getElementById('task-modal-' + id);
-        if(modal) modal.classList.add('hidden');
+        if(modal) {
+            modal.classList.add('hidden');
+            setOpenTaskInUrl(null);
+        }
     }
 
     // CONTRIBUTORS MODAL (existing)
@@ -882,6 +933,158 @@
     function closeCreateTaskModal() {
         document.getElementById('task-create-modal').classList.add('hidden');
     }
+
+    function commentItemTemplate(comment, defaultAvatar) {
+        const safeText = (comment.texte || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeValue = safeText.replace(/"/g, '&quot;');
+        const avatar = comment.user?.photo || defaultAvatar;
+        const userName = comment.user?.prenom || 'Utilisateur';
+        const created = comment.created_human || 'A l\'instant';
+
+        return `
+            <div class="flex gap-2 items-start text-sm js-comment-item" data-comment-id="${comment.id}">
+                <img src="${avatar}" class="w-8 h-8 rounded-full"/>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <span class="font-semibold">${userName}</span>
+                            <span class="text-gray-400 text-xs ml-1">${created}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="text-xs text-cyan-700 hover:underline js-comment-edit-toggle">Modifier</button>
+                            <form method="POST" action="${comment.urls.destroy}" class="js-comment-delete-form">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="text-xs text-red-600 hover:underline">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 js-comment-text">${safeText}</p>
+
+                    <form method="POST" action="${comment.urls.update}" class="mt-2 flex gap-2 items-center hidden js-comment-update-form">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="text" name="comment" value="${safeValue}" required
+                            class="flex-1 border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-600"/>
+                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs hover:bg-cyan-700">Enregistrer</button>
+                        <button type="button" class="px-3 py-1.5 rounded-lg border text-xs js-comment-edit-cancel">Annuler</button>
+                    </form>
+                </div>
+            </div>
+        `;
+    }
+
+    async function submitCommentForm(form, options = {}) {
+        const body = new FormData(form);
+        const method = options.method || form.method || 'POST';
+        if (options.methodOverride) {
+            body.set('_method', options.methodOverride);
+        }
+
+        const response = await fetch(form.action, {
+            method: method.toUpperCase() === 'GET' ? 'POST' : method,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body,
+        });
+
+        if (!response.ok) {
+            throw new Error('request_failed');
+        }
+
+        return response.json();
+    }
+
+    function bindCommentActions(scope = document) {
+        scope.querySelectorAll('.js-comment-edit-toggle').forEach((btn) => {
+            if (btn.dataset.bound === '1') return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.js-comment-item');
+                if (!item) return;
+                item.querySelector('.js-comment-update-form')?.classList.remove('hidden');
+                item.querySelector('.js-comment-text')?.classList.add('hidden');
+            });
+        });
+
+        scope.querySelectorAll('.js-comment-edit-cancel').forEach((btn) => {
+            if (btn.dataset.bound === '1') return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.js-comment-item');
+                if (!item) return;
+                item.querySelector('.js-comment-update-form')?.classList.add('hidden');
+                item.querySelector('.js-comment-text')?.classList.remove('hidden');
+            });
+        });
+
+        scope.querySelectorAll('.js-comment-create-form').forEach((form) => {
+            if (form.dataset.bound === '1') return;
+            form.dataset.bound = '1';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = form.querySelector('input[name="comment"]');
+                if (!input || !input.value.trim()) return;
+                try {
+                    const payload = await submitCommentForm(form);
+                    const list = document.querySelector(`.js-comment-list[data-task-id="${form.dataset.taskId}"]`);
+                    if (!list || !payload.comment) return;
+                    list.insertAdjacentHTML('afterbegin', commentItemTemplate(payload.comment, form.dataset.userPhoto));
+                    input.value = '';
+                    bindCommentActions(list);
+                } catch (_) {
+                    form.submit();
+                }
+            });
+        });
+
+        scope.querySelectorAll('.js-comment-update-form').forEach((form) => {
+            if (form.dataset.bound === '1') return;
+            form.dataset.bound = '1';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const payload = await submitCommentForm(form, { methodOverride: 'PUT' });
+                    const item = form.closest('.js-comment-item');
+                    const textEl = item?.querySelector('.js-comment-text');
+                    if (textEl && payload.comment?.texte) {
+                        textEl.textContent = payload.comment.texte;
+                    }
+                    form.classList.add('hidden');
+                    textEl?.classList.remove('hidden');
+                } catch (_) {
+                    form.submit();
+                }
+            });
+        });
+
+        scope.querySelectorAll('.js-comment-delete-form').forEach((form) => {
+            if (form.dataset.bound === '1') return;
+            form.dataset.bound = '1';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!confirm('Supprimer ce commentaire ?')) return;
+                try {
+                    await submitCommentForm(form, { methodOverride: 'DELETE' });
+                    form.closest('.js-comment-item')?.remove();
+                } catch (_) {
+                    form.submit();
+                }
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        bindCommentActions(document);
+
+        const openTask = new URLSearchParams(window.location.search).get('open_task');
+        if (openTask && document.getElementById('task-modal-' + openTask)) {
+            openTaskModal(openTask);
+        }
+    });
 
 </script>
 
@@ -1001,6 +1204,3 @@
 
 
 @endsection
-
-
-

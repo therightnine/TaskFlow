@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tache;
 use App\Models\Projet;
 use App\Models\Etat;
+use App\Models\Commentaire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -281,6 +282,132 @@ class TaskController extends Controller
 
         return redirect()->back()
                         ->with('success', $message);
+    }
+
+    public function storeComment(Request $request, Tache $task)
+    {
+        $user = Auth::user();
+
+        if (!$this->canAccessTaskComments($user, $task)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        Commentaire::create([
+            'texte' => $data['comment'],
+            'id_user' => $user->id,
+            'id_tache' => $task->id,
+        ]);
+
+        if ($request->expectsJson()) {
+            $created = Commentaire::with('user:id,prenom,nom,photo')
+                ->where('id_tache', $task->id)
+                ->latest('id')
+                ->first();
+
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id' => $created->id,
+                    'texte' => $created->texte,
+                    'created_human' => optional($created->created_at)->diffForHumans() ?? 'A l\'instant',
+                    'is_owner' => true,
+                    'user' => [
+                        'prenom' => optional($created->user)->prenom ?? 'Utilisateur',
+                        'photo' => optional($created->user)->photo,
+                    ],
+                    'urls' => [
+                        'update' => route('tasks.comments.update', $created->id),
+                        'destroy' => route('tasks.comments.destroy', $created->id),
+                    ],
+                ],
+            ]);
+        }
+
+        return back()->with('success', 'Commentaire ajoute avec succes.');
+    }
+
+    public function updateComment(Request $request, Commentaire $comment)
+    {
+        $user = Auth::user();
+
+        if ((int) $comment->id_user !== (int) $user->id) {
+            abort(403);
+        }
+
+        $task = Tache::findOrFail($comment->id_tache);
+        if (!$this->canAccessTaskComments($user, $task)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        $comment->update([
+            'texte' => $data['comment'],
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id' => $comment->id,
+                    'texte' => $comment->texte,
+                    'updated_human' => optional($comment->updated_at)->diffForHumans() ?? 'A l\'instant',
+                ],
+            ]);
+        }
+
+        return back()->with('success', 'Commentaire modifie avec succes.');
+    }
+
+    public function destroyComment(Commentaire $comment)
+    {
+        $user = Auth::user();
+
+        if ((int) $comment->id_user !== (int) $user->id) {
+            abort(403);
+        }
+
+        $task = Tache::findOrFail($comment->id_tache);
+        if (!$this->canAccessTaskComments($user, $task)) {
+            abort(403);
+        }
+
+        $comment->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', 'Commentaire supprime avec succes.');
+    }
+
+    private function canAccessTaskComments($user, Tache $task): bool
+    {
+        $role = (int) ($user->id_role ?? 0);
+
+        if ($role === 3) {
+            return (int) optional($task->projet)->id_user === (int) $user->id;
+        }
+
+        if ($role === 2) {
+            return $task->projet()
+                ->whereHas('superviseurs', fn ($q) => $q->where('users.id', $user->id))
+                ->exists();
+        }
+
+        if ($role === 4) {
+            return $task->contributors()
+                ->where('users.id', $user->id)
+                ->exists();
+        }
+
+        return false;
     }
 
 

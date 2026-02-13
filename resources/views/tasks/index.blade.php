@@ -664,7 +664,7 @@
                                             <form method="POST"
                                                 action="{{ route('tasks.comments.store', $task->id) }}"
                                                 class="flex gap-2 items-center mb-4 js-comment-create-form"
-                                                data-task-id="{{ $task->id }}"
+                                                data-comment-task-id="{{ $task->id }}"
                                                 data-user-name="{{ auth()->user()->prenom }}"
                                                 data-user-photo="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('images/default-avatar.png') }}">
                                                 @csrf
@@ -675,7 +675,7 @@
                                             </form>
 
                                             <!-- Existing Comments -->
-                                            <div class="space-y-3 max-h-64 overflow-y-auto js-comment-list" data-task-id="{{ $task->id }}">
+                                            <div class="space-y-3 max-h-64 overflow-y-auto js-comment-list" data-comment-task-id="{{ $task->id }}">
                                                 @foreach($task->commentaires as $comment)
                                                     <div class="flex gap-2 items-start text-sm js-comment-item" data-comment-id="{{ $comment->id }}">
                                                         <img src="{{ $comment->user->photo ? asset($comment->user->photo) : asset('images/default-avatar.png') }}" class="w-8 h-8 rounded-full"/>
@@ -1030,7 +1030,7 @@
                 if (!input || !input.value.trim()) return;
                 try {
                     const payload = await submitCommentForm(form);
-                    const list = document.querySelector(`.js-comment-list[data-task-id="${form.dataset.taskId}"]`);
+                    const list = document.querySelector(`.js-comment-list[data-comment-task-id="${form.dataset.commentTaskId}"]`);
                     if (!list || !payload.comment) return;
                     list.insertAdjacentHTML('afterbegin', commentItemTemplate(payload.comment, form.dataset.userPhoto));
                     input.value = '';

@@ -1,6 +1,6 @@
 <header x-data="{ open: false }" class="fixed top-0 left-0 w-full h-[80px] flex items-center px-4 md:px-[120px] bg-white z-50 border-b border-gray-100">
     <a href="{{ route('home') }}" class="shrink-0 transition {{ request()->routeIs('home') ? 'text-cyan-500 font-semibold' : 'text-black hover:text-cyan-500' }}">
-        <img src="{{ asset('images/Logo.png') }}" alt="Logo TaskFlow" class="h-10 w-auto object-contain">
+        <img src="{{ asset('images/Logo.png') }}" alt="Logo TaskFlow" class="h-22 w-auto object-contain">
     </a>
 
     <nav class="hidden md:flex flex-1 justify-center gap-8 text-[16px]">

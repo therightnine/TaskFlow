@@ -62,9 +62,13 @@
 
             @foreach($menuItems as $item)
                 @php
-                    $active = $item['route'] === 'settings'
-                        ? Route::is('settings') || Route::is('profile')
-                        : Route::is($item['route']);
+                    $active = match ($item['route']) {
+                        'settings' => Route::is('settings') || Route::is('profile'),
+                        'admin.abonnements.gest_abonnements' => Route::is('admin.abonnements.*'),
+                        'admin.roles.gest_roles' => Route::is('admin.roles.*'),
+                        'admin.utilisateurs.index' => Route::is('admin.utilisateurs.*'),
+                        default => Route::is($item['route']),
+                    };
                 @endphp
                 <li>
                     <a href="{{ route($item['route']) }}"
@@ -108,8 +112,9 @@
                     <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
-                    <input type="text" placeholder="Search here..."
-                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <input id="globalSearchInput" type="text" placeholder="Search here..."
+                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" autocomplete="off" />
+                    <div id="globalSearchResults" class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg hidden z-50 max-h-80 overflow-y-auto"></div>
                 </div>
             </div>
 
@@ -119,7 +124,7 @@
             <div class="relative">
                 <button id="notifDropdownBtn" class="relative cursor-pointer focus:outline-none">
                     <img src="{{ asset('images/ic_bell.png') }}" class="w-6 h-6">
-                    @if($recentTasks->count())
+                    @if($notifications->count())
                         <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                     @endif
                 </button>
@@ -130,7 +135,7 @@
                         Activité récente
                     </div>
                     <ul>
-                        @forelse ($recentTasks as $task)
+                        @forelse ($notifications as $notification)
                             <li class="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors">
                                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,11 +143,11 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ $task->nom_tache }}</p>
-                                    <p class="text-xs text-gray-500 mt-0.5">Mis à jour {{ \Carbon\Carbon::parse($task->updated_at)->diffForHumans() }}</p>
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ $notification['title'] }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $notification['message'] }}</p>
                                 </div>
                                 <span class="text-xs text-gray-400 flex-shrink-0">
-                                    {{ \Carbon\Carbon::parse($task->updated_at)->format('H:i') }}
+                                    {{ $notification['time']->diffForHumans() }}
                                 </span>
                             </li>
                         @empty
@@ -212,6 +217,90 @@
                     dropdownMenu.classList.add('hidden');
                 }
             });
+        </script>
+
+        <script>
+            const notifBtn = document.getElementById('notifDropdownBtn');
+            const notifMenu = document.getElementById('notifDropdownMenu');
+
+            if (notifBtn && notifMenu) {
+                notifBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    notifMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
+                        notifMenu.classList.add('hidden');
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            (() => {
+                const input = document.getElementById('globalSearchInput');
+                const results = document.getElementById('globalSearchResults');
+                if (!input || !results) return;
+
+                let timer = null;
+                let items = [];
+
+                const closeResults = () => {
+                    results.classList.add('hidden');
+                    results.innerHTML = '';
+                    items = [];
+                };
+
+                const render = (data) => {
+                    items = data || [];
+                    if (!items.length) {
+                        results.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">Aucun resultat</div>';
+                        results.classList.remove('hidden');
+                        return;
+                    }
+
+                    results.innerHTML = items.map((item) => `
+                        <a href="${item.url}" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+                            <div class="text-sm font-semibold text-gray-800">${item.title}</div>
+                            <div class="text-xs text-gray-500">${item.type} · ${item.subtitle ?? ''}</div>
+                        </a>
+                    `).join('');
+                    results.classList.remove('hidden');
+                };
+
+                input.addEventListener('input', () => {
+                    const q = input.value.trim();
+                    if (q.length < 2) {
+                        closeResults();
+                        return;
+                    }
+
+                    clearTimeout(timer);
+                    timer = setTimeout(async () => {
+                        try {
+                            const res = await fetch(`{{ route('dashboard.search') }}?q=${encodeURIComponent(q)}`, {
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            if (!res.ok) throw new Error();
+                            const payload = await res.json();
+                            render(payload.items || []);
+                        } catch (e) {
+                            closeResults();
+                        }
+                    }, 220);
+                });
+
+                input.addEventListener('focus', () => {
+                    if (items.length) results.classList.remove('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!results.contains(e.target) && e.target !== input) {
+                        closeResults();
+                    }
+                });
+            })();
         </script>
 
         {{-- CONTENT --}}
@@ -357,3 +446,4 @@
 <!-- fin script relié à destroy-->
 </body>
 </html>
+

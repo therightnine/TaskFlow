@@ -107,8 +107,9 @@
                     <span class="absolute inset-y-0 left-4 flex items-center text-gray-400">
                         <img src="{{ asset('images/ic_magnifier.png') }}" class="w-6 h-6">
                     </span>
-                    <input type="text" placeholder="Search here..."
-                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <input id="globalSearchInput" type="text" placeholder="Search here..."
+                           class="w-full pl-12 pr-4 py-3 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary" autocomplete="off" />
+                    <div id="globalSearchResults" class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg hidden z-50 max-h-80 overflow-y-auto"></div>
                 </div>
             </div>
 
@@ -227,6 +228,72 @@
                     notifMenu.classList.add('hidden');
                 }
             });
+        </script>
+
+        <script>
+            (() => {
+                const input = document.getElementById('globalSearchInput');
+                const results = document.getElementById('globalSearchResults');
+                if (!input || !results) return;
+
+                let timer = null;
+                let items = [];
+
+                const closeResults = () => {
+                    results.classList.add('hidden');
+                    results.innerHTML = '';
+                    items = [];
+                };
+
+                const render = (data) => {
+                    items = data || [];
+                    if (!items.length) {
+                        results.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">Aucun resultat</div>';
+                        results.classList.remove('hidden');
+                        return;
+                    }
+
+                    results.innerHTML = items.map((item) => `
+                        <a href="${item.url}" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+                            <div class="text-sm font-semibold text-gray-800">${item.title}</div>
+                            <div class="text-xs text-gray-500">${item.type} · ${item.subtitle ?? ''}</div>
+                        </a>
+                    `).join('');
+                    results.classList.remove('hidden');
+                };
+
+                input.addEventListener('input', () => {
+                    const q = input.value.trim();
+                    if (q.length < 2) {
+                        closeResults();
+                        return;
+                    }
+
+                    clearTimeout(timer);
+                    timer = setTimeout(async () => {
+                        try {
+                            const res = await fetch(`{{ route('dashboard.search') }}?q=${encodeURIComponent(q)}`, {
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            if (!res.ok) throw new Error();
+                            const payload = await res.json();
+                            render(payload.items || []);
+                        } catch (e) {
+                            closeResults();
+                        }
+                    }, 220);
+                });
+
+                input.addEventListener('focus', () => {
+                    if (items.length) results.classList.remove('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!results.contains(e.target) && e.target !== input) {
+                        closeResults();
+                    }
+                });
+            })();
         </script>
 
         {{-- CONTENT --}}

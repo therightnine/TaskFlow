@@ -64,6 +64,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $roleId = (int) ($user->id_role ?? 0);
 
+        if ($roleId === 1) {
+            return $this->notificationsForAdmin();
+        }
+
         if ($roleId === 3) {
             return $this->notificationsForCreateur($user->id);
         }
@@ -77,6 +81,67 @@ class AppServiceProvider extends ServiceProvider
         }
 
         return collect();
+    }
+
+    private function notificationsForAdmin(): Collection
+    {
+        $now = Carbon::now();
+        $notifications = collect();
+
+        $recentUsers = DB::table('users')
+            ->orderByDesc('id')
+            ->limit(4)
+            ->get(['id', 'prenom', 'nom', 'email']);
+
+        foreach ($recentUsers as $index => $user) {
+            $fullName = trim(($user->prenom ?? '') . ' ' . ($user->nom ?? ''));
+            $notifications->push(
+                $this->makeNotification(
+                    'user',
+                    'Nouvel utilisateur',
+                    ($fullName !== '' ? $fullName : ($user->email ?? 'Utilisateur')) . ' a ete ajoute.',
+                    $now->copy()->subMinutes($index),
+                    route('admin.utilisateurs.index')
+                )
+            );
+        }
+
+        $recentAbonnementsQuery = DB::table('user_abonnement')
+            ->join('users', 'users.id', '=', 'user_abonnement.id_inscri')
+            ->join('abonnements', 'abonnements.id', '=', 'user_abonnement.id_abonnement');
+
+        if (Schema::hasColumn('user_abonnement', 'date_debut')) {
+            $recentAbonnementsQuery->orderByDesc('user_abonnement.date_debut');
+        }
+
+        if (Schema::hasColumn('user_abonnement', 'id_inscri')) {
+            $recentAbonnementsQuery->orderByDesc('user_abonnement.id_inscri');
+        }
+
+        $recentAbonnements = $recentAbonnementsQuery
+            ->limit(4)
+            ->get([
+                'users.prenom',
+                'users.nom',
+                'abonnements.abonnement',
+                'user_abonnement.date_debut',
+            ]);
+
+        foreach ($recentAbonnements as $row) {
+            $fullName = trim(($row->prenom ?? '') . ' ' . ($row->nom ?? ''));
+            $time = !empty($row->date_debut) ? Carbon::parse($row->date_debut) : $now;
+            $notifications->push(
+                $this->makeNotification(
+                    'subscription',
+                    'Nouvel abonnement',
+                    ($fullName !== '' ? $fullName : 'Un utilisateur') . " a choisi l'offre {$row->abonnement}.",
+                    $time,
+                    route('admin.abonnements.gest_abonnements')
+                )
+            );
+        }
+
+        return $this->limitAndSort($notifications);
     }
 
     private function notificationsForCreateur(int $userId): Collection

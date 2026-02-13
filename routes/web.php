@@ -169,6 +169,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/superviseur', [DashboardController::class, 'supervisor'])->name('dashboard.superviseur');
     Route::get('/dashboard/member', [DashboardController::class, 'member'])->name('dashboard.member');
     Route::get('/dashboard/contributeur', [DashboardController::class, 'contributeur'])->name('dashboard.contributeur');
+    Route::get('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
 
 
     /*

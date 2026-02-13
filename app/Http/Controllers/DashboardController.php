@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Projet;
 use App\Models\Tache;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Abonnement;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -602,6 +606,182 @@ public function admin()
         ));
     }
 
+    public function search(Request $request)
+    {
+        $user = Auth::user();
+        $query = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($query) < 2) {
+            return response()->json(['items' => []]);
+        }
+
+        $items = collect();
+
+        if ((int) $user->id_role === 1) {
+            $users = User::query()
+                ->where(function ($q) use ($query) {
+                    $q->where('prenom', 'like', "%{$query}%")
+                        ->orWhere('nom', 'like', "%{$query}%")
+                        ->orWhere('email', 'like', "%{$query}%");
+                })
+                ->limit(5)
+                ->get(['prenom', 'nom', 'email']);
+
+            foreach ($users as $u) {
+                $items->push([
+                    'type' => 'Utilisateur',
+                    'title' => trim(($u->prenom ?? '') . ' ' . ($u->nom ?? '')),
+                    'subtitle' => $u->email,
+                    'url' => route('admin.utilisateurs.index'),
+                ]);
+            }
+
+            $roles = Role::query()
+                ->where('role', 'like', "%{$query}%")
+                ->orWhere('description', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['role', 'description']);
+
+            foreach ($roles as $role) {
+                $items->push([
+                    'type' => 'Role',
+                    'title' => $role->role,
+                    'subtitle' => $role->description ?: 'Gestion des roles',
+                    'url' => route('admin.roles.gest_roles'),
+                ]);
+            }
+
+            $abonnements = Abonnement::query()
+                ->where('abonnement', 'like', "%{$query}%")
+                ->orWhere('description', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['abonnement', 'prix']);
+
+            foreach ($abonnements as $abonnement) {
+                $items->push([
+                    'type' => 'Abonnement',
+                    'title' => $abonnement->abonnement,
+                    'subtitle' => isset($abonnement->prix) ? number_format((float) $abonnement->prix, 2) . ' DT' : 'Plan',
+                    'url' => route('admin.abonnements.gest_abonnements'),
+                ]);
+            }
+        }
+
+        if ((int) $user->id_role === 3) {
+            $projects = Projet::query()
+                ->where('id_user', $user->id)
+                ->where('nom_projet', 'like', "%{$query}%")
+                ->limit(6)
+                ->get(['id', 'nom_projet']);
+
+            foreach ($projects as $project) {
+                $items->push([
+                    'type' => 'Projet',
+                    'title' => $project->nom_projet,
+                    'subtitle' => 'Chef de projet',
+                    'url' => route('projects.index'),
+                ]);
+            }
+
+            $tasks = Tache::query()
+                ->whereHas('projet', function ($q) use ($user) {
+                    $q->where('id_user', $user->id);
+                })
+                ->where('nom_tache', 'like', "%{$query}%")
+                ->limit(6)
+                ->get(['nom_tache', 'id_projet']);
+
+            foreach ($tasks as $task) {
+                $items->push([
+                    'type' => 'Tache',
+                    'title' => $task->nom_tache,
+                    'subtitle' => 'Mes projets',
+                    'url' => route('tasks.index', ['project_id' => $task->id_projet]),
+                ]);
+            }
+        }
+
+        if ((int) $user->id_role === 2) {
+            $supervisedIds = Projet::query()
+                ->whereHas('superviseurs', fn ($q) => $q->where('users.id', $user->id))
+                ->pluck('id');
+
+            if ($supervisedIds->isNotEmpty()) {
+                $projects = Projet::query()
+                    ->whereIn('id', $supervisedIds)
+                    ->where('nom_projet', 'like', "%{$query}%")
+                    ->limit(6)
+                    ->get(['id', 'nom_projet']);
+
+                foreach ($projects as $project) {
+                    $items->push([
+                        'type' => 'Projet',
+                        'title' => $project->nom_projet,
+                        'subtitle' => 'Supervision',
+                        'url' => route('projects.index'),
+                    ]);
+                }
+
+                $tasks = Tache::query()
+                    ->whereIn('id_projet', $supervisedIds)
+                    ->where('nom_tache', 'like', "%{$query}%")
+                    ->limit(6)
+                    ->get(['nom_tache', 'id_projet']);
+
+                foreach ($tasks as $task) {
+                    $items->push([
+                        'type' => 'Tache',
+                        'title' => $task->nom_tache,
+                        'subtitle' => 'Mes projets supervises',
+                        'url' => route('tasks.index', ['project_id' => $task->id_projet]),
+                    ]);
+                }
+            }
+        }
+
+        if ((int) $user->id_role === 4) {
+            $projectIds = Projet::query()
+                ->whereHas('contributors', fn ($q) => $q->where('users.id', $user->id))
+                ->pluck('id');
+
+            if ($projectIds->isNotEmpty()) {
+                $projects = Projet::query()
+                    ->whereIn('id', $projectIds)
+                    ->where('nom_projet', 'like', "%{$query}%")
+                    ->limit(6)
+                    ->get(['id', 'nom_projet']);
+
+                foreach ($projects as $project) {
+                    $items->push([
+                        'type' => 'Projet',
+                        'title' => $project->nom_projet,
+                        'subtitle' => 'Contribution',
+                        'url' => route('projects.index'),
+                    ]);
+                }
+
+                $tasks = Tache::query()
+                    ->whereHas('contributors', fn ($q) => $q->where('users.id', $user->id))
+                    ->where('nom_tache', 'like', "%{$query}%")
+                    ->limit(6)
+                    ->get(['nom_tache', 'id_projet']);
+
+                foreach ($tasks as $task) {
+                    $items->push([
+                        'type' => 'Tache',
+                        'title' => $task->nom_tache,
+                        'subtitle' => 'Mes taches',
+                        'url' => route('tasks.index', ['project_id' => $task->id_projet]),
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'items' => $items->unique(fn ($item) => $item['type'] . '|' . $item['title'])->values()->take(10),
+        ]);
+    }
+
     private function isCompletedStatus(?string $status): bool
     {
         $value = Str::of((string) $status)->lower()->ascii()->value();
@@ -638,4 +818,3 @@ public function admin()
         return null;
     }
 }
-

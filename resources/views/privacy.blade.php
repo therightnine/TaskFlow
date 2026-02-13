@@ -1,100 +1,133 @@
 @extends('layouts.app')
 
-@section('title', 'Confidentialité')
+@section('title', 'Confidentialite')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
-
-    <!-- Header -->
-    <header class="p-6 flex justify-between items-center bg-white shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800"></h1>
-        <nav class="space-x-6">
-            <li class="inline"><a href="{{ route('terms') }}" class="hover:text-cyan-500 transition-colors">Conditions</a></li>
-            <li class="inline"><a href="{{ route('privacy') }}" class="hover:text-cyan-500 transition-colors">Confidentialité</a></li>
-            <li class="inline"><a href="{{ route('security') }}" class="hover:text-cyan-500 transition-colors">Sécurité</a></li>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-b from-white via-cyan-500 to-cyan-400 text-white rounded-b-3xl shadow-lg py-20 px-6 text-center space-y-6">
-        <h2 class="text-5xl font-bold text-zinc-900">Votre confidentialité, notre priorité</h2>
-        <p class="text-lg max-w-2xl mx-auto ">
-            Votre vie privée est essentielle pour nous. Nous nous engageons à protéger vos informations personnelles et à les utiliser de manière transparente et responsable.
-        </p>
-        
+<div class="min-h-screen bg-slate-50 text-slate-900">
+    <section class="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-600 via-cyan-500 to-sky-500 text-white">
+        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-black/10 blur-2xl"></div>
+        <div class="relative max-w-6xl mx-auto px-6 py-14 space-y-6">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs">
+                TaskFlow - Politique de confidentialite
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Protection des donnees personnelles</h1>
+            <p class="max-w-3xl text-cyan-50 text-sm md:text-base">
+                Cette politique explique quelles donnees nous traitons, pourquoi nous les utilisons, pendant combien de temps
+                nous les conservons et quels sont vos droits.
+            </p>
+            <p class="text-xs text-cyan-100">Derniere mise a jour: {{ now()->format('d/m/Y') }}</p>
+        </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-10 max-w-5xl mx-auto space-y-16">
-
-        <!-- Key Privacy Areas -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-                <img src="https://img.icons8.com/ios-filled/50/00bcd4/data-in-both-directions.png" alt="Collecte de données" class="mb-4 w-12 h-12">
-                <h3 class="text-2xl font-semibold text-cyan-500 mb-2">Collecte de données</h3>
-                <p class="text-gray-700">
-                    Nous collectons uniquement les informations nécessaires pour améliorer nos services et votre expérience utilisateur.
-                </p>
+    <div class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <aside class="lg:col-span-4">
+            <div class="sticky top-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-sm font-semibold text-slate-800 mb-3">Navigation</h2>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{{ route('terms') }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Conditions</a></li>
+                    <li><a href="{{ route('privacy') }}" class="block rounded-lg bg-cyan-50 text-cyan-700 px-3 py-2">Confidentialite</a></li>
+                    <li><a href="{{ route('security') }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Securite</a></li>
+                </ul>
+                <div class="mt-5 rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600">
+                    Vous gardez la maitrise de vos donnees. Nous cherchons a appliquer le principe de minimisation.
+                </div>
             </div>
+        </aside>
 
-            <div class="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-                <img src="https://img.icons8.com/ios-filled/50/00bcd4/lock-2.png" alt="Sécurité des données" class="mb-4 w-12 h-12">
-                <h3 class="text-2xl font-semibold text-cyan-500 mb-2">Sécurité des données</h3>
-                <p class="text-gray-700">
-                    Vos informations sont chiffrées et protégées avec des mesures techniques et administratives avancées.
+        <main class="lg:col-span-8 space-y-6">
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">1. Donnees collectees</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold mb-2">Donnees de compte</p>
+                        <p>Nom, prenom, email, role, photo de profil, informations optionnelles de profil.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold mb-2">Donnees d'usage</p>
+                        <p>Projets, taches, commentaires, equipe, interactions avec les fonctionnalites de la plateforme.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold mb-2">Donnees techniques</p>
+                        <p>Logs applicatifs, sessions, informations de securite necessaires au bon fonctionnement.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold mb-2">Donnees de facturation</p>
+                        <p>Abonnement choisi, date de debut, date de fin, statut d'activation du plan.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">2. Finalites du traitement</h3>
+                <ul class="space-y-2 text-sm text-slate-700 leading-7 list-disc pl-5">
+                    <li>Creer et administrer les comptes utilisateurs.</li>
+                    <li>Permettre la collaboration et la gestion des projets/taches.</li>
+                    <li>Assurer la securite, detecter les abus et prevenir la fraude.</li>
+                    <li>Fournir l'assistance utilisateur et traiter les demandes de support.</li>
+                    <li>Ameliorer les performances, la fiabilite et l'experience produit.</li>
+                </ul>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">3. Bases juridiques (reference RGPD)</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Selon le contexte, les traitements peuvent reposer sur l'execution du contrat (fourniture du service),
+                    le respect d'obligations legales, l'interet legitime (securite, prevention des abus, amelioration continue)
+                    ou le consentement lorsque necessaire.
                 </p>
-            </div>
+            </section>
 
-            <div class="bg-white shadow-lg p-6 rounded-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-                <img src="https://img.icons8.com/ios-filled/50/00bcd4/data-in-both-directions.png" alt="Partage des informations" class="mb-4 w-12 h-12">
-                <h3 class="text-2xl font-semibold text-cyan-500 mb-2">Partage des informations</h3>
-                <p class="text-gray-700">
-                    Nous ne partageons vos données avec aucun tiers sans votre consentement, sauf obligation légale ou pour fournir nos services.
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">4. Conservation des donnees</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Les donnees sont conservees pendant la duree necessaire aux finalites pour lesquelles elles ont ete collectees,
+                    puis archivees ou supprimees selon les exigences legales et operationnelles.
+                    Les donnees de compte inactif peuvent etre anonymisees ou supprimees apres une periode raisonnable.
                 </p>
-            </div>
-        </section>
+            </section>
 
-        <!-- Additional Details -->
-        <section class="space-y-6">
-            <h3 class="text-3xl font-semibold text-cyan-500 text-center">Vos droits et choix</h3>
-            <p class="text-gray-700 leading-relaxed text-center">
-                Vous pouvez accéder, corriger ou supprimer vos données personnelles à tout moment. Nous respectons vos choix et mettons tout en œuvre pour vous garantir un contrôle total sur vos informations.
-            </p>
-            <ul class="space-y-4 max-w-3xl mx-auto">
-                <li class="flex items-start space-x-3">
-                    <svg class="w-6 h-6 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14l5 5 12-12-1.5-1.5z"/></svg>
-                    <span>Accès à vos données personnelles à tout moment.</span>
-                </li>
-                <li class="flex items-start space-x-3">
-                    <svg class="w-6 h-6 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14l5 5 12-12-1.5-1.5z"/></svg>
-                    <span>Possibilité de corriger ou mettre à jour vos informations.</span>
-                </li>
-                <li class="flex items-start space-x-3">
-                    <svg class="w-6 h-6 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14l5 5 12-12-1.5-1.5z"/></svg>
-                    <span>Option de suppression complète de vos données sur demande.</span>
-                </li>
-            </ul>
-        </section>
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">5. Partage et sous-traitance</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Nous ne vendons pas vos donnees personnelles. Certaines donnees peuvent etre traitees par des prestataires
+                    techniques necessaires au fonctionnement du service (hebergement, supervision, support), uniquement sur instruction,
+                    avec des engagements de confidentialite et de securite appropries.
+                </p>
+            </section>
 
-        <!-- FAQ or Tips -->
-        <section class="space-y-6">
-            <h3 class="text-3xl font-semibold text-cyan-500 text-center">Conseils pour protéger votre vie privée</h3>
-            <ul class="space-y-4 max-w-3xl mx-auto text-gray-700">
-                <li class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>
-                    <span>Utilisez un mot de passe fort et unique pour votre compte.</span>
-                </li>
-                <li class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>
-                    <span>Ne partagez jamais vos informations personnelles par email non sécurisé.</span>
-                </li>
-                <li class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 text-cyan-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>
-                    <span>Vérifiez toujours les autorisations que vous accordez aux applications tierces.</span>
-                </li>
-            </ul>
-        </section>
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">6. Vos droits</h3>
+                <ul class="space-y-2 text-sm text-slate-700 leading-7 list-disc pl-5">
+                    <li>Droit d'acces a vos donnees.</li>
+                    <li>Droit de rectification en cas d'information inexacte.</li>
+                    <li>Droit a l'effacement dans les conditions prevues par la loi.</li>
+                    <li>Droit de limitation et d'opposition a certains traitements.</li>
+                    <li>Droit a la portabilite des donnees lorsque applicable.</li>
+                </ul>
+                <p class="text-sm text-slate-700 mt-3">
+                    Pour exercer ces droits, contactez le support via
+                    <a href="{{ route('support') }}" class="text-cyan-700 underline underline-offset-2">la page support</a>.
+                </p>
+            </section>
 
-    </main>
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">7. Cookies et sessions</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    La plateforme utilise des cookies techniques et des sessions pour maintenir l'authentification,
+                    proteger les formulaires (CSRF), memoriser certaines preferences et assurer la stabilite applicative.
+                    Vous pouvez configurer votre navigateur pour limiter certains cookies, avec impact possible sur le fonctionnement.
+                </p>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">8. Mise a jour de la politique</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Cette politique peut evoluer en fonction des modifications produit, techniques, organisationnelles ou reglementaires.
+                    La version la plus recente fait foi et la date de mise a jour est indiquee en haut de page.
+                </p>
+            </section>
+        </main>
+    </div>
 </div>
 @endsection

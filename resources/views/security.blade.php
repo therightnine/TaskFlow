@@ -1,104 +1,118 @@
 @extends('layouts.app')
 
-@section('title', 'Sécurité')
+@section('title', 'Securite')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
-
-    <!-- Header -->
-    <header class="p-6 flex justify-between items-center bg-white shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800"></h1>
-        <nav class="space-x-6">
-            <li class="inline"><a href="{{ route('terms') }}" class="hover:text-cyan-500 transition-colors">Conditions</a></li>
-            <li class="inline"><a href="{{ route('privacy') }}" class="hover:text-cyan-500 transition-colors">Confidentialité</a></li>
-            <li class="inline"><a href="{{ route('security') }}" class="hover:text-cyan-500 transition-colors">Sécurité</a></li>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-b from-white via-cyan-500 to-cyan-400 text-white rounded-b-3xl shadow-lg py-20 px-6 text-center space-y-6">
-        <h2 class="text-5xl font-bold text-zinc-900">Votre sécurité, notre priorité</h2>
-        <p class="text-lg max-w-2xl mx-auto ">
-            Nous mettons en œuvre les technologies et les protocoles les plus avancés pour protéger vos données et garantir un environnement sûr et fiable pour tous nos utilisateurs.
-        </p>
-        <a href="#security-features" class="mt-4 inline-block bg-white text-cyan-600 font-semibold px-8 py-3 rounded-full shadow-lg hover:bg-gray-100 transition duration-300">
-            Explorer les fonctionnalités
-        </a>
+<div class="min-h-screen bg-slate-50 text-slate-900">
+    <section class="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-600 via-cyan-500 to-sky-500 text-white">
+        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-black/10 blur-2xl"></div>
+        <div class="relative max-w-6xl mx-auto px-6 py-14 space-y-6">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs">
+                TaskFlow - Engagement securite
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Securite de la plateforme</h1>
+            <p class="max-w-3xl text-cyan-50 text-sm md:text-base">
+                Nous mettons en place des controles techniques et organisationnels pour proteger l'integrite, la disponibilite
+                et la confidentialite de vos donnees.
+            </p>
+            <p class="text-xs text-cyan-100">Derniere mise a jour: {{ now()->format('d/m/Y') }}</p>
+        </div>
     </section>
 
-    <!-- Security Features -->
-    <main class="flex-1 p-10 max-w-6xl mx-auto space-y-16">
-
-        <section id="security-features" class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-            <div class="bg-white shadow-lg p-8 rounded-2xl hover:shadow-2xl transition duration-300 flex flex-col items-center space-y-4">
-                <img src="https://img.icons8.com/fluency/48/000000/lock.png" alt="Chiffrement" class="mb-2">
-                <h3 class="text-2xl font-semibold text-cyan-500">Chiffrement de pointe</h3>
-                <p class="text-gray-700">Toutes les données sensibles sont cryptées à l’aide des protocoles SSL et AES 256 bits pour garantir une sécurité maximale.</p>
-            </div>
-
-            <div class="bg-white shadow-lg p-8 rounded-2xl hover:shadow-2xl transition duration-300 flex flex-col items-center space-y-4">
-                <img src="https://img.icons8.com/fluency/48/000000/security-checked.png" alt="Surveillance" class="mb-2">
-                <h3 class="text-2xl font-semibold text-cyan-500">Surveillance 24/7</h3>
-                <p class="text-gray-700">Notre équipe surveille les systèmes en continu pour détecter toute activité suspecte et réagir immédiatement.</p>
-            </div>
-
-            <div class="bg-white shadow-lg p-8 rounded-2xl hover:shadow-2xl transition duration-300 flex flex-col items-center space-y-4">
-                <img src="https://img.icons8.com/fluency/40/000000/shield.png" alt="Conformité" class="mb-2">
-                <h3 class="text-2xl font-semibold text-cyan-500">Conformité & Audits</h3>
-                <p class="text-gray-700">Nous respectons les normes de sécurité internationales et effectuons régulièrement des audits pour maintenir la confiance de nos utilisateurs.</p>
-            </div>
-        </section>
-
-        <!-- Security Layers Section -->
-        <section class="bg-white rounded-3xl shadow-lg p-12 space-y-12">
-            <h3 class="text-4xl font-bold text-center text-cyan-500">Notre approche en couches</h3>
-            <p class="text-gray-700 max-w-3xl mx-auto text-center">
-                Nous appliquons une approche multi-couches pour protéger les données, l’infrastructure et l’expérience utilisateur.
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div class="flex space-x-4 items-start">
-                    <img src="https://img.icons8.com/fluency/40/000000/shield.png"/>
-                    <div>
-                        <h4 class="text-xl font-semibold text-cyan-500">Pare-feu avancé</h4>
-                        <p class="text-gray-700">Filtrage des accès réseau et protection contre les attaques externes.</p>
-                    </div>
-                </div>
-                <div class="flex space-x-4 items-start">
-                    <img src="https://img.icons8.com/fluency/40/000000/password.png"/>
-                    <div>
-                        <h4 class="text-xl font-semibold text-cyan-500">Authentification forte</h4>
-                        <p class="text-gray-700">2FA et gestion sécurisée des mots de passe pour protéger les comptes utilisateurs.</p>
-                    </div>
-                </div>
-                <div class="flex space-x-4 items-start">
-                    <img src="https://img.icons8.com/fluency/40/000000/virus.png"/>
-                    <div>
-                        <h4 class="text-xl font-semibold text-cyan-500">Détection des menaces</h4>
-                        <p class="text-gray-700">Analyse proactive pour identifier et bloquer toute activité malveillante.</p>
-                    </div>
-                </div>
-                <div class="flex space-x-4 items-start">
-                    <img src="https://img.icons8.com/fluency/48/000000/security-checked.png"/>
-                    <div>
-                        <h4 class="text-xl font-semibold text-cyan-500">Protection cloud</h4>
-                        <p class="text-gray-700">Nos serveurs et services cloud bénéficient des meilleures pratiques de sécurité.</p>
-                    </div>
+    <div class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <aside class="lg:col-span-4">
+            <div class="sticky top-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-sm font-semibold text-slate-800 mb-3">Navigation</h2>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{{ route('terms') }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Conditions</a></li>
+                    <li><a href="{{ route('privacy') }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Confidentialite</a></li>
+                    <li><a href="{{ route('security') }}" class="block rounded-lg bg-cyan-50 text-cyan-700 px-3 py-2">Securite</a></li>
+                </ul>
+                <div class="mt-5 rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600">
+                    La securite est un processus continu: prevention, detection, reponse et amelioration.
                 </div>
             </div>
-        </section>
+        </aside>
 
-        <!-- Call-to-Action -->
-        <section class="text-center space-y-6">
-            <h3 class="text-3xl font-bold text-cyan-500">Vous voulez en savoir plus ?</h3>
-            <p class="text-gray-700 max-w-2xl mx-auto">
-                Contactez notre équipe sécurité pour comprendre comment nous protégeons vos données et garantir votre tranquillité d’esprit.
-            </p>
-            <a href="{{ route('support') }}" class="inline-block bg-cyan-500 hover:bg-white text-white hover:text-cyan-600 font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300">
-                Contactez-nous
-            </a>
-        </section>
+        <main class="lg:col-span-8 space-y-6">
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">1. Gouvernance securite</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Nous appliquons des standards de securite a chaque phase du cycle de vie applicatif:
+                    conception, developpement, deploiement, exploitation et supervision. Les acces sont geres
+                    selon le principe du moindre privilege et revus periodiquement.
+                </p>
+            </section>
 
-    </main>
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">2. Protections techniques principales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold text-slate-800 mb-1">Chiffrement en transit</p>
+                        <p class="text-sm text-slate-700">Utilisation de protocoles HTTPS/TLS pour proteger les echanges reseau.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold text-slate-800 mb-1">Protection applicative</p>
+                        <p class="text-sm text-slate-700">Controles d'authentification, gestion des sessions et protection CSRF.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold text-slate-800 mb-1">Journalisation securite</p>
+                        <p class="text-sm text-slate-700">Collecte d'evenements pour tracer les actions critiques et investiguer.</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="font-semibold text-slate-800 mb-1">Durcissement environnement</p>
+                        <p class="text-sm text-slate-700">Mise a jour des composants et reduction de la surface d'attaque.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">3. Detection et reponse aux incidents</h3>
+                <ul class="space-y-2 text-sm text-slate-700 leading-7 list-disc pl-5">
+                    <li>Surveillance des anomalies et alertes operationnelles.</li>
+                    <li>Processus de qualification, confinement et remediations.</li>
+                    <li>Tracabilite des actions et revue post-incident.</li>
+                    <li>Mesures correctives pour reduire le risque de recurrence.</li>
+                </ul>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">4. Disponibilite et continuites</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Nous cherchons a maintenir un niveau de disponibilite eleve via la supervision active,
+                    les pratiques de sauvegarde et des procedures de reprise. Des interruptions peuvent toutefois survenir
+                    lors de maintenance planifiee ou d'evenements externes majeurs.
+                </p>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">5. Securite cote utilisateur</h3>
+                <ul class="space-y-2 text-sm text-slate-700 leading-7 list-disc pl-5">
+                    <li>Utiliser un mot de passe unique et robuste.</li>
+                    <li>Eviter le partage de compte entre plusieurs personnes.</li>
+                    <li>Se deconnecter des postes partages.</li>
+                    <li>Signaler immediatement toute activite suspecte.</li>
+                </ul>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">6. Signalement de vulnerabilites</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    Si vous identifiez une faille potentielle, merci de la signaler de maniere responsable via
+                    <a href="{{ route('support') }}" class="text-cyan-700 underline underline-offset-2">le support</a>.
+                    Nous analysons les signalements et priorisons les corrections en fonction de leur impact.
+                </p>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-xl font-semibold mb-3">7. Amelioration continue</h3>
+                <p class="text-sm text-slate-700 leading-7">
+                    La securite evolue en permanence. Nos pratiques sont ajustees regulierement selon les retours terrain,
+                    les nouvelles menaces, les dependances logicielles et les contraintes reglementaires.
+                </p>
+            </section>
+        </main>
+    </div>
 </div>
 @endsection
